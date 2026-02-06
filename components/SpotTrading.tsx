@@ -137,7 +137,6 @@ const SpotTrading: React.FC = () => {
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="text-xl font-bold tracking-tight">BTC/USDT</span>
-                {/* Sakrivamo dropdown ikonicu ako je sidebar vec tu na desktopu, ali ostavljamo je za mobile interakciju */}
                 <svg className={`w-4 h-4 text-zinc-500 group-hover:text-white transition-transform duration-200 lg:hidden ${isPairSelectorOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="m6 9 6 6 6-6"/></svg>
               </div>
             </div>
@@ -146,7 +145,7 @@ const SpotTrading: React.FC = () => {
               <svg className="w-4 h-4 text-[#f5a623]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
             </button>
 
-            {/* Mobile Dropdown (Samo za rezolucije gde sidebar nije vidljiv) */}
+            {/* Mobile Dropdown */}
             {isPairSelectorOpen && (
               <div className="lg:hidden absolute top-[64px] left-4 w-[320px] bg-zinc-950 border border-zinc-800 rounded-2xl shadow-[0_32px_64px_rgba(0,0,0,0.8)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                 <div className="p-4 border-b border-zinc-900">
@@ -179,33 +178,35 @@ const SpotTrading: React.FC = () => {
           </div>
         </div>
 
-        {/* Chart */}
-        <div className="flex-1 bg-black overflow-hidden relative"><TradeChart /></div>
+        {/* Chart - Smanjen prioritet vertikalnog prostora */}
+        <div className="flex-1 bg-black overflow-hidden relative min-h-[220px]">
+          <TradeChart />
+        </div>
         
-        {/* History Panel */}
-        <div className="h-72 border-t border-zinc-900 bg-black flex flex-col shrink-0">
+        {/* History Panel - Smanjena visina sa h-72 na h-60 za bolji FHD pregled */}
+        <div className="h-60 border-t border-zinc-900 bg-black flex flex-col shrink-0">
           <div className="flex border-b border-zinc-900">
             {['Market Trades', 'Open Orders (0)', 'Order History'].map((tab, i) => (
-              <button key={tab} className={`px-6 py-3 text-[10px] font-bold uppercase tracking-widest ${i === 0 ? 'border-b-2 border-white text-white' : 'text-zinc-600 hover:text-zinc-400'}`}>{tab}</button>
+              <button key={tab} className={`px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest ${i === 0 ? 'border-b-2 border-white text-white' : 'text-zinc-600 hover:text-zinc-400'}`}>{tab}</button>
             ))}
           </div>
           <div className="flex-1 overflow-auto custom-scrollbar">
             <table className="w-full text-[11px] text-left">
               <thead className="sticky top-0 bg-zinc-950 text-zinc-600 font-bold uppercase tracking-tighter border-b border-zinc-900">
                 <tr>
-                  <th className="px-6 py-2.5">Time</th>
-                  <th className="px-6 py-2.5">Side</th>
-                  <th className="px-6 py-2.5">Price(USDT)</th>
-                  <th className="px-6 py-2.5 text-right">Amount(BTC)</th>
+                  <th className="px-6 py-2">Time</th>
+                  <th className="px-6 py-2">Side</th>
+                  <th className="px-6 py-2">Price(USDT)</th>
+                  <th className="px-6 py-2 text-right">Amount(BTC)</th>
                 </tr>
               </thead>
               <tbody>
                 {tradeHistory.map((t) => (
                   <tr key={t.id} className="hover:bg-zinc-900/30 transition-colors border-b border-zinc-900/30">
-                    <td className="px-6 py-2 text-zinc-500 font-mono">{t.time}</td>
-                    <td className={`px-6 py-2 font-bold ${t.type === 'buy' ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>{t.type.toUpperCase()}</td>
-                    <td className="px-6 py-2 font-mono text-zinc-200">{t.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                    <td className="px-6 py-2 text-right font-mono text-zinc-400">{t.amount}</td>
+                    <td className="px-6 py-1.5 text-zinc-500 font-mono">{t.time}</td>
+                    <td className={`px-6 py-1.5 font-bold ${t.type === 'buy' ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>{t.type.toUpperCase()}</td>
+                    <td className="px-6 py-1.5 font-mono text-zinc-200">{t.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    <td className="px-6 py-1.5 text-right font-mono text-zinc-400">{t.amount}</td>
                   </tr>
                 ))}
               </tbody>
@@ -233,31 +234,31 @@ const SpotTrading: React.FC = () => {
             ))}
           </div>
 
-          <div className="space-y-3.5">
+          <div className="space-y-3">
             <div className="relative group">
-              <input type="number" value={orderType === 'market' ? '' : priceInput} placeholder={orderType === 'market' ? 'Market Price' : 'Price'} onChange={(e) => setPriceInput(e.target.value)} disabled={orderType === 'market'} className="w-full bg-[#111] border border-zinc-800 rounded-lg p-3 text-sm focus:border-zinc-400 outline-none transition-all font-mono text-white disabled:opacity-50" />
+              <input type="number" value={orderType === 'market' ? '' : priceInput} placeholder={orderType === 'market' ? 'Market Price' : 'Price'} onChange={(e) => setPriceInput(e.target.value)} disabled={orderType === 'market'} className="w-full bg-[#111] border border-zinc-800 rounded-lg p-2.5 text-sm focus:border-zinc-400 outline-none transition-all font-mono text-white disabled:opacity-50" />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-zinc-500 uppercase">USDT</span>
             </div>
 
             <div className="relative group">
-              <input type="number" value={amount} placeholder="Amount" onChange={(e) => setAmount(e.target.value)} className="w-full bg-[#111] border border-zinc-800 rounded-lg p-3 text-sm focus:border-zinc-400 outline-none transition-all font-mono text-white" />
+              <input type="number" value={amount} placeholder="Amount" onChange={(e) => setAmount(e.target.value)} className="w-full bg-[#111] border border-zinc-800 rounded-lg p-2.5 text-sm focus:border-zinc-400 outline-none transition-all font-mono text-white" />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-zinc-500 uppercase">BTC</span>
             </div>
             
-            <div className="grid grid-cols-4 gap-1.5">
+            <div className="grid grid-cols-4 gap-1">
                {[25, 50, 75, 100].map(pct => (
                  <button key={pct} onClick={() => setAmount(side === 'buy' ? ((usdtBalance * (pct/100)) / livePrice).toFixed(4) : (btcBalance * (pct/100)).toFixed(4))} className="py-1 bg-zinc-900 border border-zinc-800 rounded text-[9px] font-bold text-zinc-500 hover:text-white hover:border-zinc-600 transition-all">{pct}%</button>
                ))}
             </div>
 
-            <div className="flex justify-between items-center text-[10px] font-bold text-zinc-500 px-0.5 mt-2">
+            <div className="flex justify-between items-center text-[10px] font-bold text-zinc-500 px-0.5 mt-1">
               <span>Available</span>
               <span className="text-zinc-200 font-mono tracking-tight">{side === 'buy' ? `${usdtBalance.toLocaleString()} USDT` : `${btcBalance.toFixed(4)} BTC`}</span>
             </div>
 
             <button 
               onClick={handleTrade}
-              className={`w-full py-3 rounded-lg font-bold text-sm uppercase tracking-tight transition-all active:scale-[0.98] shadow-2xl mt-2 ${
+              className={`w-full py-2.5 rounded-lg font-bold text-sm uppercase tracking-tight transition-all active:scale-[0.98] shadow-2xl mt-1 ${
                 side === 'buy' ? 'bg-[#00d18e] hover:bg-[#00e099] text-black' : 'bg-[#ff4d4f] hover:bg-[#ff5c5e] text-white'
               }`}
             >
