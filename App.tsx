@@ -8,6 +8,7 @@ import Assets from './components/Assets';
 import Referral from './components/Referral';
 import Settings from './components/Settings';
 import Footer from './components/Footer';
+import Markets from './components/Markets';
 import { useExchangeStore } from './store';
 
 const App: React.FC = () => {
@@ -52,6 +53,7 @@ const App: React.FC = () => {
   const renderContent = () => {
     switch (currentPage) {
       case Page.HOME: return <Home onTrade={() => setCurrentPage(Page.TRADE)} />;
+      case Page.MARKETS: return <Markets onTrade={() => setCurrentPage(Page.TRADE)} />;
       case Page.TRADE: return <SpotTrading />;
       case Page.ASSETS: return <Assets />;
       case Page.REFERRAL: return <Referral />;

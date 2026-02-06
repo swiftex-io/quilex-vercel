@@ -277,7 +277,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
             { title: 'Markets Overview', desc: 'Prices and trends', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8l4 4-4 4"/></svg> },
             { title: 'Market Data', desc: 'Real-time analytics', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 20v-6M6 20V10M18 20V4"/></svg> }
           ].map((item, idx) => (
-            <button key={idx} onClick={() => { onNavigate(Page.HOME); setIsMarketsOpen(false); }} className={`${dropdownItemClass} rounded-2xl`}>
+            <button key={idx} onClick={() => { onNavigate(Page.MARKETS); setIsMarketsOpen(false); }} className={`${dropdownItemClass} rounded-2xl`}>
               <span className={dropdownIconClass}>{item.icon}</span>
               <div>
                 <div className={dropdownTextClass}>{item.title}</div>
@@ -323,7 +323,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
         <div className="hidden md:flex items-center gap-8 text-[14px] font-medium tracking-tight h-full">
           {[
             { label: 'Trade', page: Page.TRADE, dropdown: <TradeDropdownContent />, open: isTradeOpen, setOpen: setIsTradeOpen },
-            { label: 'Markets', page: Page.HOME, dropdown: <MarketsDropdownContent />, open: isMarketsOpen, setOpen: setIsMarketsOpen },
+            { label: 'Markets', page: Page.MARKETS, dropdown: <MarketsDropdownContent />, open: isMarketsOpen, setOpen: setIsMarketsOpen },
             { label: 'Earn', page: null, dropdown: <EarnDropdownContent />, open: isEarnNavOpen, setOpen: setIsEarnNavOpen },
             { label: 'Learn', page: null, dropdown: <LearnDropdownContent />, open: isLearnOpen, setOpen: setIsLearnOpen }
           ].map((item, idx) => (
