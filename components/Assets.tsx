@@ -51,6 +51,10 @@ const Assets: React.FC = () => {
   const btcPrice = balances.find(b => b.symbol === 'BTC')?.price || 65000;
   const totalInBTC = totalBalanceUSD / btcPrice;
 
+  // Mock PNL data
+  const pnlAmount = totalBalanceUSD * 0.0245; // 2.45% gain
+  const pnlPercentage = 2.45;
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -169,9 +173,19 @@ const Assets: React.FC = () => {
           <div className="bg-zinc-950 border border-white/5 rounded-2xl p-8 shadow-2xl relative overflow-hidden group">
             <div className="relative z-10">
               <div className="flex items-center gap-2 text-gray-500 font-medium text-[10px] uppercase tracking-widest mb-4"><span>Total Assets Value</span></div>
-              <div className="flex flex-col sm:flex-row items-baseline gap-4 mb-8">
+              <div className="flex flex-col sm:flex-row items-baseline gap-4 mb-3">
                 <span className="text-5xl font-bold tracking-tighter">${totalBalanceUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 <span className="text-xl font-medium text-gray-500 tracking-tight">≈ {totalInBTC.toFixed(6)} BTC</span>
+              </div>
+              
+              <div className="flex items-center gap-2 text-[13px] font-semibold">
+                <span className="text-zinc-500">Today's PNL:</span>
+                <span className={`${pnlAmount >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'} flex items-center gap-1`}>
+                  {pnlAmount >= 0 ? '+' : ''}${Math.abs(pnlAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  <span className="bg-current/10 px-1.5 py-0.5 rounded text-[11px]">
+                    {pnlAmount >= 0 ? '+' : ''}{pnlPercentage.toFixed(2)}%
+                  </span>
+                </span>
               </div>
             </div>
           </div>
