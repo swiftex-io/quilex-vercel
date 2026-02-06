@@ -30,19 +30,19 @@ const Settings: React.FC = () => {
               </span>
             </div>
             <div className="flex flex-col">
-              <span className="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1">Email</span>
+              <span className="text-xs text-zinc-500 font-bold tracking-tight mb-1">Email</span>
               <span className="text-sm font-semibold">{user?.email || 'vir***@proton.me'}</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1 flex items-center gap-1">Identity verification <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="m9 5 7 7-7 7"/></svg></span>
+              <span className="text-xs text-zinc-500 font-bold tracking-tight mb-1 flex items-center gap-1">Identity verification <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="m9 5 7 7-7 7"/></svg></span>
               <button className="text-[11px] font-bold px-2 py-0.5 border border-zinc-700 rounded hover:border-white transition-colors w-fit">Verify now</button>
             </div>
             <div className="flex flex-col">
-              <span className="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1 flex items-center gap-1">Country/Region <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="m9 5 7 7-7 7"/></svg></span>
+              <span className="text-xs text-zinc-500 font-bold tracking-tight mb-1 flex items-center gap-1">Country/Region <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="m9 5 7 7-7 7"/></svg></span>
               <span className="text-sm font-semibold">United States</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1 flex items-center gap-1">Trading fee tier <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="m9 5 7 7-7 7"/></svg></span>
+              <span className="text-xs text-zinc-500 font-bold tracking-tight mb-1 flex items-center gap-1">Trading fee tier <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="m9 5 7 7-7 7"/></svg></span>
               <span className="text-[11px] font-bold px-2 py-0.5 border border-zinc-700 rounded w-fit">Regular user</span>
             </div>
           </div>
@@ -52,22 +52,26 @@ const Settings: React.FC = () => {
 
       <div className="grid grid-cols-12 gap-6 pb-12">
         <div className="col-span-8 space-y-6">
-          <div className="bg-[#111] border border-zinc-900 rounded-xl overflow-hidden shadow-2xl">
-            <div className="p-8">
+          {/* Highlighted Security Banner */}
+          <div className="bg-gradient-to-br from-amber-400/10 via-[#111] to-[#111] border border-amber-500/20 rounded-xl overflow-hidden shadow-2xl relative">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 blur-[60px] rounded-full -mr-10 -mt-10"></div>
+            <div className="p-8 relative z-10">
               <h3 className="text-2xl font-bold mb-2">Help us secure your account</h3>
               <p className="text-zinc-500 text-sm mb-8">Verify your identity now</p>
               
               <div className="flex items-center justify-between group cursor-pointer">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M12 4v16m8-8H4"/></svg>
+                  <div className="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-amber-500 shadow-inner">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M7 3H5a2 2 0 0 0-2 2v2M17 3h2a2 2 0 0 1 2 2v2M7 21H5a2 2 0 0 1-2-2v-2M17 21h2a2 2 0 0 0 2-2v-2M12 8v4M9 11v1M15 11v1M9 15c.5 1 1.5 1.5 3 1.5s2.5-.5 3-1.5"/>
+                    </svg>
                   </div>
                   <div>
                     <div className="text-[15px] font-bold">Verify your identity</div>
                     <div className="text-xs text-zinc-500 mt-0.5">Complete verification for enhanced security</div>
                   </div>
                 </div>
-                <div className="text-[#00d18e] text-xs font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                <div className="text-amber-500 text-xs font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                   Verify now <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="m9 5 7 7-7 7"/></svg>
                 </div>
               </div>
