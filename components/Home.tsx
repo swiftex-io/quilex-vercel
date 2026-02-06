@@ -20,11 +20,11 @@ const Home: React.FC<HomeProps> = ({ onTrade }) => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button 
             onClick={onTrade}
-            className="px-10 py-5 bg-white text-black font-bold rounded-xl text-lg hover:bg-gray-200 transition-all transform hover:scale-105"
+            className="px-10 py-5 bg-white text-black font-bold rounded-xl text-base hover:bg-gray-200 transition-all transform hover:scale-105"
           >
             Trade Now
           </button>
-          <button className="px-10 py-5 bg-zinc-900 text-white font-bold rounded-xl text-lg border border-gray-800 hover:bg-zinc-800 transition-all">
+          <button className="px-10 py-5 bg-zinc-900 text-white font-bold rounded-xl text-base border border-gray-800 hover:bg-zinc-800 transition-all">
             Learn More
           </button>
         </div>
