@@ -56,7 +56,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
     ).slice(0, 10);
   }, [balances, searchQuery]);
 
-  // Standardized UI constants - Reduced border radius from 24px to 16px (rounded-2xl)
+  // Standardized UI constants
   const dropdownBaseClass = "bg-white text-black rounded-2xl shadow-[0_32px_64px_rgba(0,0,0,0.18)] overflow-hidden border border-gray-100 animate-in fade-in zoom-in-95 duration-200";
   const dropdownItemClass = "w-full flex items-center gap-3.5 px-5 py-3 hover:bg-gray-50 transition-all text-left group";
   const dropdownTextClass = "text-[13px] font-medium text-gray-800 group-hover:text-black tracking-tight"; 
@@ -83,21 +83,13 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                 <span className={`text-[13px] font-bold w-4 ${idx < 3 && !searchQuery ? 'text-orange-500' : 'text-gray-300'}`}>
                   {idx + 1}
                 </span>
-                
                 <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-[10px] text-gray-500 overflow-hidden">
                    {asset.symbol[0]}
                 </div>
-                
                 <div className="flex items-center gap-1.5">
                   <span className="text-[14px] font-bold text-black">{asset.symbol}/USD</span>
-                  {idx < 3 && !searchQuery && (
-                    <span className="text-red-500">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 23c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8zm0-18.5c-3.037 0-5.5 2.463-5.5 5.5s2.463 5.5 5.5 5.5 5.5-2.463 5.5-5.5-2.463-5.5-5.5-5.5zM12 12c-1.105 0-2-.895-2-2s.895-2 2-2 2 .895 2 2-.895 2-2 2z"/></svg>
-                    </span>
-                  )}
                 </div>
               </div>
-              
               <div className="text-right">
                 <div className="text-[13px] font-medium text-black">
                   {asset.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
@@ -105,149 +97,6 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                 <div className={`text-[11px] font-medium ${asset.change24h >= 0 ? 'text-green-500' : 'text-red-400'}`}>
                   {asset.change24h >= 0 ? '+' : ''}{asset.change24h.toFixed(2)}%
                 </div>
-              </div>
-            </button>
-          ))}
-          {searchResults.length === 0 && (
-            <div className="px-6 py-10 text-center text-[13px] text-gray-400 font-medium">
-              No results found for "{searchQuery}"
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-
-  const EarnDropdownContent = () => (
-    <div className={`absolute top-full left-0 z-[100] dropdown-container ${isEarnNavOpen ? 'is-visible' : ''}`}>
-      <div className={`${dropdownBaseClass} w-[380px] py-4`}>
-        <div className="px-5 pb-3 text-[10px] font-bold text-gray-400 tracking-tight border-b border-gray-50 mb-3">Passive income</div>
-        <div className="space-y-1 px-2">
-          {[
-            { title: 'Simple Earn', desc: 'Flexible savings with daily rewards', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> },
-            { title: 'Staking', desc: 'Earn high yields on your crypto', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 3v18M3 12h18M5 19l14-14M5 5l14 14"/></svg> },
-            { title: 'ETH Staking', desc: 'Stake ETH and receive BETH', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m12 2 7 4-7 4-7-4 7-4zM12 11l7 4-7 4-7-4 7-4zM12 20l7 4-7 4-7-4 7-4z"/></svg> },
-            { title: 'Dual Investment', desc: 'Buy low or sell high with bonus yield', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="7" cy="12" r="5"/><circle cx="17" cy="12" r="5"/></svg> }
-          ].map((item, idx) => (
-            <button key={idx} className={`${dropdownItemClass} rounded-2xl`}>
-              <span className={dropdownIconClass}>{item.icon}</span>
-              <div className="flex-1">
-                <div className={dropdownTextClass}>{item.title}</div>
-                <p className="text-[11px] text-gray-400 font-medium leading-tight mt-0.5">{item.desc}</p>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
-  const UserDropdownContent = () => (
-    <div className={`absolute top-full right-0 z-[100] dropdown-container ${isUserOpen ? 'is-visible' : ''}`}>
-      <div className={`${dropdownBaseClass} w-[300px] py-4`}>
-        <div className="px-5 pb-5 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-100 shadow-sm">
-            <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.id || 'quilex'}`} alt="avatar" className="w-full h-full object-cover" />
-          </div>
-          <div className="flex flex-col min-w-0">
-            <span className="text-sm font-semibold truncate tracking-tight">{maskedEmail}</span>
-            <span className="text-[10px] text-gray-400 font-bold tracking-tight mt-0.5 opacity-80">UID: {displayUid}</span>
-          </div>
-        </div>
-        <div className="px-5 pb-4 border-b border-gray-50">
-          <button className="w-full py-2 border border-gray-200 rounded-full text-[11px] font-semibold hover:bg-gray-50 transition-colors tracking-tight">
-            Switch sub-account
-          </button>
-        </div>
-        <div className="py-2 max-h-[440px] overflow-y-auto light-scrollbar">
-          {[
-            { label: 'Overview', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 12L16 10M12 12V7"/></svg> },
-            { label: 'Profile', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
-            { label: 'Security', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg> },
-            { label: 'Verification', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect width="18" height="14" x="3" y="5" rx="2"/><path d="M7 10h10M7 14h6"/></svg> },
-            { label: 'Country/Region', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> },
-            { label: 'Preferences', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> }
-          ].map((item) => (
-            <button key={item.label} onClick={() => { onNavigate(Page.SETTINGS); setIsUserOpen(false); }} className={dropdownItemClass}>
-              <span className={dropdownIconClass}>{item.icon}</span>
-              <span className={dropdownTextClass}>{item.label}</span>
-            </button>
-          ))}
-        </div>
-        <div className="mt-1 pt-2 border-t border-gray-50">
-          <button onClick={() => { signOut(); setIsUserOpen(false); }} className={`${dropdownItemClass} py-4`}>
-            <span className={dropdownIconClass}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-            </span>
-            <span className="text-[13px] font-bold text-red-600 group-hover:text-red-700 tracking-tight">Log out</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-
-  const LanguageDropdownContent = () => (
-    <div className={`absolute top-full right-0 z-[100] dropdown-container ${isLanguageOpen ? 'is-visible' : ''}`}>
-      <div className={`${dropdownBaseClass} w-[640px] p-8`}>
-        <div className="grid grid-cols-2 gap-10">
-          <div>
-            <div className="flex items-center gap-2 mb-6">
-              <h3 className="text-xl font-bold tracking-tight">Language</h3>
-            </div>
-            <div className="relative mb-6">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-              </div>
-              <input type="text" placeholder="Search" className="w-full bg-gray-50 border-none rounded-xl py-3 pl-10 pr-4 text-sm font-medium focus:ring-1 focus:ring-black outline-none transition-all placeholder:text-gray-400" />
-            </div>
-            <div className="space-y-0.5 max-h-[400px] overflow-y-auto pr-2 light-scrollbar">
-              {['English', '简体中文', '繁體中文', 'Tiếng Việt', 'Русский', 'Español', 'Bahasa Indonesia', 'Français', 'Deutsch', 'Italiano'].map(lang => (
-                <button key={lang} onClick={() => setSelectedLang(lang)} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 transition-all text-left group">
-                  <span className={`text-[13px] font-medium ${selectedLang === lang ? 'text-black' : 'text-gray-600 group-hover:text-black'}`}>{lang}</span>
-                  {selectedLang === lang && <svg className="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="m5 13 4 4L19 7"/></svg>}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <div className="flex items-center gap-2 mb-6">
-              <h3 className="text-xl font-bold tracking-tight">Local currency</h3>
-            </div>
-            <div className="relative mb-6">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-              </div>
-              <input type="text" placeholder="Search" className="w-full bg-gray-50 border-none rounded-xl py-3 pl-10 pr-4 text-sm font-medium focus:ring-1 focus:ring-black outline-none transition-all placeholder:text-gray-400" />
-            </div>
-            <div className="space-y-0.5 max-h-[400px] overflow-y-auto pr-2 light-scrollbar">
-              {['USD', 'CNY', 'RUB', 'JPY', 'EUR', 'VND', 'IDR', 'PHP', 'INR', 'GBP'].map(curr => (
-                <button key={curr} onClick={() => setSelectedCurrency(curr)} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 transition-all text-left group">
-                  <span className={`text-[13px] font-medium ${selectedCurrency === curr ? 'text-black' : 'text-gray-600 group-hover:text-black'}`}>{curr}</span>
-                  {selectedCurrency === curr && <svg className="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="m5 13 4 4L19 7"/></svg>}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const TradeDropdownContent = () => (
-    <div className={`absolute top-full left-0 z-[100] dropdown-container ${isTradeOpen ? 'is-visible' : ''}`}>
-      <div className={`${dropdownBaseClass} w-[380px] py-4`}>
-        <div className="px-5 pb-3 text-[10px] font-bold text-gray-400 tracking-tight border-b border-gray-50 mb-3">Trading instruments</div>
-        <div className="space-y-1 px-2">
-          {[
-            { title: 'Convert', desc: 'Quick conversion, zero fees', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8l4 4-4 4M8 12h7"/></svg> },
-            { title: 'Spot', desc: 'Buy and sell crypto with ease', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9-9a9 9 0 0 0-9 9"/></svg> },
-            { title: 'Futures', desc: 'Up to 125x leverage', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> }
-          ].map((item, idx) => (
-            <button key={idx} onClick={() => { onNavigate(Page.TRADE); setIsTradeOpen(false); }} className={`${dropdownItemClass} rounded-2xl`}>
-              <span className={dropdownIconClass}>{item.icon}</span>
-              <div className="flex-1">
-                <div className={dropdownTextClass}>{item.title}</div>
-                <p className="text-[11px] text-gray-400 font-medium leading-tight mt-0.5">{item.desc}</p>
               </div>
             </button>
           ))}
@@ -261,36 +110,14 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
       <div className={`${dropdownBaseClass} w-[300px] py-4 px-2`}>
         <div className="space-y-1">
           {[
-            { title: 'Markets Overview', desc: 'Prices and trends', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8l4 4-4 4"/></svg> },
-            { title: 'Market Data', desc: 'Real-time analytics', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 20v-6M6 20V10M18 20V4"/></svg> }
+            { title: 'Markets Overview', desc: 'Prices and trends', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8l4 4-4 4"/></svg>, page: Page.MARKETS },
+            { title: 'Market Data', desc: 'Real-time analytics', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>, page: Page.MARKETS }
           ].map((item, idx) => (
-            <button key={idx} onClick={() => { onNavigate(Page.HOME); setIsMarketsOpen(false); }} className={`${dropdownItemClass} rounded-2xl`}>
+            <button key={idx} onClick={() => { onNavigate(item.page); setIsMarketsOpen(false); }} className={`${dropdownItemClass} rounded-2xl`}>
               <span className={dropdownIconClass}>{item.icon}</span>
               <div>
                 <div className={dropdownTextClass}>{item.title}</div>
                 <p className="text-[11px] text-gray-400 font-medium mt-0.5">{item.desc}</p>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
-  const LearnDropdownContent = () => (
-    <div className={`absolute top-full left-0 z-[100] dropdown-container ${isLearnOpen ? 'is-visible' : ''}`}>
-      <div className={`${dropdownBaseClass} w-[340px] py-4 px-2`}>
-        <div className="space-y-1">
-          {[
-            { title: 'Learn crypto', desc: 'Build crypto fundamentals', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg> },
-            { title: 'How to buy crypto', desc: 'Step-by-step guides', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20M7 15h.01M11 15h2"/></svg> },
-            { title: 'Getting started', desc: 'Common journey questions', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> }
-          ].map((item, idx) => (
-            <button key={idx} className={`${dropdownItemClass} rounded-2xl`}>
-              <span className={dropdownIconClass}>{item.icon}</span>
-              <div>
-                <div className={dropdownTextClass}>{item.title}</div>
-                <p className="text-[11px] text-gray-400 font-medium leading-snug mt-1">{item.desc}</p>
               </div>
             </button>
           ))}
@@ -308,32 +135,27 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
         </div>
 
         <div className="hidden md:flex items-center gap-8 text-[14px] font-medium tracking-tight h-full">
-          {[
-            { label: 'Trade', page: Page.TRADE, dropdown: <TradeDropdownContent />, open: isTradeOpen, setOpen: setIsTradeOpen },
-            { label: 'Markets', page: Page.HOME, dropdown: <MarketsDropdownContent />, open: isMarketsOpen, setOpen: setIsMarketsOpen },
-            { label: 'Earn', page: null, dropdown: <EarnDropdownContent />, open: isEarnNavOpen, setOpen: setIsEarnNavOpen },
-            { label: 'Learn', page: null, dropdown: <LearnDropdownContent />, open: isLearnOpen, setOpen: setIsLearnOpen }
-          ].map((item, idx) => (
-            <div key={idx} className="relative h-full flex items-center" onMouseEnter={() => item.setOpen(true)} onMouseLeave={() => item.setOpen(false)}>
-              <button onClick={() => item.page && onNavigate(item.page)} className={`transition-all hover:text-white flex items-center gap-1.5 h-full ${currentPage === item.page ? 'text-white' : 'text-gray-400'}`}>
-                {item.label}
-                <svg className={`w-3 h-3 transition-transform duration-300 ${item.open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="m6 9 6 6 6-6"/></svg>
-              </button>
-              {item.dropdown}
-            </div>
-          ))}
+          <div className="relative h-full flex items-center" onMouseEnter={() => setIsTradeOpen(true)} onMouseLeave={() => setIsTradeOpen(false)}>
+            <button onClick={() => onNavigate(Page.TRADE)} className={`transition-all hover:text-white flex items-center gap-1.5 h-full ${currentPage === Page.TRADE ? 'text-white' : 'text-gray-400'}`}>
+              Trade
+              <svg className={`w-3 h-3 transition-transform duration-300 ${isTradeOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+          </div>
+
+          <div className="relative h-full flex items-center" onMouseEnter={() => setIsMarketsOpen(true)} onMouseLeave={() => setIsMarketsOpen(false)}>
+            <button onClick={() => onNavigate(Page.MARKETS)} className={`transition-all hover:text-white flex items-center gap-1.5 h-full ${currentPage === Page.MARKETS ? 'text-white' : 'text-gray-400'}`}>
+              Markets
+              <svg className={`w-3 h-3 transition-transform duration-300 ${isMarketsOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <MarketsDropdownContent />
+          </div>
 
           <button onClick={() => onNavigate(Page.REFERRAL)} className={`transition-all hover:text-white relative h-full flex items-center ${currentPage === Page.REFERRAL ? 'text-white' : 'text-gray-400'}`}>
             Referral
           </button>
-          
-          <button onClick={() => onNavigate(Page.AFFILIATE)} className={`transition-all hover:text-white relative h-full flex items-center ${currentPage === Page.AFFILIATE ? 'text-white' : 'text-gray-400'}`}>
-            Affiliate
-          </button>
         </div>
 
         <div className="ml-auto flex items-center gap-1">
-          {/* Enhanced Search Component - Aligned left-to-right */}
           <div className="hidden lg:flex items-center relative mr-4 group" ref={searchRef}>
             <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none group-focus-within:text-white transition-colors z-10">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -353,90 +175,13 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
           </div>
 
           {user ? (
-            <>
-              <button onClick={() => { onNavigate(Page.ASSETS); setDepositModalOpen(true); }} className="hidden sm:block px-5 py-2 bg-white text-black text-[11px] font-semibold tracking-tight rounded-xl hover:bg-gray-200 transition-all mr-3 shadow-md">
-                Deposit
+            <div className="relative h-16 flex items-center" onMouseEnter={() => setIsUserOpen(true)} onMouseLeave={() => setIsUserOpen(false)}>
+              <button onClick={() => onNavigate(Page.SETTINGS)} className={`p-2.5 rounded-xl transition-all flex items-center justify-center ${currentPage === Page.SETTINGS || isUserOpen ? 'text-white bg-zinc-800' : 'text-gray-400 hover:text-white hover:bg-zinc-800'}`}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
               </button>
-
-              <div className="relative h-16 flex items-center" onMouseEnter={() => setIsWalletOpen(true)} onMouseLeave={() => setIsWalletOpen(false)}>
-                <button onClick={() => onNavigate(Page.ASSETS)} className={`p-2.5 rounded-xl transition-all flex items-center gap-1.5 ${currentPage === Page.ASSETS || isWalletOpen ? 'text-white bg-zinc-800' : 'text-gray-400 hover:text-white hover:bg-zinc-800'}`}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
-                  <span className="hidden lg:block text-[11px] font-semibold tracking-tight">Wallet</span>
-                </button>
-                <div className={`absolute top-full right-0 z-[100] dropdown-container ${isWalletOpen ? 'is-visible' : ''}`}>
-                  <div className={`${dropdownBaseClass} w-80 p-6`}>
-                    <div className="mb-6">
-                      <div className="text-[10px] font-bold text-gray-400 tracking-tight mb-1.5 opacity-80">Total balance</div>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-bold text-black tracking-tight">${totalBalanceUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                        <span className="text-[11px] font-bold text-gray-400">USD</span>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3 mb-6">
-                      <button onClick={() => { onNavigate(Page.ASSETS); setDepositModalOpen(true); setIsWalletOpen(false); }} className="py-3 bg-black text-white text-[11px] font-semibold rounded-2xl hover:bg-zinc-800 transition-all shadow-lg tracking-tight">Deposit</button>
-                      <button onClick={() => { onNavigate(Page.ASSETS); setIsWalletOpen(false); }} className="py-3 bg-gray-50 text-black text-[11px] font-semibold rounded-2xl border border-gray-100 hover:bg-gray-100 transition-all tracking-tight">Withdraw</button>
-                    </div>
-                    <div className="space-y-0.5 border-t border-gray-50 pt-5">
-                      {[
-                        { label: 'Overview', page: Page.ASSETS, icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 12L16 10M12 12V7"/></svg> },
-                        { label: 'Spot', page: Page.TRADE, icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5"/></svg> },
-                        { label: 'Fees', page: Page.SETTINGS, icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg> },
-                        { label: 'Earn', page: Page.ASSETS, icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 6v12m-3-2.818.879.659"/></svg> }
-                      ].map((link) => (
-                        <button key={link.label} onClick={() => { onNavigate(link.page); setIsWalletOpen(false); }} className={dropdownItemClass}>
-                          <span className={dropdownIconClass}>{link.icon}</span>
-                          <span className={dropdownTextClass}>{link.label}</span>
-                          <svg className="ml-auto w-3.5 h-3.5 text-gray-200 group-hover:text-black transition-all transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="m9 18 6-6-6-6"/></svg>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="relative h-16 flex items-center" onMouseEnter={() => setIsUserOpen(true)} onMouseLeave={() => setIsUserOpen(false)}>
-                <button onClick={() => onNavigate(Page.SETTINGS)} className={`p-2.5 rounded-xl transition-all flex items-center justify-center ${currentPage === Page.SETTINGS || isUserOpen ? 'text-white bg-zinc-800' : 'text-gray-400 hover:text-white hover:bg-zinc-800'}`}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                </button>
-                <UserDropdownContent />
-              </div>
-
-              <div className="h-6 w-[1px] bg-zinc-600/60 mx-2"></div>
-              
-              <div className="relative h-16 flex items-center" onMouseEnter={() => setIsLanguageOpen(true)} onMouseLeave={() => setIsLanguageOpen(false)}>
-                <button className={`p-2.5 rounded-xl transition-all flex items-center justify-center ${isLanguageOpen ? 'text-white bg-zinc-800' : 'text-gray-400 hover:text-white hover:bg-zinc-800'}`}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                </button>
-                <LanguageDropdownContent />
-              </div>
-            </>
+            </div>
           ) : (
-            <>
-              <div className="relative h-16 flex items-center" onMouseEnter={() => setIsSupportOpen(true)} onMouseLeave={() => setIsSupportOpen(false)}>
-                <button className={`p-2.5 rounded-xl transition-all flex items-center gap-1.5 ${isSupportOpen ? 'text-white bg-zinc-800' : 'text-gray-400 hover:text-white hover:bg-zinc-800'}`}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                  <span className="hidden lg:block text-[11px] font-semibold tracking-tight">Support</span>
-                </button>
-                <div className={`absolute top-full right-0 z-[100] dropdown-container ${isSupportOpen ? 'is-visible' : ''}`}>
-                  <div className={`${dropdownBaseClass} w-64 p-3`}>
-                    <button className={dropdownItemClass}>
-                      <span className={dropdownIconClass}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
-                      <span className={dropdownTextClass}>Support center</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="relative h-16 flex items-center" onMouseEnter={() => setIsLanguageOpen(true)} onMouseLeave={() => setIsLanguageOpen(false)}>
-                <button className={`p-2.5 rounded-xl transition-all flex items-center justify-center ${isLanguageOpen ? 'text-white bg-zinc-800' : 'text-gray-400 hover:text-white hover:bg-zinc-800'}`}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                </button>
-                <LanguageDropdownContent />
-              </div>
-
-              <div className="h-6 w-[1px] bg-zinc-600/60 mx-3"></div>
-              <button onClick={() => setShowAuth(true)} className="px-6 py-2.5 bg-white text-black text-[11px] font-semibold tracking-tight rounded-xl hover:bg-gray-200 transition-all shadow-xl">Sign in</button>
-            </>
+            <button onClick={() => setShowAuth(true)} className="px-6 py-2.5 bg-white text-black text-[11px] font-semibold tracking-tight rounded-xl hover:bg-gray-200 transition-all shadow-xl">Sign in</button>
           )}
         </div>
       </nav>
