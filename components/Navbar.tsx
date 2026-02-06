@@ -64,11 +64,11 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
 
   const SearchDropdownContent = () => (
     <div className={`absolute top-full left-0 mt-2 z-[100] dropdown-container ${isSearchOpen ? 'is-visible' : ''}`}>
-      <div className={`${dropdownBaseClass} w-[340px] py-6`}>
-        <div className="px-6 pb-4 text-[15px] font-bold text-black tracking-tight">
+      <div className={`${dropdownBaseClass} w-[310px] py-4`}>
+        <div className="px-5 pb-3 text-[13px] font-bold text-black tracking-tight">
           {searchQuery ? 'Search results' : 'Popular searches'}
         </div>
-        <div className="space-y-1">
+        <div className="space-y-0.5">
           {searchResults.map((asset, idx) => (
             <button 
               key={asset.symbol} 
@@ -77,14 +77,14 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                 setIsSearchOpen(false);
                 setSearchQuery('');
               }}
-              className="w-full flex items-center px-6 py-3 hover:bg-gray-50 transition-all group"
+              className="w-full flex items-center px-4 py-2.5 hover:bg-gray-50 transition-all group"
             >
-              <div className="flex items-center gap-4 flex-1">
-                <span className={`text-[13px] font-bold w-4 ${idx < 3 && !searchQuery ? 'text-orange-500' : 'text-gray-300'}`}>
+              <div className="flex items-center gap-3 flex-1">
+                <span className={`text-[12px] font-bold w-4 ${idx < 3 && !searchQuery ? 'text-orange-500' : 'text-gray-300'}`}>
                   {idx + 1}
                 </span>
                 
-                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-[10px] text-gray-500 overflow-hidden relative">
+                <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center font-bold text-[9px] text-gray-500 overflow-hidden relative">
                    <img 
                     src={`https://assets.coincap.io/assets/icons/${asset.symbol.toLowerCase()}@2x.png`} 
                     alt={asset.symbol}
@@ -93,21 +93,17 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                    />
                 </div>
                 
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[14px] font-bold text-black">{asset.symbol}/USD</span>
-                  {idx < 3 && !searchQuery && (
-                    <span className="text-red-500">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 23c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8zm0-18.5c-3.037 0-5.5 2.463-5.5 5.5s2.463 5.5 5.5 5.5 5.5-2.463 5.5-5.5-2.463-5.5-5.5-5.5zM12 12c-1.105 0-2-.895-2-2s.895-2 2-2 2 .895 2 2-.895 2-2 2z"/></svg>
-                    </span>
-                  )}
+                <div className="flex flex-col items-start leading-none">
+                  <span className="text-[13px] font-bold text-black">{asset.symbol}</span>
+                  <span className="text-[10px] text-gray-400 font-medium">{asset.name}</span>
                 </div>
               </div>
               
               <div className="text-right">
-                <div className="text-[13px] font-medium text-black">
-                  {asset.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
+                <div className="text-[12px] font-mono font-bold text-black">
+                  {asset.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
-                <div className={`text-[11px] font-medium ${asset.change24h >= 0 ? 'text-green-500' : 'text-red-400'}`}>
+                <div className={`text-[10px] font-bold ${asset.change24h >= 0 ? 'text-green-500' : 'text-red-400'}`}>
                   {asset.change24h >= 0 ? '+' : ''}{asset.change24h.toFixed(2)}%
                 </div>
               </div>
