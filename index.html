@@ -12,16 +12,8 @@
             font-family: 'Inter', sans-serif;
             background-color: #000000;
             color: #ffffff;
-            margin: 0;
-            min-height: 100vh;
         }
         
-        #root {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
         /* Global Dark Scrollbar */
         ::-webkit-scrollbar {
             width: 4px;
@@ -36,6 +28,18 @@
         }
         ::-webkit-scrollbar-thumb:hover {
             background: #555;
+        }
+
+        /* Light Theme Scrollbar Override */
+        .light-scrollbar::-webkit-scrollbar-track {
+            background: #f9f9f9 !important;
+        }
+        .light-scrollbar::-webkit-scrollbar-thumb {
+            background: #e2e2e2 !important;
+            border-radius: 10px;
+        }
+        .light-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #d1d1d1 !important;
         }
 
         /* Dropdown Animation Classes */
@@ -56,31 +60,23 @@
             transform: translateY(0) scale(1);
             visibility: visible;
         }
-        
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 2px;
-        }
     </style>
-    <script type="importmap">
+<script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@19.0.0",
-    "react-dom": "https://esm.sh/react-dom@19.0.0",
-    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
-    "recharts": "https://esm.sh/recharts@2.12.0",
-    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.39.7",
-    "zustand": "https://esm.sh/zustand@4.5.1",
-    "react/jsx-runtime": "https://esm.sh/react@19.0.0/jsx-runtime",
+    "react": "https://esm.sh/react@^19.2.4",
     "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
     "react/": "https://esm.sh/react@^19.2.4/",
-    "vite": "https://esm.sh/vite@^7.3.1"
+    "recharts": "https://esm.sh/recharts@^3.7.0",
+    "vite": "https://esm.sh/vite@^7.3.1",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@^2.94.0",
+    "zustand": "https://esm.sh/zustand@^5.0.11"
   }
 }
 </script>
 </head>
 <body>
     <div id="root"></div>
-    <!-- Script tag je neophodan za Vercel (Vite build), a AI Studio ga sada ispravno razrešava -->
-    <script type="module" src="./index.tsx"></script>
+    <script type="module" src="/index.tsx"></script>
 </body>
 </html>

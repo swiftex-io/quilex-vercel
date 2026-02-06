@@ -9,38 +9,18 @@ const SpotTrading: React.FC = () => {
   const [side, setSide] = useState<'buy' | 'sell'>('buy');
   const [amount, setAmount] = useState('');
 
-  const { balances, executeTrade, tradeHistory, addMarketTrade } = useExchangeStore();
+  const { balances, executeTrade, tradeHistory } = useExchangeStore();
   
   const btcAsset = balances.find(b => b.symbol === 'BTC');
   const livePrice = btcAsset?.price || 65000;
   
   const [priceInput, setPriceInput] = useState(livePrice.toFixed(2));
 
-  // Sync price input with live price if market order
   useEffect(() => {
     if (orderType === 'market') {
       setPriceInput(livePrice.toFixed(2));
     }
   }, [livePrice, orderType]);
-
-  // Simulate market activity
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const randomSide = Math.random() > 0.5 ? 'buy' : 'sell';
-      const randomAmount = parseFloat((Math.random() * 0.1).toFixed(4));
-      const randomPrice = livePrice + (Math.random() - 0.5) * 5;
-      
-      addMarketTrade({
-        id: Math.random().toString(36).substr(2, 9),
-        pair: 'BTC/USDT',
-        type: randomSide as 'buy' | 'sell',
-        price: randomPrice,
-        amount: randomAmount,
-        time: new Date().toLocaleTimeString([], { hour12: false })
-      });
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [livePrice, addMarketTrade]);
 
   const usdtBalance = balances.find(b => b.symbol === 'USDT')?.available || 0;
   const btcBalance = btcAsset?.available || 0;
@@ -95,9 +75,9 @@ const SpotTrading: React.FC = () => {
         {/* Bottom History Panel */}
         <div className="h-72 border-t border-zinc-900 bg-zinc-950/30 flex flex-col shrink-0">
           <div className="flex border-b border-zinc-900 bg-black/40">
-            <button className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest border-b-2 border-white text-white">Live Trades</button>
+            <button className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest border-b-2 border-white text-white">Market Trades</button>
             <button className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-zinc-600 hover:text-zinc-400">Open Orders (0)</button>
-            <button className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-zinc-600 hover:text-zinc-400">Funds</button>
+            <button className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-zinc-600 hover:text-zinc-400">Order History</button>
           </div>
           <div className="flex-1 overflow-auto custom-scrollbar">
             <table className="w-full text-[10px] text-left">
@@ -115,7 +95,7 @@ const SpotTrading: React.FC = () => {
                     <td className="px-6 py-2 text-zinc-500 font-mono">{t.time}</td>
                     <td className={`px-6 py-2 font-bold ${t.type === 'buy' ? 'text-green-500' : 'text-red-500'}`}>{t.type.toUpperCase()}</td>
                     <td className="px-6 py-2 font-mono text-zinc-300">{t.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                    <td className="px-6 py-2 text-right font-mono text-white">{t.amount.toFixed(4)} BTC</td>
+                    <td className="px-6 py-2 text-right font-mono text-white">{t.amount} BTC</td>
                   </tr>
                 ))}
               </tbody>

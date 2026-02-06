@@ -5,8 +5,7 @@ export enum Page {
   REFERRAL = 'referral',
   AFFILIATE = 'affiliate',
   SETTINGS = 'settings',
-  HOME = 'home',
-  MARKETS = 'markets'
+  HOME = 'home'
 }
 
 export type LayoutType = 'default' | 'trading' | 'none';
