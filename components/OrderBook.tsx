@@ -17,12 +17,12 @@ const OrderBook: React.FC<OrderBookProps> = ({ currentPrice = 65432.50 }) => {
     <div className="flex flex-col h-full bg-[#0a0a0a] overflow-hidden">
       {/* Header Tabs */}
       <div className="flex border-b border-zinc-900 h-9 shrink-0">
-        <button className="px-4 text-[10px] font-black uppercase tracking-widest text-white border-b-2 border-white">Order Book</button>
-        <button className="px-4 text-[10px] font-black uppercase tracking-widest text-zinc-600">Market</button>
+        <button className="px-4 text-[12px] font-normal text-white border-b-2 border-white">Order book</button>
+        <button className="px-4 text-[12px] font-normal text-zinc-500 hover:text-zinc-300">Market</button>
       </div>
       
       {/* Column Titles */}
-      <div className="grid grid-cols-3 px-3 py-1.5 text-zinc-600 font-black text-[9px] uppercase tracking-tighter shrink-0 border-b border-zinc-900/30">
+      <div className="grid grid-cols-3 px-3 py-1.5 text-zinc-500 font-normal text-[11px] shrink-0 border-b border-zinc-900/30">
         <span>Price</span>
         <span className="text-right">Amount</span>
         <span className="text-right">Total</span>
@@ -40,7 +40,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ currentPrice = 65432.50 }) => {
                   className="absolute right-0 top-0 bottom-0 bg-[#ff4d4f]/10 transition-all duration-300"
                   style={{ width: `${depth}%` }}
                 ></div>
-                <span className="text-[#ff4d4f] z-10 font-mono font-bold tabular-nums text-[11px]">{displayPrice.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
+                <span className="text-[#ff4d4f] z-10 font-mono font-normal tabular-nums text-[11px]">{displayPrice.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
                 <span className="text-right z-10 font-mono text-zinc-400 tabular-nums text-[11px]">{ask.amount.toFixed(4)}</span>
                 <span className="text-right z-10 font-mono text-zinc-600 tabular-nums text-[11px]">{(ask.amount * 1.5).toFixed(3)}</span>
               </div>
@@ -51,11 +51,11 @@ const OrderBook: React.FC<OrderBookProps> = ({ currentPrice = 65432.50 }) => {
         {/* Mid Price & Spread Indicator */}
         <div className="py-2 px-3 bg-zinc-900/20 border-y border-zinc-900/30 my-1 flex flex-col shrink-0">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-black text-[#00d18e] tabular-nums tracking-tighter">
+            <span className="text-sm font-normal text-[#00d18e] tabular-nums tracking-tighter">
               {currentPrice.toLocaleString(undefined, { minimumFractionDigits: 1 })}
             </span>
-            <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-tighter">
-              {spread.toFixed(1)} ({spreadPercent}%)
+            <span className="text-[10px] font-normal text-zinc-500">
+              Spread {spread.toFixed(1)} ({spreadPercent}%)
             </span>
           </div>
         </div>
@@ -71,7 +71,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ currentPrice = 65432.50 }) => {
                   className="absolute right-0 top-0 bottom-0 bg-[#00d18e]/10 transition-all duration-300"
                   style={{ width: `${depth}%` }}
                 ></div>
-                <span className="text-[#00d18e] z-10 font-mono font-bold tabular-nums text-[11px]">{displayPrice.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
+                <span className="text-[#00d18e] z-10 font-mono font-normal tabular-nums text-[11px]">{displayPrice.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
                 <span className="text-right z-10 font-mono text-zinc-400 tabular-nums text-[11px]">{bid.amount.toFixed(4)}</span>
                 <span className="text-right z-10 font-mono text-zinc-600 tabular-nums text-[11px]">{(bid.amount * 1.2).toFixed(3)}</span>
               </div>
