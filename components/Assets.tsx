@@ -42,9 +42,13 @@ const Assets: React.FC = () => {
   const [isAssetDropdownOpen, setIsAssetDropdownOpen] = useState(false);
   const [assetSearch, setAssetSearch] = useState('');
   
-  const [hideZero, setHideZero] = useState(false);
+  const [hideSmallBalances, setHideSmallBalances] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'funding' | 'trading'>('all');
   
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   const dropdownRef = useRef<HTMLDivElement>(null);
   
   const totalBalanceUSD = balances.reduce((acc, asset) => acc + (asset.balance * asset.price), 0);
@@ -65,6 +69,11 @@ const Assets: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Reset pagination when searching or filtering
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [assetSearch, hideSmallBalances]);
+
   const filteredBalances = useMemo(() => {
     // 1. Filter by search
     let result = balances.filter(asset => 
@@ -72,9 +81,9 @@ const Assets: React.FC = () => {
       asset.name.toLowerCase().includes(assetSearch.toLowerCase())
     );
 
-    // 2. Filter by zero balance if enabled
-    if (hideZero) {
-      result = result.filter(asset => asset.balance > 0);
+    // 2. Filter by small balance if enabled (threshold: 1 USD)
+    if (hideSmallBalances) {
+      result = result.filter(asset => (asset.balance * asset.price) >= 1);
     }
 
     // 3. Sort assets so those with balance > 0 come first
@@ -83,7 +92,14 @@ const Assets: React.FC = () => {
       const bVal = b.balance > 0 ? 1 : 0;
       return bVal - aVal;
     });
-  }, [balances, hideZero, assetSearch]);
+  }, [balances, hideSmallBalances, assetSearch]);
+
+  // Derived pagination data
+  const totalPages = Math.ceil(filteredBalances.length / itemsPerPage);
+  const paginatedBalances = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredBalances.slice(start, start + itemsPerPage);
+  }, [filteredBalances, currentPage]);
 
   const handleFinishDeposit = async () => {
     await deposit(selectedAsset, 1000);
@@ -213,8 +229,8 @@ const Assets: React.FC = () => {
                 <div className="relative">
                   <input 
                     type="checkbox" 
-                    checked={hideZero}
-                    onChange={(e) => setHideZero(e.target.checked)}
+                    checked={hideSmallBalances}
+                    onChange={(e) => setHideSmallBalances(e.target.checked)}
                     className="sr-only peer"
                   />
                   <div className="w-3.5 h-3.5 border-2 border-zinc-700 rounded-sm peer-checked:bg-white peer-checked:border-white transition-all"></div>
@@ -222,7 +238,7 @@ const Assets: React.FC = () => {
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="4"><path d="M5 13l4 4L19 7"/></svg>
                   </div>
                 </div>
-                <span className="text-[11px] font-semibold text-gray-500 group-hover:text-gray-300 transition-colors">Hide my balances</span>
+                <span className="text-[11px] font-semibold text-gray-500 group-hover:text-gray-300 transition-colors">Hide small balances</span>
               </label>
 
               <button className="text-[11px] font-semibold text-blue-500 hover:text-white transition-colors tracking-tight">
@@ -243,7 +259,7 @@ const Assets: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {filteredBalances.length > 0 ? filteredBalances.map((asset) => {
+                  {paginatedBalances.length > 0 ? paginatedBalances.map((asset) => {
                     const hasBalance = asset.balance > 0;
                     return (
                       <tr 
@@ -274,6 +290,42 @@ const Assets: React.FC = () => {
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="px-8 py-6 border-t border-white/5 flex items-center justify-between">
+                <div className="text-[11px] text-gray-500 font-medium">
+                  Showing <span className="text-white">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="text-white">{Math.min(currentPage * itemsPerPage, filteredBalances.length)}</span> of <span className="text-white">{filteredBalances.length}</span> assets
+                </div>
+                <div className="flex items-center gap-1">
+                  <button 
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="p-2 rounded-lg hover:bg-zinc-900 text-gray-500 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-transparent"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m15 18-6-6 6-6"/></svg>
+                  </button>
+                  
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`min-w-[32px] h-8 rounded-lg text-[11px] font-bold transition-all ${currentPage === page ? 'bg-white text-black' : 'text-gray-500 hover:text-white hover:bg-zinc-900'}`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+
+                  <button 
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className="p-2 rounded-lg hover:bg-zinc-900 text-gray-500 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-transparent"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m9 18 6-6-6-6" transform="rotate(180 12 12)"/></svg>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
