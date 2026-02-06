@@ -10,7 +10,7 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
-  const { balances, user, profile, signOut, isGuest, setDepositModalOpen } = useExchangeStore();
+  const { balances, user, profile, signOut, isGuest, setDepositModalOpen, setMarketsActiveTab } = useExchangeStore();
   const [showAuth, setShowAuth] = useState(false);
   const [isWalletOpen, setIsWalletOpen] = useState(false);
   const [isSupportOpen, setIsSupportOpen] = useState(false);
@@ -25,6 +25,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const searchRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const [selectedLang, setSelectedLang] = useState('English');
   const [selectedCurrency, setSelectedCurrency] = useState('USD');
@@ -50,7 +51,6 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
   // Filtered results for search
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) {
-      // Show "Popular" (first 8 as mock popular)
       return balances.slice(0, 8);
     }
     return balances.filter(asset => 
@@ -66,7 +66,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
   const dropdownIconClass = "text-gray-400 group-hover:text-black transition-colors shrink-0";
 
   const SearchDropdownContent = () => (
-    <div className={`absolute top-full left-0 mt-2 z-[100] dropdown-container ${isSearchOpen ? 'is-visible' : ''}`}>
+    <div className={`absolute top-full right-0 xl:left-0 mt-2 z-[100] dropdown-container ${isSearchOpen ? 'is-visible' : ''}`}>
       <div className={`${dropdownBaseClass} w-[310px] py-4`}>
         <div className="px-5 pb-3 text-[13px] font-bold text-black tracking-tight">
           {searchQuery ? 'Search results' : 'Popular searches'}
@@ -288,7 +288,15 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
             { title: 'Markets Overview', desc: 'Prices and trends', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8l4 4-4 4"/></svg> },
             { title: 'Rankings', desc: 'Top gainers and trends', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 20v-6M6 20V10M18 20V4"/></svg> }
           ].map((item, idx) => (
-            <button key={idx} onClick={() => { onNavigate(Page.MARKETS); setIsMarketsOpen(false); }} className={`${dropdownItemClass} rounded-2xl`}>
+            <button 
+              key={idx} 
+              onClick={() => { 
+                setMarketsActiveTab(item.title as any);
+                onNavigate(Page.MARKETS); 
+                setIsMarketsOpen(false); 
+              }} 
+              className={`${dropdownItemClass} rounded-2xl`}
+            >
               <span className={dropdownIconClass}>{item.icon}</span>
               <div>
                 <div className={dropdownTextClass}>{item.title}</div>
@@ -326,7 +334,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
   return (
     <>
       <nav className="h-16 flex items-center px-6 bg-black z-[60] sticky top-0 shadow-2xl">
-        <div className="flex items-center gap-2 mr-10 cursor-pointer group" onClick={() => onNavigate(Page.HOME)}>
+        <div className="flex items-center gap-2 mr-10 cursor-pointer group shrink-0" onClick={() => onNavigate(Page.HOME)}>
           <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center font-black text-black transition-all group-hover:bg-blue-500 shadow-sm">Q</div>
           <span className="text-xl font-bold tracking-tighter text-white">QUILEX</span>
         </div>
@@ -342,7 +350,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
               <button onClick={() => item.page && onNavigate(item.page)} className={`transition-all hover:text-white flex items-center gap-1.5 h-full ${currentPage === item.page ? 'text-white' : 'text-gray-400'}`}>
                 {item.label}
                 {item.label === 'Earn' && (
-                  <span className="ml-1 bg-amber-400 text-black text-[9px] font-bold px-2 py-0.5 rounded-full tracking-tighter whitespace-nowrap">Up to 58% APR</span>
+                  <span className="ml-1 hidden xl:inline-block bg-amber-400 text-black text-[9px] font-bold px-2 py-0.5 rounded-full tracking-tighter whitespace-nowrap">Up to 58% APR</span>
                 )}
                 <svg className={`w-3 h-3 transition-transform duration-300 ${item.open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="m6 9 6 6 6-6"/></svg>
               </button>
@@ -360,12 +368,19 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
         </div>
 
         <div className="ml-auto flex items-center gap-1">
-          {/* Enhanced Search Component */}
-          <div className="hidden lg:flex items-center relative mr-4 group" ref={searchRef}>
-            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-focus-within:text-white transition-colors z-10">
+          {/* Enhanced Search Component - Responsive */}
+          <div className="flex items-center relative mr-2 group" ref={searchRef}>
+            <button 
+              onClick={() => {
+                setIsSearchOpen(!isSearchOpen);
+                if (!isSearchOpen) setTimeout(() => inputRef.current?.focus(), 50);
+              }}
+              className="xl:absolute xl:left-3.5 xl:top-1/2 xl:-translate-y-1/2 p-2.5 rounded-xl text-gray-400 hover:text-white xl:pointer-events-none xl:p-0 transition-colors z-10"
+            >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-            </div>
+            </button>
             <input 
+              ref={inputRef}
               type="text" 
               placeholder="Search crypto" 
               value={searchQuery}
@@ -374,21 +389,25 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                 setSearchQuery(e.target.value);
                 setIsSearchOpen(true);
               }}
-              className="bg-zinc-800/60 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-[11px] font-medium w-32 focus:w-48 focus:bg-zinc-800 focus:border-white/20 outline-none transition-all placeholder:text-gray-500 placeholder:tracking-tighter text-white shadow-inner relative z-[1]"
+              className="hidden xl:block bg-zinc-800/60 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-[11px] font-medium w-32 focus:w-48 focus:bg-zinc-800 focus:border-white/20 outline-none transition-all placeholder:text-gray-500 placeholder:tracking-tighter text-white shadow-inner relative z-[1]"
             />
             <SearchDropdownContent />
           </div>
 
           {user ? (
             <>
-              <button onClick={() => { onNavigate(Page.ASSETS); setDepositModalOpen(true); }} className="hidden sm:block px-5 py-2 bg-white text-black text-[11px] font-semibold tracking-tight rounded-xl hover:bg-gray-200 transition-all mr-3 shadow-md">
+              {/* Deposit Button - Responsive (Hidden below lg) */}
+              <button 
+                onClick={() => { onNavigate(Page.ASSETS); setDepositModalOpen(true); }} 
+                className="hidden lg:block px-5 py-2 bg-white text-black text-[11px] font-semibold tracking-tight rounded-xl hover:bg-gray-200 transition-all mr-3 shadow-md whitespace-nowrap shrink-0"
+              >
                 Deposit
               </button>
 
               <div className="relative h-16 flex items-center" onMouseEnter={() => setIsWalletOpen(true)} onMouseLeave={() => setIsWalletOpen(false)}>
                 <button onClick={() => onNavigate(Page.ASSETS)} className={`p-2.5 rounded-xl transition-all flex items-center gap-1.5 ${currentPage === Page.ASSETS || isWalletOpen ? 'text-white bg-zinc-800' : 'text-gray-400 hover:text-white hover:bg-zinc-800'}`}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
-                  <span className="hidden lg:block text-[11px] font-semibold tracking-tight">Wallet</span>
+                  <span className="hidden xl:block text-[11px] font-semibold tracking-tight">Wallet</span>
                 </button>
                 <div className={`absolute top-full right-0 z-[100] dropdown-container ${isWalletOpen ? 'is-visible' : ''}`}>
                   <div className={`${dropdownBaseClass} w-80 p-6`}>
@@ -433,16 +452,16 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                 <UserDropdownContent />
               </div>
 
-              <div className="h-6 w-[1px] bg-zinc-600/60 mx-2"></div>
+              <div className="h-6 w-[1px] bg-zinc-600/60 mx-2 hidden sm:block"></div>
               
-              <div className="relative h-16 flex items-center" onMouseEnter={() => setIsSupportOpen(true)} onMouseLeave={() => setIsSupportOpen(false)}>
+              <div className="relative h-16 flex items-center hidden sm:flex" onMouseEnter={() => setIsSupportOpen(true)} onMouseLeave={() => setIsSupportOpen(false)}>
                 <button className={`p-2.5 rounded-xl transition-all flex items-center gap-1.5 ${isSupportOpen ? 'text-white bg-zinc-800' : 'text-gray-400 hover:text-white hover:bg-zinc-800'}`}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                 </button>
                 <SupportDropdownContent />
               </div>
 
-              <div className="relative h-16 flex items-center" onMouseEnter={() => setIsLanguageOpen(true)} onMouseLeave={() => setIsLanguageOpen(false)}>
+              <div className="relative h-16 flex items-center hidden sm:flex" onMouseEnter={() => setIsLanguageOpen(true)} onMouseLeave={() => setIsLanguageOpen(false)}>
                 <button className={`p-2.5 rounded-xl transition-all flex items-center justify-center ${isLanguageOpen ? 'text-white bg-zinc-800' : 'text-gray-400 hover:text-white hover:bg-zinc-800'}`}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                 </button>
@@ -451,23 +470,23 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
             </>
           ) : (
             <>
-              <div className="relative h-16 flex items-center" onMouseEnter={() => setIsSupportOpen(true)} onMouseLeave={() => setIsSupportOpen(false)}>
+              <div className="relative h-16 flex items-center hidden lg:flex" onMouseEnter={() => setIsSupportOpen(true)} onMouseLeave={() => setIsSupportOpen(false)}>
                 <button className={`p-2.5 rounded-xl transition-all flex items-center gap-1.5 ${isSupportOpen ? 'text-white bg-zinc-800' : 'text-gray-400 hover:text-white hover:bg-zinc-800'}`}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                  <span className="hidden lg:block text-[11px] font-semibold tracking-tight">Support</span>
+                  <span className="hidden xl:block text-[11px] font-semibold tracking-tight">Support</span>
                 </button>
                 <SupportDropdownContent />
               </div>
 
-              <div className="relative h-16 flex items-center" onMouseEnter={() => setIsLanguageOpen(true)} onMouseLeave={() => setIsLanguageOpen(false)}>
+              <div className="relative h-16 flex items-center hidden lg:flex" onMouseEnter={() => setIsLanguageOpen(true)} onMouseLeave={() => setIsLanguageOpen(false)}>
                 <button className={`p-2.5 rounded-xl transition-all flex items-center justify-center ${isLanguageOpen ? 'text-white bg-zinc-800' : 'text-gray-400 hover:text-white hover:bg-zinc-800'}`}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                 </button>
                 <LanguageDropdownContent />
               </div>
 
-              <div className="h-6 w-[1px] bg-zinc-600/60 mx-3"></div>
-              <button onClick={() => setShowAuth(true)} className="px-6 py-2.5 bg-white text-black text-[11px] font-semibold tracking-tight rounded-xl hover:bg-gray-200 transition-all shadow-xl">Sign in</button>
+              <div className="h-6 w-[1px] bg-zinc-600/60 mx-3 hidden sm:block"></div>
+              <button onClick={() => setShowAuth(true)} className="px-6 py-2.5 bg-white text-black text-[11px] font-semibold tracking-tight rounded-xl hover:bg-gray-200 transition-all shadow-xl whitespace-nowrap shrink-0">Sign in</button>
             </>
           )}
         </div>

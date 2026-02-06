@@ -7,8 +7,7 @@ interface MarketsProps {
 }
 
 const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
-  const { balances } = useExchangeStore();
-  const [activeSubTab, setActiveSubTab] = useState<'Markets Overview' | 'Rankings'>('Markets Overview');
+  const { balances, marketsActiveTab, setMarketsActiveTab } = useExchangeStore();
   const [cryptoFilter, setCryptoFilter] = useState('All');
 
   const renderSparkline = (change: number) => {
@@ -136,14 +135,31 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
 
       {/* Main Table Controls */}
       <div className="flex items-center gap-6 mb-8 overflow-x-auto no-scrollbar border-b border-zinc-900 py-2">
-        {['Favorites', 'Crypto', 'Spot', 'Futures', 'Options'].map(tab => (
-          <button key={tab} className={`text-sm font-normal transition-all pb-2 ${tab === 'Crypto' ? 'text-white border-b-2 border-white' : 'text-zinc-500 hover:text-white'}`}>{tab}</button>
+        {[
+          { label: 'Favorites', soon: false },
+          { label: 'Crypto', soon: false },
+          { label: 'Spot', soon: false },
+          { label: 'Futures', soon: true }
+        ].map(tab => (
+          <button 
+            key={tab.label} 
+            disabled={tab.soon}
+            className={`text-sm font-medium transition-all pb-2 flex items-center gap-2 ${
+              tab.label === 'Crypto' ? 'text-white border-b-2 border-white' : 
+              tab.soon ? 'text-zinc-700 cursor-not-allowed opacity-60' : 'text-zinc-500 hover:text-white'
+            }`}
+          >
+            {tab.label}
+            {tab.soon && (
+              <span className="bg-blue-500/10 text-blue-500 text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Soon</span>
+            )}
+          </button>
         ))}
       </div>
 
       <div className="flex items-center gap-4 mb-6 overflow-x-auto no-scrollbar">
         {['All', 'Top', 'New', 'AI', 'Solana', 'RWA', 'Meme', 'Payment', 'DeFi', 'Layer 1'].map(filter => (
-          <button key={filter} onClick={() => setCryptoFilter(filter)} className={`text-[11px] px-3 py-1.5 rounded-lg transition-all whitespace-nowrap ${cryptoFilter === filter ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>
+          <button key={filter} onClick={() => setCryptoFilter(filter)} className={`text-[13px] font-medium px-3 py-1.5 rounded-lg transition-all whitespace-nowrap ${cryptoFilter === filter ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>
             {filter}
           </button>
         ))}
@@ -156,14 +172,14 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
       <div className="bg-black">
         <table className="w-full text-left">
           <thead>
-            <tr className="text-[10px] text-zinc-600 font-normal border-b border-zinc-900">
-              <th className="px-4 py-3">Name</th>
-              <th className="px-4 py-3">Price</th>
-              <th className="px-4 py-3">24h change</th>
-              <th className="px-4 py-3">Last 24h</th>
-              <th className="px-4 py-3">24h range</th>
-              <th className="px-4 py-3">Market cap</th>
-              <th className="px-4 py-3 text-right">Action</th>
+            <tr className="text-[12px] text-zinc-600 font-normal border-b border-zinc-900 tracking-tight">
+              <th className="px-4 py-3 font-normal">Name</th>
+              <th className="px-4 py-3 font-normal">Price</th>
+              <th className="px-4 py-3 font-normal">24h change</th>
+              <th className="px-4 py-3 font-normal">Last 24h</th>
+              <th className="px-4 py-3 font-normal">24h range</th>
+              <th className="px-4 py-3 font-normal">Market cap</th>
+              <th className="px-4 py-3 text-right font-normal">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-900/50">
@@ -186,12 +202,16 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
                 <td className="px-4 py-5">{renderSparkline(asset.change24h)}</td>
                 <td className="px-4 py-5">
                   <div className="w-32">
-                    <div className="flex justify-between text-[8px] text-zinc-600 mb-1">
+                    <div className="flex justify-between text-[10px] text-zinc-600 mb-1 font-medium">
                       <span>${(asset.price * 0.95).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                       <span>${(asset.price * 1.05).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                     </div>
                     <div className="h-0.5 bg-zinc-800 rounded-full relative">
-                      <div className="absolute top-1/2 -translate-y-1/2 left-1/2 w-1.5 h-1.5 bg-white rounded-full"></div>
+                      <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -ml-1.5 flex items-center justify-center">
+                        <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M6 0L11.1962 7.5H0.803848L6 0Z" fill="white"/>
+                        </svg>
+                      </div>
                     </div>
                   </div>
                 </td>
@@ -234,7 +254,7 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
               </h3>
               <button className="text-[11px] font-bold text-zinc-600 hover:text-white transition-colors">More &gt;</button>
             </div>
-            <div className="grid grid-cols-12 text-[10px] text-zinc-600 font-bold uppercase tracking-widest mb-4 px-1">
+            <div className="grid grid-cols-12 text-[12px] text-zinc-600 font-normal uppercase tracking-tight mb-4 px-1">
               <div className="col-span-8">Name | Turnover</div>
               <div className="col-span-2 text-right">Price</div>
               <div className="col-span-2 text-right">24h</div>
@@ -276,9 +296,9 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
           {['Markets Overview', 'Rankings'].map((item) => (
             <button
               key={item}
-              onClick={() => setActiveSubTab(item as any)}
+              onClick={() => setMarketsActiveTab(item as any)}
               className={`py-4 text-[13px] font-bold border-b-2 transition-all whitespace-nowrap tracking-tight ${
-                activeSubTab === item 
+                marketsActiveTab === item 
                   ? 'border-white text-white' 
                   : 'border-transparent text-zinc-500 hover:text-zinc-300'
               }`}
@@ -290,8 +310,8 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
       </div>
 
       <div className="max-w-[1400px] mx-auto px-8 py-10">
-        {activeSubTab === 'Markets Overview' && renderMarketsTab()}
-        {activeSubTab === 'Rankings' && renderRankingsTab()}
+        {marketsActiveTab === 'Markets Overview' && renderMarketsTab()}
+        {marketsActiveTab === 'Rankings' && renderRankingsTab()}
       </div>
     </div>
   );

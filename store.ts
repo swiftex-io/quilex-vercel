@@ -15,6 +15,7 @@ interface ExchangeState {
   profile: { nickname: string } | null;
   isGuest: boolean;
   isDepositModalOpen: boolean;
+  marketsActiveTab: 'Markets Overview' | 'Rankings';
   
   initialize: () => Promise<void>;
   setUser: (user: any) => void;
@@ -25,6 +26,7 @@ interface ExchangeState {
   executeTrade: (pair: string, type: 'buy' | 'sell', price: number, amount: number) => Promise<boolean>;
   updatePrices: (priceData: Record<string, number>) => void;
   setDepositModalOpen: (open: boolean) => void;
+  setMarketsActiveTab: (tab: 'Markets Overview' | 'Rankings') => void;
 }
 
 export const useExchangeStore = create<ExchangeState>((set, get) => ({
@@ -38,6 +40,9 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
   profile: null,
   isGuest: false,
   isDepositModalOpen: false,
+  marketsActiveTab: 'Markets Overview',
+
+  setMarketsActiveTab: (tab) => set({ marketsActiveTab: tab }),
 
   setDepositModalOpen: (open: boolean) => set({ isDepositModalOpen: open }),
 
