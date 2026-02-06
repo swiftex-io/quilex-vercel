@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useExchangeStore } from '../store';
 
 interface HomeProps {
@@ -9,6 +9,25 @@ interface HomeProps {
 const Home: React.FC<HomeProps> = ({ onTrade }) => {
   const { balances } = useExchangeStore();
   
+  // States for currency dropdowns
+  const [hotCurrency, setHotCurrency] = useState('USD');
+  const [isHotOpen, setIsHotOpen] = useState(false);
+  const [newListCurrency, setNewListCurrency] = useState('USD');
+  const [isNewListOpen, setIsNewListOpen] = useState(false);
+
+  const hotRef = useRef<HTMLDivElement>(null);
+  const newRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdowns on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (hotRef.current && !hotRef.current.contains(event.target as Node)) setIsHotOpen(false);
+      if (newRef.current && !newRef.current.contains(event.target as Node)) setIsNewListOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   // Dohvatanje podataka za Hot Crypto boks
   const hotAssets = balances.filter(b => ['BTC', 'ETH', 'SOL'].includes(b.symbol));
 
@@ -22,6 +41,30 @@ const Home: React.FC<HomeProps> = ({ onTrade }) => {
           (e.target as HTMLImageElement).style.display = 'none';
         }}
       />
+    </div>
+  );
+
+  const CurrencyDropdown = ({ selected, onSelect, isOpen, setIsOpen, containerRef }: any) => (
+    <div className="relative" ref={containerRef}>
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-1 text-zinc-500 hover:text-zinc-300 text-[11px] font-bold transition-colors"
+      >
+        {selected} <svg className={`w-2.5 h-2.5 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-20 bg-zinc-900 border border-zinc-800 rounded-lg shadow-2xl py-1 z-20 animate-in fade-in zoom-in-95 duration-100">
+          {['USD', 'USDT'].map(curr => (
+            <button 
+              key={curr}
+              onClick={() => { onSelect(curr); setIsOpen(false); }}
+              className={`w-full text-left px-3 py-1.5 text-[11px] font-bold hover:bg-zinc-800 transition-colors ${selected === curr ? 'text-white' : 'text-zinc-500'}`}
+            >
+              {curr}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 
@@ -74,12 +117,16 @@ const Home: React.FC<HomeProps> = ({ onTrade }) => {
           {/* Box 1: Hot crypto */}
           <div className="bg-[#111111] rounded-xl p-6 group">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-[13px] font-black text-white uppercase tracking-wider flex items-center gap-1">
+              <h3 className="text-[14px] font-bold text-white tracking-tight flex items-center gap-1">
                 Hot crypto <svg className="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M9 5l7 7-7 7"/></svg>
               </h3>
-              <div className="flex items-center gap-1 text-zinc-600 text-[10px] font-bold">
-                USD <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="m6 9 6 6 6-6"/></svg>
-              </div>
+              <CurrencyDropdown 
+                selected={hotCurrency} 
+                onSelect={setHotCurrency} 
+                isOpen={isHotOpen} 
+                setIsOpen={setIsHotOpen} 
+                containerRef={hotRef}
+              />
             </div>
             <div className="space-y-2">
               {hotAssets.map((asset) => (
@@ -90,7 +137,7 @@ const Home: React.FC<HomeProps> = ({ onTrade }) => {
                 >
                   <div className="flex items-center gap-3">
                     {renderIcon(asset.symbol)}
-                    <span className="text-sm font-bold">{asset.symbol}<span className="text-zinc-600">/USD</span></span>
+                    <span className="text-sm font-bold">{asset.symbol}<span className="text-zinc-600">/{hotCurrency}</span></span>
                   </div>
                   <div className="text-right">
                     <div className="text-sm font-mono font-bold tracking-tight text-zinc-200">{asset.price.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</div>
@@ -106,12 +153,16 @@ const Home: React.FC<HomeProps> = ({ onTrade }) => {
           {/* Box 2: New listings */}
           <div className="bg-[#111111] rounded-xl p-6 group">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-[13px] font-black text-white uppercase tracking-wider flex items-center gap-1">
+              <h3 className="text-[14px] font-bold text-white tracking-tight flex items-center gap-1">
                 New listings <svg className="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M9 5l7 7-7 7"/></svg>
               </h3>
-              <div className="flex items-center gap-1 text-zinc-600 text-[10px] font-bold">
-                USD <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="m6 9 6 6 6-6"/></svg>
-              </div>
+              <CurrencyDropdown 
+                selected={newListCurrency} 
+                onSelect={setNewListCurrency} 
+                isOpen={isNewListOpen} 
+                setIsOpen={setIsNewListOpen} 
+                containerRef={newRef}
+              />
             </div>
             <div className="space-y-2">
               {[
@@ -126,7 +177,7 @@ const Home: React.FC<HomeProps> = ({ onTrade }) => {
                 >
                   <div className="flex items-center gap-3">
                     {renderIcon(item.symbol)}
-                    <span className="text-sm font-bold">{item.symbol}<span className="text-zinc-600">/USD</span></span>
+                    <span className="text-sm font-bold">{item.symbol}<span className="text-zinc-600">/{newListCurrency}</span></span>
                   </div>
                   <div className="text-right">
                     <div className="text-sm font-mono font-bold tracking-tight text-zinc-200">{item.price.toFixed(item.price < 1 ? 5 : 2)}</div>
@@ -142,7 +193,7 @@ const Home: React.FC<HomeProps> = ({ onTrade }) => {
           {/* Box 3: Macro data */}
           <div className="bg-[#111111] rounded-xl p-6 group">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-[13px] font-black text-white uppercase tracking-wider flex items-center gap-1">
+              <h3 className="text-[14px] font-bold text-white tracking-tight flex items-center gap-1">
                 Macro data <svg className="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M9 5l7 7-7 7"/></svg>
               </h3>
             </div>
