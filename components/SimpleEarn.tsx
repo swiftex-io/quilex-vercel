@@ -18,32 +18,58 @@ const SimpleEarn: React.FC = () => {
   const itemsPerPage = 10;
 
   const vantaRef = useRef<HTMLDivElement>(null);
-  const [vantaEffect, setVantaEffect] = useState<any>(null);
+  const vantaEffectRef = useRef<any>(null);
 
-  // Vanta.js DOTS effect
+  // Vanta.js DOTS effect with IntersectionObserver for resource saving
   useEffect(() => {
-    if (!vantaEffect && vantaRef.current && window.VANTA) {
-      const effect = window.VANTA.DOTS({
-        el: vantaRef.current,
-        mouseControls: true,
-        touchControls: true,
-        gyroControls: false,
-        minHeight: 200.00,
-        minWidth: 200.00,
-        scale: 1.00,
-        scaleMobile: 1.00,
-        color: 0xd7ff20,
-        color2: 0xf1ff20,
-        size: 2.90,
-        spacing: 28.00,
-        backgroundColor: 0x000000
-      });
-      setVantaEffect(effect);
-    }
-    return () => {
-      if (vantaEffect) vantaEffect.destroy();
+    const initVanta = () => {
+      if (!vantaEffectRef.current && vantaRef.current && window.VANTA) {
+        vantaEffectRef.current = window.VANTA.DOTS({
+          el: vantaRef.current,
+          mouseControls: true,
+          touchControls: true,
+          gyroControls: false,
+          minHeight: 200.00,
+          minWidth: 200.00,
+          scale: 1.00,
+          scaleMobile: 1.00,
+          color: 0xd7ff20,
+          color2: 0x444444,
+          size: 2.50, // Slightly smaller for cleaner look
+          spacing: 35.00, // Increased spacing to ensure no "line" perception
+          showLines: false, // Ensure lines are explicitly disabled if version supports it
+          backgroundColor: 0x000000
+        });
+      }
     };
-  }, [vantaEffect]);
+
+    const destroyVanta = () => {
+      if (vantaEffectRef.current) {
+        vantaEffectRef.current.destroy();
+        vantaEffectRef.current = null;
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          initVanta();
+        } else {
+          destroyVanta();
+        }
+      },
+      { threshold: 0.1 } // Trigger when 10% is visible
+    );
+
+    if (vantaRef.current) {
+      observer.observe(vantaRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+      destroyVanta();
+    };
+  }, []);
 
   // Reset pagination on search
   useEffect(() => {
