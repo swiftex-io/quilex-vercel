@@ -362,19 +362,19 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
         <div className="ml-auto flex items-center gap-1">
           {/* Enhanced Search Component */}
           <div className="hidden lg:flex items-center relative mr-4 group" ref={searchRef}>
-            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none group-focus-within:text-white transition-colors z-10">
+            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-focus-within:text-white transition-colors z-10">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
             </div>
             <input 
               type="text" 
-              placeholder="Search coins" 
+              placeholder="Search crypto" 
               value={searchQuery}
               onFocus={() => setIsSearchOpen(true)}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
                 setIsSearchOpen(true);
               }}
-              className="bg-zinc-900/50 border border-white/5 rounded-xl py-2.5 pl-10 pr-4 text-[11px] font-medium w-32 focus:w-48 focus:bg-zinc-800 focus:border-transparent outline-none transition-all placeholder:text-gray-600 text-white shadow-inner relative z-[1]"
+              className="bg-zinc-800/60 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-[11px] font-medium w-32 focus:w-48 focus:bg-zinc-800 focus:border-white/20 outline-none transition-all placeholder:text-gray-500 placeholder:tracking-tighter text-white shadow-inner relative z-[1]"
             />
             <SearchDropdownContent />
           </div>
