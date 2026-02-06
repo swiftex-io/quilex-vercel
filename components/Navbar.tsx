@@ -141,6 +141,17 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
     </div>
   );
 
+  const SupportDropdownContent = () => (
+    <div className={`absolute top-full right-0 z-[100] dropdown-container ${isSupportOpen ? 'is-visible' : ''}`}>
+      <div className={`${dropdownBaseClass} w-64 p-3`}>
+        <button className={dropdownItemClass}>
+          <span className={dropdownIconClass}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+          <span className={dropdownTextClass}>Support center</span>
+        </button>
+      </div>
+    </div>
+  );
+
   const UserDropdownContent = () => (
     <div className={`absolute top-full right-0 z-[100] dropdown-container ${isUserOpen ? 'is-visible' : ''}`}>
       <div className={`${dropdownBaseClass} w-[300px] py-4`}>
@@ -330,6 +341,9 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
             <div key={idx} className="relative h-full flex items-center" onMouseEnter={() => item.setOpen(true)} onMouseLeave={() => item.setOpen(false)}>
               <button onClick={() => item.page && onNavigate(item.page)} className={`transition-all hover:text-white flex items-center gap-1.5 h-full ${currentPage === item.page ? 'text-white' : 'text-gray-400'}`}>
                 {item.label}
+                {item.label === 'Earn' && (
+                  <span className="ml-1 bg-amber-400 text-black text-[9px] font-bold px-2 py-0.5 rounded-full tracking-tighter whitespace-nowrap">Up to 58% APR</span>
+                )}
                 <svg className={`w-3 h-3 transition-transform duration-300 ${item.open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="m6 9 6 6 6-6"/></svg>
               </button>
               {item.dropdown}
@@ -421,6 +435,13 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
 
               <div className="h-6 w-[1px] bg-zinc-600/60 mx-2"></div>
               
+              <div className="relative h-16 flex items-center" onMouseEnter={() => setIsSupportOpen(true)} onMouseLeave={() => setIsSupportOpen(false)}>
+                <button className={`p-2.5 rounded-xl transition-all flex items-center gap-1.5 ${isSupportOpen ? 'text-white bg-zinc-800' : 'text-gray-400 hover:text-white hover:bg-zinc-800'}`}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </button>
+                <SupportDropdownContent />
+              </div>
+
               <div className="relative h-16 flex items-center" onMouseEnter={() => setIsLanguageOpen(true)} onMouseLeave={() => setIsLanguageOpen(false)}>
                 <button className={`p-2.5 rounded-xl transition-all flex items-center justify-center ${isLanguageOpen ? 'text-white bg-zinc-800' : 'text-gray-400 hover:text-white hover:bg-zinc-800'}`}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
@@ -435,14 +456,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                   <span className="hidden lg:block text-[11px] font-semibold tracking-tight">Support</span>
                 </button>
-                <div className={`absolute top-full right-0 z-[100] dropdown-container ${isSupportOpen ? 'is-visible' : ''}`}>
-                  <div className={`${dropdownBaseClass} w-64 p-3`}>
-                    <button className={dropdownItemClass}>
-                      <span className={dropdownIconClass}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
-                      <span className={dropdownTextClass}>Support center</span>
-                    </button>
-                  </div>
-                </div>
+                <SupportDropdownContent />
               </div>
 
               <div className="relative h-16 flex items-center" onMouseEnter={() => setIsLanguageOpen(true)} onMouseLeave={() => setIsLanguageOpen(false)}>

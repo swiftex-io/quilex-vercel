@@ -106,7 +106,7 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
           </div>
           <div className="h-10 w-full overflow-hidden flex items-end gap-0.5 mt-auto">
             {Array.from({ length: 20 }).map((_, i) => (
-              <div key={i} className="flex-1 bg-zinc-900" style={{ height: `${20 + Math.random() * 80}%` }}></div>
+              <div key={i} className="flex-1 bg-zinc-800" style={{ height: `${20 + Math.random() * 80}%` }}></div>
             ))}
           </div>
         </div>
