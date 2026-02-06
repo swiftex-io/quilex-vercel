@@ -26,11 +26,11 @@ const Home: React.FC<HomeProps> = ({ onTrade }) => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-24">
           <button 
             onClick={onTrade}
-            className="px-10 py-5 bg-white text-black font-bold rounded-xl text-lg hover:bg-gray-200 transition-all transform hover:scale-105"
+            className="px-8 py-4 bg-white text-black font-bold rounded-xl text-base hover:bg-gray-200 transition-all transform hover:scale-105"
           >
             Trade Now
           </button>
-          <button className="px-10 py-5 bg-zinc-900 text-white font-bold rounded-xl text-lg border border-gray-800 hover:bg-zinc-800 transition-all">
+          <button className="px-8 py-4 bg-zinc-900 text-white font-bold rounded-xl text-base border border-gray-800 hover:bg-zinc-800 transition-all">
             Learn More
           </button>
         </div>
@@ -59,7 +59,7 @@ const Home: React.FC<HomeProps> = ({ onTrade }) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
           
           {/* Box 1: Hot crypto */}
-          <div className="bg-[#111111] border border-zinc-900 rounded-xl p-6 hover:border-zinc-700 transition-colors group">
+          <div className="bg-[#111111] rounded-xl p-6 group">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-[13px] font-black text-white uppercase tracking-wider flex items-center gap-1">
                 Hot crypto <svg className="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M9 5l7 7-7 7"/></svg>
@@ -68,15 +68,15 @@ const Home: React.FC<HomeProps> = ({ onTrade }) => {
                 USD <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="m6 9 6 6 6-6"/></svg>
               </div>
             </div>
-            <div className="space-y-5">
+            <div className="space-y-2">
               {hotAssets.map((asset) => (
                 <div 
                   key={asset.symbol} 
                   onClick={onTrade}
-                  className="flex justify-between items-center cursor-pointer hover:bg-white/[0.02] -mx-2 px-2 py-1 rounded-lg transition-all"
+                  className="flex justify-between items-center cursor-pointer hover:bg-white/[0.04] -mx-2 px-2 py-2 rounded-lg transition-all group/row"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-[11px] font-black text-zinc-400 group-hover/row:text-white">{asset.symbol[0]}</div>
+                    <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-[11px] font-black text-zinc-400 group-hover/row:text-white transition-colors">{asset.symbol[0]}</div>
                     <span className="text-sm font-bold">{asset.symbol}<span className="text-zinc-600">/USD</span></span>
                   </div>
                   <div className="text-right">
@@ -91,7 +91,7 @@ const Home: React.FC<HomeProps> = ({ onTrade }) => {
           </div>
 
           {/* Box 2: New listings */}
-          <div className="bg-[#111111] border border-zinc-900 rounded-xl p-6 hover:border-zinc-700 transition-colors group">
+          <div className="bg-[#111111] rounded-xl p-6 group">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-[13px] font-black text-white uppercase tracking-wider flex items-center gap-1">
                 New listings <svg className="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M9 5l7 7-7 7"/></svg>
@@ -100,7 +100,7 @@ const Home: React.FC<HomeProps> = ({ onTrade }) => {
                 USD <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="m6 9 6 6 6-6"/></svg>
               </div>
             </div>
-            <div className="space-y-5">
+            <div className="space-y-2">
               {[
                 { symbol: 'ZAMA', name: 'Zama', price: 0.02774, change: 4.68 },
                 { symbol: 'USAT', name: 'USAT', price: 1.0020, change: 0.00 },
@@ -109,10 +109,10 @@ const Home: React.FC<HomeProps> = ({ onTrade }) => {
                 <div 
                   key={item.symbol} 
                   onClick={onTrade}
-                  className="flex justify-between items-center cursor-pointer hover:bg-white/[0.02] -mx-2 px-2 py-1 rounded-lg transition-all"
+                  className="flex justify-between items-center cursor-pointer hover:bg-white/[0.04] -mx-2 px-2 py-2 rounded-lg transition-all group/row"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-[11px] font-black text-zinc-400">{item.symbol[0]}</div>
+                    <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-[11px] font-black text-zinc-400 group-hover/row:text-white transition-colors">{item.symbol[0]}</div>
                     <span className="text-sm font-bold">{item.symbol}<span className="text-zinc-600">/USD</span></span>
                   </div>
                   <div className="text-right">
@@ -127,7 +127,7 @@ const Home: React.FC<HomeProps> = ({ onTrade }) => {
           </div>
 
           {/* Box 3: Macro data */}
-          <div className="bg-[#111111] border border-zinc-900 rounded-xl p-6 hover:border-zinc-700 transition-colors group">
+          <div className="bg-[#111111] rounded-xl p-6 group">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-[13px] font-black text-white uppercase tracking-wider flex items-center gap-1">
                 Macro data <svg className="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M9 5l7 7-7 7"/></svg>
