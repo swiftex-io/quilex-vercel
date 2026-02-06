@@ -12,6 +12,19 @@ const Home: React.FC<HomeProps> = ({ onTrade }) => {
   // Dohvatanje podataka za Hot Crypto boks
   const hotAssets = balances.filter(b => ['BTC', 'ETH', 'SOL'].includes(b.symbol));
 
+  const renderIcon = (symbol: string) => (
+    <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-[11px] font-black text-zinc-400 transition-colors overflow-hidden relative">
+      <img 
+        src={`https://assets.coincap.io/assets/icons/${symbol.toLowerCase()}@2x.png`} 
+        alt={symbol}
+        className="w-full h-full object-cover relative z-10"
+        onError={(e) => {
+          (e.target as HTMLImageElement).style.display = 'none';
+        }}
+      />
+    </div>
+  );
+
   return (
     <div className="flex flex-col items-center bg-black px-6 pb-20">
       <div className="max-w-6xl w-full text-center pt-24">
@@ -76,7 +89,7 @@ const Home: React.FC<HomeProps> = ({ onTrade }) => {
                   className="flex justify-between items-center cursor-pointer hover:bg-white/[0.04] -mx-2 px-2 py-2 rounded-lg transition-all group/row"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-[11px] font-black text-zinc-400 group-hover/row:text-white transition-colors">{asset.symbol[0]}</div>
+                    {renderIcon(asset.symbol)}
                     <span className="text-sm font-bold">{asset.symbol}<span className="text-zinc-600">/USD</span></span>
                   </div>
                   <div className="text-right">
@@ -112,7 +125,7 @@ const Home: React.FC<HomeProps> = ({ onTrade }) => {
                   className="flex justify-between items-center cursor-pointer hover:bg-white/[0.04] -mx-2 px-2 py-2 rounded-lg transition-all group/row"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-[11px] font-black text-zinc-400 group-hover/row:text-white transition-colors">{item.symbol[0]}</div>
+                    {renderIcon(item.symbol)}
                     <span className="text-sm font-bold">{item.symbol}<span className="text-zinc-600">/USD</span></span>
                   </div>
                   <div className="text-right">

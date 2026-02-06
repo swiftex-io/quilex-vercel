@@ -41,6 +41,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
+    // Fix: Using removeEventListener instead of the non-existent removeOverlay method
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
@@ -56,7 +57,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
     ).slice(0, 10);
   }, [balances, searchQuery]);
 
-  // Standardized UI constants - Reduced border radius from 24px to 16px (rounded-2xl)
+  // Standardized UI constants
   const dropdownBaseClass = "bg-white text-black rounded-2xl shadow-[0_32px_64px_rgba(0,0,0,0.18)] overflow-hidden border border-gray-100 animate-in fade-in zoom-in-95 duration-200";
   const dropdownItemClass = "w-full flex items-center gap-3.5 px-5 py-3 hover:bg-gray-50 transition-all text-left group";
   const dropdownTextClass = "text-[13px] font-medium text-gray-800 group-hover:text-black tracking-tight"; 
@@ -84,8 +85,13 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                   {idx + 1}
                 </span>
                 
-                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-[10px] text-gray-500 overflow-hidden">
-                   {asset.symbol[0]}
+                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-[10px] text-gray-500 overflow-hidden relative">
+                   <img 
+                    src={`https://assets.coincap.io/assets/icons/${asset.symbol.toLowerCase()}@2x.png`} 
+                    alt={asset.symbol}
+                    className="w-full h-full object-cover relative z-10"
+                    onError={(e) => (e.target as HTMLImageElement).style.display = 'none'}
+                   />
                 </div>
                 
                 <div className="flex items-center gap-1.5">
@@ -108,11 +114,6 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
               </div>
             </button>
           ))}
-          {searchResults.length === 0 && (
-            <div className="px-6 py-10 text-center text-[13px] text-gray-400 font-medium">
-              No results found for "{searchQuery}"
-            </div>
-          )}
         </div>
       </div>
     </div>
@@ -333,7 +334,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
         </div>
 
         <div className="ml-auto flex items-center gap-1">
-          {/* Enhanced Search Component - Aligned left-to-right */}
+          {/* Enhanced Search Component */}
           <div className="hidden lg:flex items-center relative mr-4 group" ref={searchRef}>
             <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none group-focus-within:text-white transition-colors z-10">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
