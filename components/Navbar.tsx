@@ -175,7 +175,6 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
             { label: 'Profile', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
             { label: 'Security', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg> },
             { label: 'Verification', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect width="18" height="14" x="3" y="5" rx="2"/><path d="M7 10h10M7 14h6"/></svg> },
-            { label: 'Country/Region', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> },
             { label: 'Preferences', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> }
           ].map((item) => (
             <button key={item.label} onClick={() => { onNavigate(Page.SETTINGS); setIsUserOpen(false); }} className={dropdownItemClass}>
@@ -261,7 +260,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                 }
                 setIsTradeOpen(false); 
               }} 
-              className={`${dropdownItemClass} rounded-2xl ${item.soon ? 'cursor-default' : ''}`}
+              className={`${dropdownItemClass} rounded-2xl ${item.soon ? 'cursor-not-allowed opacity-50' : ''}`}
             >
               <span className={dropdownIconClass}>{item.icon}</span>
               <div className="flex-1">
