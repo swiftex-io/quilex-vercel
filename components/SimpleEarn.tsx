@@ -76,10 +76,10 @@ const SimpleEarn: React.FC = () => {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-gradient-to-b from-[#d7ff20]/10 via-transparent to-transparent blur-[120px] pointer-events-none opacity-40"></div>
 
         <div className="relative z-10 max-w-4xl mx-auto animate-in fade-in zoom-in-95 duration-1000">
-          <h1 className="text-6xl md:text-9xl font-black mb-2 tracking-tighter leading-[0.95] bg-gradient-to-b from-white to-zinc-400 bg-clip-text text-transparent uppercase">
+          <h1 className="text-5xl md:text-8xl font-black mb-3 tracking-tighter leading-none text-white">
             Quilex Earn
           </h1>
-          <p className="text-xl md:text-2xl font-light text-[#d7ff20] mb-8 tracking-wide opacity-90">
+          <p className="text-lg md:text-xl font-light text-[#d7ff20] mb-8 tracking-wide opacity-90">
             New user exclusive: Up to 600% APR
           </p>
           <p className="text-sm md:text-base text-zinc-500 mb-10 max-w-xl mx-auto font-normal leading-relaxed opacity-70">
