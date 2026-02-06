@@ -41,7 +41,6 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
-    // Fix: Using removeEventListener instead of the non-existent removeOverlay method
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
@@ -242,12 +241,26 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
           {[
             { title: 'Convert', desc: 'Quick conversion, zero fees', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8l4 4-4 4M8 12h7"/></svg> },
             { title: 'Spot', desc: 'Buy and sell crypto with ease', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9-9a9 9 0 0 0-9 9"/></svg> },
-            { title: 'Futures', desc: 'Up to 125x leverage', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> }
+            { title: 'Futures', desc: 'Up to 125x leverage', soon: true, icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> }
           ].map((item, idx) => (
-            <button key={idx} onClick={() => { onNavigate(Page.TRADE); setIsTradeOpen(false); }} className={`${dropdownItemClass} rounded-2xl`}>
+            <button 
+              key={idx} 
+              onClick={() => { 
+                if (!item.soon) {
+                  onNavigate(Page.TRADE); 
+                }
+                setIsTradeOpen(false); 
+              }} 
+              className={`${dropdownItemClass} rounded-2xl ${item.soon ? 'cursor-default' : ''}`}
+            >
               <span className={dropdownIconClass}>{item.icon}</span>
               <div className="flex-1">
-                <div className={dropdownTextClass}>{item.title}</div>
+                <div className="flex items-center gap-2">
+                  <div className={dropdownTextClass}>{item.title}</div>
+                  {item.soon && (
+                    <span className="bg-blue-500/10 text-blue-500 text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Soon</span>
+                  )}
+                </div>
                 <p className="text-[11px] text-gray-400 font-medium leading-tight mt-0.5">{item.desc}</p>
               </div>
             </button>
