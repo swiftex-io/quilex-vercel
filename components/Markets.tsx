@@ -232,7 +232,7 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
                 </span>
                 {cat.name}
               </h3>
-              <button className="text-[11px] text-zinc-600 hover:text-white">More ></button>
+              <button className="text-[11px] text-zinc-600 hover:text-white">More &gt;</button>
             </div>
             <div className="grid grid-cols-12 text-[10px] text-zinc-600 mb-4 px-1">
               <div className="col-span-8">Name | Turnover</div>
