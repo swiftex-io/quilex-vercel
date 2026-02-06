@@ -119,12 +119,12 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
         <div className="px-5 pb-3 text-[10px] font-bold text-gray-400 tracking-tight border-b border-gray-50 mb-3">Passive income</div>
         <div className="space-y-1 px-2">
           {[
-            { title: 'Simple Earn', desc: 'Flexible savings with daily rewards', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> },
+            { title: 'Simple Earn', page: Page.SIMPLE_EARN, desc: 'Flexible savings with daily rewards', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> },
             { title: 'Staking', desc: 'Earn high yields on your crypto', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 3v18M3 12h18M5 19l14-14M5 5l14 14"/></svg> },
             { title: 'ETH Staking', desc: 'Stake ETH and receive BETH', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m12 2 7 4-7 4-7-4 7-4zM12 11l7 4-7 4-7-4 7-4zM12 20l7 4-7 4-7-4 7-4z"/></svg> },
             { title: 'Dual Investment', desc: 'Buy low or sell high with bonus yield', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="7" cy="12" r="5"/><circle cx="17" cy="12" r="5"/></svg> }
           ].map((item, idx) => (
-            <button key={idx} className={`${dropdownItemClass} rounded-2xl`}>
+            <button key={idx} onClick={() => { if(item.page) onNavigate(item.page); setIsEarnNavOpen(false); }} className={`${dropdownItemClass} rounded-2xl`}>
               <span className={dropdownIconClass}>{item.icon}</span>
               <div className="flex-1">
                 <div className={dropdownTextClass}>{item.title}</div>

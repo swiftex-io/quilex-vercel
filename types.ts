@@ -6,7 +6,8 @@ export enum Page {
   AFFILIATE = 'affiliate',
   SETTINGS = 'settings',
   HOME = 'home',
-  MARKETS = 'markets'
+  MARKETS = 'markets',
+  SIMPLE_EARN = 'simple_earn'
 }
 
 export type LayoutType = 'default' | 'trading' | 'none';

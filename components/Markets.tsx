@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useExchangeStore } from '../store';
 
 interface MarketsProps {
@@ -9,6 +9,40 @@ interface MarketsProps {
 const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
   const { balances, marketsActiveTab, setMarketsActiveTab } = useExchangeStore();
   const [cryptoFilter, setCryptoFilter] = useState('All');
+  
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  // Reset pagination when filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [cryptoFilter]);
+
+  const filteredAssets = useMemo(() => {
+    // Basic mock filtering based on categories
+    let result = [...balances];
+    
+    if (cryptoFilter === 'Meme') {
+      result = result.filter(a => ['DOGE', 'SHIB', 'PEPE'].includes(a.symbol));
+    } else if (cryptoFilter === 'AI') {
+      result = result.filter(a => ['RNDR', 'NEAR', 'ICP'].includes(a.symbol));
+    } else if (cryptoFilter === 'Solana') {
+      result = result.filter(a => ['SOL'].includes(a.symbol));
+    } else if (cryptoFilter === 'Layer 1') {
+      result = result.filter(a => ['BTC', 'ETH', 'BNB', 'ADA', 'AVAX', 'DOT', 'ATOM'].includes(a.symbol));
+    } else if (cryptoFilter === 'Top') {
+      result = result.sort((a, b) => b.price * 1000 - a.price * 1000).slice(0, 15);
+    }
+    
+    return result;
+  }, [balances, cryptoFilter]);
+
+  const totalPages = Math.ceil(filteredAssets.length / itemsPerPage);
+  const paginatedAssets = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredAssets.slice(start, start + itemsPerPage);
+  }, [filteredAssets, currentPage]);
 
   const renderSparkline = (change: number) => {
     const color = change >= 0 ? '#00d18e' : '#ff4d4f';
@@ -169,23 +203,23 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
       </div>
 
       {/* Main Market Table */}
-      <div className="bg-black">
+      <div className="bg-zinc-950 border border-white/5 rounded-2xl shadow-2xl overflow-hidden">
         <table className="w-full text-left">
           <thead>
             <tr className="text-[12px] text-zinc-600 font-normal border-b border-zinc-900 tracking-tight">
-              <th className="px-4 py-3 font-normal">Name</th>
-              <th className="px-4 py-3 font-normal">Price</th>
-              <th className="px-4 py-3 font-normal">24h change</th>
-              <th className="px-4 py-3 font-normal">Last 24h</th>
-              <th className="px-4 py-3 font-normal">24h range</th>
-              <th className="px-4 py-3 font-normal">Market cap</th>
-              <th className="px-4 py-3 text-right font-normal">Action</th>
+              <th className="px-8 py-3 font-normal">Name</th>
+              <th className="px-8 py-3 font-normal">Price</th>
+              <th className="px-8 py-3 font-normal">24h change</th>
+              <th className="px-8 py-3 font-normal">Last 24h</th>
+              <th className="px-8 py-3 font-normal">24h range</th>
+              <th className="px-8 py-3 font-normal">Market cap</th>
+              <th className="px-8 py-3 text-right font-normal">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-900/50">
-            {balances.slice(0, 15).map((asset) => (
+            {paginatedAssets.length > 0 ? paginatedAssets.map((asset) => (
               <tr key={asset.symbol} onClick={onTrade} className="hover:bg-zinc-900/30 transition-all group cursor-pointer">
-                <td className="px-4 py-5">
+                <td className="px-8 py-5">
                   <div className="flex items-center gap-3">
                     <button onClick={(e) => e.stopPropagation()} className="text-zinc-800 hover:text-amber-500 transition-colors"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg></button>
                     <img src={`https://assets.coincap.io/assets/icons/${asset.symbol.toLowerCase()}@2x.png`} className="w-8 h-8 rounded-full" alt="" />
@@ -195,12 +229,12 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
                     </div>
                   </div>
                 </td>
-                <td className="px-4 py-5 font-mono text-sm">${asset.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                <td className={`px-4 py-5 font-normal text-sm ${asset.change24h >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>
+                <td className="px-8 py-5 font-mono text-sm">${asset.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                <td className={`px-8 py-5 font-normal text-sm ${asset.change24h >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>
                   {asset.change24h >= 0 ? '+' : ''}{asset.change24h.toFixed(2)}%
                 </td>
-                <td className="px-4 py-5">{renderSparkline(asset.change24h)}</td>
-                <td className="px-4 py-5">
+                <td className="px-8 py-5">{renderSparkline(asset.change24h)}</td>
+                <td className="px-8 py-5">
                   <div className="w-32">
                     <div className="flex justify-between text-[10px] text-zinc-600 mb-1 font-medium">
                       <span>${(asset.price * 0.95).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
@@ -215,8 +249,8 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
                     </div>
                   </div>
                 </td>
-                <td className="px-4 py-5 text-sm text-zinc-400 font-normal">${(Math.random() * 500).toFixed(2)}B</td>
-                <td className="px-4 py-5 text-right">
+                <td className="px-8 py-5 text-sm text-zinc-400 font-normal">${(Math.random() * 500).toFixed(2)}B</td>
+                <td className="px-8 py-5 text-right">
                   <div className="flex items-center justify-end gap-3 text-[12px] font-normal">
                     <button onClick={(e) => { e.stopPropagation(); }} className="text-zinc-600 hover:text-white transition-colors">Details</button>
                     <span className="text-zinc-900">|</span>
@@ -224,9 +258,51 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
                   </div>
                 </td>
               </tr>
-            ))}
+            )) : (
+              <tr>
+                <td colSpan={7} className="px-8 py-10 text-center text-zinc-600 text-xs font-medium uppercase tracking-widest">
+                  No assets found for this category
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
+
+        {/* Pagination Controls - Identical to Assets.tsx */}
+        {totalPages > 1 && (
+          <div className="px-8 py-6 border-t border-white/5 flex items-center justify-between bg-zinc-950">
+            <div className="text-[11px] text-zinc-500 font-medium">
+              Showing <span className="text-white">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="text-white">{Math.min(currentPage * itemsPerPage, filteredAssets.length)}</span> of <span className="text-white">{filteredAssets.length}</span> pairs
+            </div>
+            <div className="flex items-center gap-1">
+              <button 
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="p-2 rounded-lg hover:bg-zinc-900 text-zinc-500 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-transparent"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m15 18-6-6 6-6"/></svg>
+              </button>
+              
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`min-w-[32px] h-8 rounded-lg text-[11px] font-bold transition-all ${currentPage === page ? 'bg-white text-black' : 'text-zinc-500 hover:text-white hover:bg-zinc-900'}`}
+                >
+                  {page}
+                </button>
+              ))}
+
+              <button 
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="p-2 rounded-lg hover:bg-zinc-900 text-zinc-500 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-transparent"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

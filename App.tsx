@@ -9,6 +9,7 @@ import Referral from './components/Referral';
 import Settings from './components/Settings';
 import Footer from './components/Footer';
 import Markets from './components/Markets';
+import SimpleEarn from './components/SimpleEarn';
 import { useExchangeStore } from './store';
 
 const App: React.FC = () => {
@@ -59,6 +60,7 @@ const App: React.FC = () => {
       case Page.REFERRAL: return <Referral />;
       case Page.AFFILIATE: return <Referral isAffiliate />;
       case Page.SETTINGS: return <Settings />;
+      case Page.SIMPLE_EARN: return <SimpleEarn />;
       default: return <Home onTrade={() => setCurrentPage(Page.TRADE)} />;
     }
   };

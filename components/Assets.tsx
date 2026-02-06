@@ -321,7 +321,7 @@ const Assets: React.FC = () => {
                     disabled={currentPage === totalPages}
                     className="p-2 rounded-lg hover:bg-zinc-900 text-gray-500 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-transparent"
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m9 18 6-6-6-6" transform="rotate(180 12 12)"/></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m9 18 6-6-6-6"/></svg>
                   </button>
                 </div>
               </div>
