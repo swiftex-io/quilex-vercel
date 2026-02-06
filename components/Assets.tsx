@@ -62,7 +62,14 @@ const Assets: React.FC = () => {
   }, []);
 
   const filteredBalances = useMemo(() => {
-    return balances.filter(asset => {
+    // Sort assets so those with balance > 0 come first
+    const sorted = [...balances].sort((a, b) => {
+      const aVal = a.balance > 0 ? 1 : 0;
+      const bVal = b.balance > 0 ? 1 : 0;
+      return bVal - aVal;
+    });
+
+    return sorted.filter(asset => {
       if (hideZero && asset.balance <= 0) return false;
       return true;
     });
@@ -182,22 +189,28 @@ const Assets: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {filteredBalances.map((asset) => (
-                  <tr key={asset.symbol} className="hover:bg-white/[0.02] transition-colors group">
-                    <td className="px-8 py-5">
-                      <div className="flex items-center gap-4">
-                        {renderCryptoIcon(asset.symbol)}
-                        <div>
-                          <div className="font-semibold text-sm">{asset.symbol}</div>
-                          <div className="text-[10px] text-gray-500 font-medium uppercase">{asset.name}</div>
+                {filteredBalances.map((asset) => {
+                  const hasBalance = asset.balance > 0;
+                  return (
+                    <tr 
+                      key={asset.symbol} 
+                      className={`transition-colors group ${hasBalance ? 'bg-zinc-900/40 hover:bg-zinc-800/50' : 'hover:bg-white/[0.02] opacity-60 hover:opacity-100'}`}
+                    >
+                      <td className="px-8 py-5">
+                        <div className="flex items-center gap-4">
+                          {renderCryptoIcon(asset.symbol)}
+                          <div>
+                            <div className="font-semibold text-sm">{asset.symbol}</div>
+                            <div className="text-[10px] text-gray-500 font-medium uppercase">{asset.name}</div>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-8 py-5 font-mono text-xs font-medium">{asset.balance.toLocaleString(undefined, { maximumFractionDigits: 6 })}</td>
-                    <td className="px-8 py-5 font-mono text-xs text-white">${(asset.balance * asset.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                    <td className="px-8 py-5 text-right"><button className="text-[10px] font-semibold text-blue-500 hover:text-white uppercase tracking-widest transition-colors">Trade</button></td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="px-8 py-5 font-mono text-xs font-medium">{asset.balance.toLocaleString(undefined, { maximumFractionDigits: 6 })}</td>
+                      <td className="px-8 py-5 font-mono text-xs text-white">${(asset.balance * asset.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                      <td className="px-8 py-5 text-right"><button className="text-[10px] font-semibold text-blue-500 hover:text-white uppercase tracking-widest transition-colors">Trade</button></td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
