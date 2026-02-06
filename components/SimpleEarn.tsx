@@ -2,85 +2,44 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useExchangeStore } from '../store';
 
+declare global {
+  interface Window {
+    VANTA: any;
+  }
+}
+
 const SimpleEarn: React.FC = () => {
   const { balances } = useExchangeStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [productFilter, setProductFilter] = useState('All products');
   const [termFilter, setTermFilter] = useState('All terms');
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const vantaRef = useRef<HTMLDivElement>(null);
+  const [vantaEffect, setVantaEffect] = useState<any>(null);
 
-  // WebGL-like Particle Animation
+  // Vanta.js DOTS effect
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let animationFrameId: number;
-    let particles: Array<{ x: number; y: number; vx: number; vy: number; size: number }> = [];
-
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = 600;
-      init();
-    };
-
-    const init = () => {
-      particles = [];
-      const count = Math.min(window.innerWidth / 10, 100);
-      for (let i = 0; i < count; i++) {
-        particles.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          vx: (Math.random() - 0.5) * 0.5,
-          vy: (Math.random() - 0.5) * 0.5,
-          size: Math.random() * 2 + 1,
-        });
-      }
-    };
-
-    const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = 'rgba(0, 242, 255, 0.5)';
-      
-      particles.forEach((p, i) => {
-        p.x += p.vx;
-        p.y += p.vy;
-
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Lines
-        for (let j = i + 1; j < particles.length; j++) {
-          const p2 = particles[j];
-          const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
-          if (dist < 150) {
-            ctx.strokeStyle = `rgba(0, 242, 255, ${0.1 * (1 - dist / 150)})`;
-            ctx.lineWidth = 0.5;
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.stroke();
-          }
-        }
+    if (!vantaEffect && vantaRef.current && window.VANTA) {
+      const effect = window.VANTA.DOTS({
+        el: vantaRef.current,
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200.00,
+        minWidth: 200.00,
+        scale: 1.00,
+        scaleMobile: 1.00,
+        color: 0xd7ff20,
+        color2: 0xf1ff20,
+        size: 2.90,
+        spacing: 28.00,
+        backgroundColor: 0x000000
       });
-
-      animationFrameId = requestAnimationFrame(draw);
-    };
-
-    window.addEventListener('resize', resize);
-    resize();
-    draw();
-
+      setVantaEffect(effect);
+    }
     return () => {
-      window.removeEventListener('resize', resize);
-      cancelAnimationFrame(animationFrameId);
+      if (vantaEffect) vantaEffect.destroy();
     };
-  }, []);
+  }, [vantaEffect]);
 
   // Mock APY data mapped to balances
   const earnProducts = useMemo(() => {
@@ -110,15 +69,12 @@ const SimpleEarn: React.FC = () => {
   return (
     <div className="bg-black min-h-screen text-white pb-32">
       {/* Hero Section */}
-      <div className="relative pt-32 pb-48 px-6 flex flex-col items-center text-center overflow-hidden">
-        {/* Canvas Animation Background */}
-        <canvas 
-          ref={canvasRef} 
-          className="absolute inset-0 w-full h-full pointer-events-none opacity-40"
-        />
+      <div ref={vantaRef} className="relative pt-32 pb-48 px-6 flex flex-col items-center text-center overflow-hidden">
+        {/* Background Overlay to ensure readability */}
+        <div className="absolute inset-0 bg-black/40 pointer-events-none"></div>
         
-        {/* Background Glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-gradient-to-b from-cyan-500/10 via-purple-500/5 to-transparent blur-[120px] pointer-events-none"></div>
+        {/* Subtle Gradient for depth */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-gradient-to-b from-[#d7ff20]/10 via-transparent to-transparent blur-[120px] pointer-events-none opacity-40"></div>
 
         <div className="relative z-10 max-w-4xl mx-auto animate-in fade-in zoom-in-95 duration-1000">
           <h1 className="text-6xl md:text-8xl font-black mb-8 tracking-tighter leading-[1.05] bg-gradient-to-b from-white to-zinc-400 bg-clip-text text-transparent">
@@ -130,7 +86,7 @@ const SimpleEarn: React.FC = () => {
             Make your crypto work for you.
           </p>
 
-          <button className="px-12 py-5 bg-[#00f2ff] text-black font-black rounded-full text-lg hover:bg-cyan-300 transition-all shadow-[0_0_40px_rgba(0,242,255,0.4)] active:scale-95">
+          <button className="px-12 py-5 bg-[#d7ff20] text-black font-black rounded-full text-lg hover:bg-white transition-all shadow-[0_0_40px_rgba(215,255,32,0.3)] active:scale-95">
             Start Staking
           </button>
         </div>
@@ -183,7 +139,7 @@ const SimpleEarn: React.FC = () => {
                 placeholder="Search crypto"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl py-3 pl-12 pr-4 text-sm font-bold focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 outline-none transition-all placeholder:text-zinc-600"
+                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl py-3 pl-12 pr-4 text-sm font-bold focus:border-[#d7ff20]/50 focus:ring-1 focus:ring-[#d7ff20]/20 outline-none transition-all placeholder:text-zinc-600"
               />
             </div>
           </div>
@@ -224,7 +180,7 @@ const SimpleEarn: React.FC = () => {
                   </td>
                   <td className="px-10 py-8 text-right">
                     <div className="flex items-center justify-end gap-6">
-                      <button className="px-8 py-2.5 bg-white text-black text-sm font-black rounded-full hover:bg-zinc-200 transition-all opacity-0 group-hover:opacity-100 transform translate-x-4 group-hover:translate-x-0">
+                      <button className="px-8 py-2.5 bg-white text-black text-sm font-black rounded-full hover:bg-[#d7ff20] transition-all opacity-0 group-hover:opacity-100 transform translate-x-4 group-hover:translate-x-0">
                         Subscribe
                       </button>
                       <svg className="w-5 h-5 text-zinc-600 transition-transform group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="m9 18 6-6-6-6"/></svg>
@@ -256,7 +212,7 @@ const SimpleEarn: React.FC = () => {
                 Simple Earn is a principal-protected product that provides flexible or fixed terms with daily rewards. Your assets are used to generate yield through institutional-grade DeFi and lending protocols.
               </p>
             </div>
-            <button className="text-cyan-400 text-xs font-black uppercase tracking-widest flex items-center gap-2 group-hover:translate-x-2 transition-transform">
+            <button className="text-[#d7ff20] text-xs font-black uppercase tracking-widest flex items-center gap-2 group-hover:translate-x-2 transition-transform">
               Learn more about yield <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m9 18 6-6-6-6"/></svg>
             </button>
           </div>
@@ -267,7 +223,7 @@ const SimpleEarn: React.FC = () => {
                 Your principal is always protected. Quilex uses advanced risk management frameworks to ensure that rewards are distributed consistently while maintaining 100% solvency of the Earn pool.
               </p>
             </div>
-            <button className="text-cyan-400 text-xs font-black uppercase tracking-widest flex items-center gap-2 group-hover:translate-x-2 transition-transform">
+            <button className="text-[#d7ff20] text-xs font-black uppercase tracking-widest flex items-center gap-2 group-hover:translate-x-2 transition-transform">
               Review safety report <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m9 18 6-6-6-6"/></svg>
             </button>
           </div>
