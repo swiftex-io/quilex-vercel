@@ -16,7 +16,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const searchRef = useRef<HTMLDivElement>(null);
 
-  // Close search on click outside
+  // Zatvaranje search-a na klik van njega
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -36,49 +36,50 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
   }, [balances, searchQuery]);
 
   const navLinkClass = (page: Page) => `
-    px-1 py-5 text-[14px] font-medium transition-all hover:text-white relative flex items-center gap-1
+    h-full px-2 text-[14px] font-medium transition-all hover:text-white relative flex items-center
     ${currentPage === page ? 'text-white' : 'text-zinc-400'}
   `;
 
   return (
     <>
       <nav className="h-16 flex items-center px-6 bg-black border-b border-zinc-900 z-[60] sticky top-0">
-        {/* Logo Section */}
-        <div 
-          className="flex items-center gap-2 mr-10 cursor-pointer group shrink-0" 
-          onClick={() => onNavigate(Page.HOME)}
-        >
-          <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center font-black text-black transition-all group-hover:bg-blue-500">Q</div>
-          <span className="text-xl font-bold tracking-tighter text-white">QUILEX</span>
+        {/* LEVA STRANA: Logo i Primarni Linkovi */}
+        <div className="flex items-center h-full">
+          <div 
+            className="flex items-center gap-2 mr-10 cursor-pointer group shrink-0" 
+            onClick={() => onNavigate(Page.HOME)}
+          >
+            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center font-black text-black group-hover:bg-blue-500 transition-colors">Q</div>
+            <span className="text-xl font-bold tracking-tighter text-white">QUILEX</span>
+          </div>
+
+          <div className="hidden md:flex items-center gap-8 h-full">
+            <button onClick={() => onNavigate(Page.TRADE)} className={navLinkClass(Page.TRADE)}>
+              Trade
+            </button>
+            <button onClick={() => onNavigate(Page.MARKETS)} className={navLinkClass(Page.MARKETS)}>
+              Markets
+            </button>
+            <button onClick={() => onNavigate(Page.REFERRAL)} className={navLinkClass(Page.REFERRAL)}>
+              Referral
+            </button>
+          </div>
         </div>
 
-        {/* Primary Links */}
-        <div className="hidden md:flex items-center gap-8 h-full">
-          <button onClick={() => onNavigate(Page.TRADE)} className={navLinkClass(Page.TRADE)}>
-            Trade
-          </button>
-          <button onClick={() => onNavigate(Page.MARKETS)} className={navLinkClass(Page.MARKETS)}>
-            Markets
-          </button>
-          <button onClick={() => onNavigate(Page.REFERRAL)} className={navLinkClass(Page.REFERRAL)}>
-            Referral
-          </button>
-        </div>
-
-        {/* Right Actions */}
-        <div className="ml-auto flex items-center gap-4">
+        {/* DESNA STRANA: Search i Profil/Auth */}
+        <div className="ml-auto flex items-center gap-6 h-full">
           {/* Search Bar */}
           <div className="hidden lg:flex items-center relative group" ref={searchRef}>
-            <div className="absolute left-3 text-zinc-500 group-focus-within:text-white transition-colors">
+            <div className="absolute left-3 text-zinc-500 group-focus-within:text-white transition-colors pointer-events-none">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
             </div>
             <input 
               type="text" 
-              placeholder="Search coins" 
+              placeholder="Search" 
               value={searchQuery}
               onFocus={() => setIsSearchOpen(true)}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-zinc-900 border border-zinc-800 rounded-xl py-2 pl-9 pr-4 text-[12px] w-48 focus:w-64 focus:border-zinc-600 outline-none transition-all placeholder:text-zinc-600"
+              className="bg-zinc-900 border border-zinc-800 rounded-lg py-1.5 pl-9 pr-4 text-[12px] w-40 focus:w-60 focus:border-zinc-600 outline-none transition-all placeholder:text-zinc-600 text-white"
             />
             
             {isSearchOpen && (
@@ -94,10 +95,10 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                       className="w-full flex items-center justify-between p-3 hover:bg-zinc-800 transition-colors"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-[10px] font-bold">{asset.symbol[0]}</div>
-                        <span className="text-sm font-bold">{asset.symbol}</span>
+                        <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-[10px] font-bold text-zinc-400">{asset.symbol[0]}</div>
+                        <span className="text-sm font-bold text-white">{asset.symbol}/USDT</span>
                       </div>
-                      <span className={`text-xs font-mono ${asset.change24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                      <span className={`text-xs font-mono font-bold ${asset.change24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                         {asset.change24h >= 0 ? '+' : ''}{asset.change24h.toFixed(2)}%
                       </span>
                     </button>
@@ -108,10 +109,11 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
           </div>
 
           {user ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
               <button 
                 onClick={() => onNavigate(Page.ASSETS)}
-                className="p-2 text-zinc-400 hover:text-white transition-colors"
+                className="text-zinc-400 hover:text-white transition-colors"
+                title="Assets"
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M12 10v4M2 10h20"/></svg>
               </button>
@@ -123,16 +125,16 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <button 
                 onClick={() => setShowAuth(true)}
-                className="text-[14px] font-medium text-zinc-400 hover:text-white px-4"
+                className="text-[14px] font-medium text-zinc-400 hover:text-white"
               >
                 Log in
               </button>
               <button 
                 onClick={() => setShowAuth(true)}
-                className="bg-white text-black px-5 py-2 rounded-xl text-[14px] font-bold hover:bg-zinc-200 transition-all"
+                className="bg-white text-black px-4 py-1.5 rounded-lg text-[14px] font-bold hover:bg-zinc-200 transition-all"
               >
                 Sign up
               </button>
