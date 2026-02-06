@@ -286,7 +286,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
         <div className="space-y-1">
           {[
             { title: 'Markets Overview', desc: 'Prices and trends', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8l4 4-4 4"/></svg> },
-            { title: 'Market Data', desc: 'Real-time analytics', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 20v-6M6 20V10M18 20V4"/></svg> }
+            { title: 'Rankings', desc: 'Top gainers and trends', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 20v-6M6 20V10M18 20V4"/></svg> }
           ].map((item, idx) => (
             <button key={idx} onClick={() => { onNavigate(Page.MARKETS); setIsMarketsOpen(false); }} className={`${dropdownItemClass} rounded-2xl`}>
               <span className={dropdownIconClass}>{item.icon}</span>
