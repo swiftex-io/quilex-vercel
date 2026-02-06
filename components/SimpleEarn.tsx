@@ -12,6 +12,11 @@ const SimpleEarn: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [productFilter, setProductFilter] = useState('All products');
   const [termFilter, setTermFilter] = useState('All terms');
+  
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   const vantaRef = useRef<HTMLDivElement>(null);
   const [vantaEffect, setVantaEffect] = useState<any>(null);
 
@@ -40,7 +45,12 @@ const SimpleEarn: React.FC = () => {
     };
   }, [vantaEffect]);
 
-  // Mock APY data mapped to balances
+  // Reset pagination on search
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  // Mock APY and TVL data mapped to balances
   const earnProducts = useMemo(() => {
     const assetsWithAPY = balances.filter(b => b.symbol !== 'USDT' && b.symbol !== 'USDC').map(asset => {
       // Deterministic mock APY
@@ -52,10 +62,19 @@ const SimpleEarn: React.FC = () => {
       if (asset.symbol === 'ATOM') apy = 16.74;
       if (apy === 1.25) apy = 2.45 + (asset.symbol.charCodeAt(0) % 10);
 
+      // Mock Locked Amount & TVL
+      const seed = asset.symbol.charCodeAt(0) + asset.symbol.charCodeAt(asset.symbol.length - 1);
+      const lockedAmount = asset.price > 1000 
+        ? (seed * 12.5) 
+        : (seed * 15420.5);
+      const tvl = lockedAmount * asset.price;
+
       return {
         ...asset,
         apy: apy.toFixed(2),
-        term: 'Flexible'
+        term: 'Flexible',
+        lockedAmount: lockedAmount.toLocaleString(undefined, { maximumFractionDigits: 0 }),
+        tvl: tvl.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
       };
     });
 
@@ -65,18 +84,23 @@ const SimpleEarn: React.FC = () => {
     );
   }, [balances, searchQuery]);
 
+  // Derived pagination data
+  const totalPages = Math.ceil(earnProducts.length / itemsPerPage);
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return earnProducts.slice(start, start + itemsPerPage);
+  }, [earnProducts, currentPage]);
+
   return (
     <div className="bg-black min-h-screen text-white pb-32 selection:bg-[#d7ff20]/20 font-sans">
       {/* Hero Section */}
       <div ref={vantaRef} className="relative pt-24 pb-36 px-6 flex flex-col items-center text-center overflow-hidden">
-        {/* Background Overlay to ensure readability */}
         <div className="absolute inset-0 bg-black/60 pointer-events-none"></div>
         
-        {/* Subtle Gradient for depth */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-gradient-to-b from-[#d7ff20]/10 via-transparent to-transparent blur-[120px] pointer-events-none opacity-40"></div>
 
         <div className="relative z-10 max-w-4xl mx-auto animate-in fade-in zoom-in-95 duration-1000">
-          <h1 className="text-5xl md:text-8xl font-black mb-3 tracking-tighter leading-none text-white">
+          <h1 className="text-4xl md:text-7xl font-black mb-3 tracking-tighter leading-none text-white">
             Quilex Earn
           </h1>
           <p className="text-lg md:text-xl font-light text-[#d7ff20] mb-8 tracking-wide opacity-90">
@@ -142,22 +166,24 @@ const SimpleEarn: React.FC = () => {
           </div>
         </div>
 
-        {/* Products Table - Matches Markets.tsx style with thinner fonts */}
+        {/* Products Table */}
         <div className="bg-zinc-950 border border-white/5 rounded-xl overflow-hidden shadow-2xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="text-[11px] text-zinc-600 font-normal border-b border-zinc-900 tracking-tight">
-                  <th className="px-8 py-3.5 font-normal">Token</th>
-                  <th className="px-8 py-3.5 font-normal">Market APY</th>
-                  <th className="px-8 py-3.5 font-normal">Term</th>
-                  <th className="px-8 py-3.5 text-right font-normal">Action</th>
+                  <th className="px-8 py-4 font-normal">Token</th>
+                  <th className="px-8 py-4 font-normal">Market APY</th>
+                  <th className="px-8 py-4 font-normal text-right">Total Locked</th>
+                  <th className="px-8 py-4 font-normal text-right">TVL (USD)</th>
+                  <th className="px-8 py-4 font-normal text-center">Term</th>
+                  <th className="px-8 py-4 text-right font-normal">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-900/50">
-                {earnProducts.length > 0 ? earnProducts.map((product) => (
+                {paginatedProducts.length > 0 ? paginatedProducts.map((product) => (
                   <tr key={product.symbol} className="hover:bg-zinc-900/20 transition-all group cursor-pointer">
-                    <td className="px-8 py-4">
+                    <td className="px-8 py-5">
                       <div className="flex items-center gap-3">
                         <div className="w-7 h-7 rounded-full bg-zinc-900 flex items-center justify-center overflow-hidden border border-white/5">
                            <img src={`https://assets.coincap.io/assets/icons/${product.symbol.toLowerCase()}@2x.png`} className="w-full h-full object-cover" alt="" />
@@ -168,13 +194,19 @@ const SimpleEarn: React.FC = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-8 py-4 font-mono">
+                    <td className="px-8 py-5 font-mono">
                       <span className="text-[13px] font-normal text-[#00d18e]">{product.apy}%</span>
                     </td>
-                    <td className="px-8 py-4">
+                    <td className="px-8 py-5 text-right font-mono">
+                      <span className="text-[12px] text-zinc-300 font-normal">{product.lockedAmount} {product.symbol}</span>
+                    </td>
+                    <td className="px-8 py-5 text-right font-mono">
+                      <span className="text-[12px] text-zinc-500 font-normal">${product.tvl}</span>
+                    </td>
+                    <td className="px-8 py-5 text-center">
                        <span className="text-[12px] text-zinc-500 font-normal">{product.term}</span>
                     </td>
-                    <td className="px-8 py-4 text-right">
+                    <td className="px-8 py-5 text-right">
                       <div className="flex items-center justify-end gap-3">
                         <button className="px-3.5 py-1.5 bg-white text-black text-[10px] font-bold rounded-lg hover:bg-[#d7ff20] transition-all opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 uppercase tracking-tighter">
                           Subscribe
@@ -185,7 +217,7 @@ const SimpleEarn: React.FC = () => {
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan={4} className="px-8 py-12 text-center">
+                    <td colSpan={6} className="px-8 py-12 text-center">
                       <p className="text-zinc-600 text-[11px] font-normal uppercase tracking-widest opacity-60">No products available</p>
                     </td>
                   </tr>
@@ -193,6 +225,42 @@ const SimpleEarn: React.FC = () => {
               </tbody>
             </table>
           </div>
+
+          {/* Pagination Controls - Standard Quilex Style */}
+          {totalPages > 1 && (
+            <div className="px-8 py-6 border-t border-white/5 flex items-center justify-between bg-zinc-950/20">
+              <div className="text-[11px] text-zinc-500 font-medium">
+                Showing <span className="text-white">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="text-white">{Math.min(currentPage * itemsPerPage, earnProducts.length)}</span> of <span className="text-white">{earnProducts.length}</span> products
+              </div>
+              <div className="flex items-center gap-1">
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="p-2 rounded-lg hover:bg-zinc-900 text-zinc-500 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-transparent"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`min-w-[32px] h-8 rounded-lg text-[11px] font-bold transition-all ${currentPage === page ? 'bg-white text-black' : 'text-zinc-500 hover:text-white hover:bg-zinc-900'}`}
+                  >
+                    {page}
+                  </button>
+                ))}
+
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="p-2 rounded-lg hover:bg-zinc-900 text-zinc-500 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-transparent"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Info Cards */}
