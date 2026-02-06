@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useExchangeStore } from '../store';
 
@@ -67,26 +66,28 @@ const SimpleEarn: React.FC = () => {
   }, [balances, searchQuery]);
 
   return (
-    <div className="bg-black min-h-screen text-white pb-32">
+    <div className="bg-black min-h-screen text-white pb-32 selection:bg-[#d7ff20]/20 font-sans">
       {/* Hero Section */}
-      <div ref={vantaRef} className="relative pt-32 pb-48 px-6 flex flex-col items-center text-center overflow-hidden">
+      <div ref={vantaRef} className="relative pt-24 pb-36 px-6 flex flex-col items-center text-center overflow-hidden">
         {/* Background Overlay to ensure readability */}
-        <div className="absolute inset-0 bg-black/40 pointer-events-none"></div>
+        <div className="absolute inset-0 bg-black/60 pointer-events-none"></div>
         
         {/* Subtle Gradient for depth */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-gradient-to-b from-[#d7ff20]/10 via-transparent to-transparent blur-[120px] pointer-events-none opacity-40"></div>
 
         <div className="relative z-10 max-w-4xl mx-auto animate-in fade-in zoom-in-95 duration-1000">
-          <h1 className="text-6xl md:text-8xl font-black mb-8 tracking-tighter leading-[1.05] bg-gradient-to-b from-white to-zinc-400 bg-clip-text text-transparent">
-            Earn APR on your crypto <br />
-            with Quilex Earn
+          <h1 className="text-6xl md:text-9xl font-black mb-2 tracking-tighter leading-[0.95] bg-gradient-to-b from-white to-zinc-400 bg-clip-text text-transparent uppercase">
+            Quilex Earn
           </h1>
-          <p className="text-xl text-zinc-400 mb-12 max-w-2xl mx-auto font-medium leading-relaxed">
+          <p className="text-xl md:text-2xl font-light text-[#d7ff20] mb-8 tracking-wide opacity-90">
+            New user exclusive: Up to 600% APR
+          </p>
+          <p className="text-sm md:text-base text-zinc-500 mb-10 max-w-xl mx-auto font-normal leading-relaxed opacity-70">
             Hold crypto, earn rewards, it's that simple. <br className="hidden md:block" />
-            Make your crypto work for you.
+            Join the next generation of automated passive income.
           </p>
 
-          <button className="px-12 py-5 bg-[#d7ff20] text-black font-black rounded-full text-lg hover:bg-white transition-all shadow-[0_0_40px_rgba(215,255,32,0.3)] active:scale-95">
+          <button className="px-10 py-3.5 bg-[#d7ff20] text-black font-semibold rounded-xl text-[11px] hover:bg-white transition-all shadow-[0_0_30px_rgba(215,255,32,0.15)] active:scale-95 uppercase tracking-[0.2em]">
             Start Staking
           </button>
         </div>
@@ -94,137 +95,128 @@ const SimpleEarn: React.FC = () => {
 
       {/* Stats Section */}
       <div className="max-w-[1400px] mx-auto px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-0 border-y border-zinc-900 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-0 border-y border-zinc-900 py-12">
           <div className="flex flex-col items-center md:border-r border-zinc-900">
-            <div className="text-5xl font-black mb-2 tracking-tighter">1M+</div>
-            <div className="text-zinc-500 text-xs font-bold uppercase tracking-widest">Users Worldwide</div>
+            <div className="text-3xl font-medium mb-1 tracking-tight">1M+</div>
+            <div className="text-zinc-600 text-[9px] font-semibold uppercase tracking-[0.25em]">Users Worldwide</div>
           </div>
           <div className="flex flex-col items-center md:border-r border-zinc-900 px-8">
-            <div className="text-5xl font-black mb-2 tracking-tighter">24/7</div>
-            <div className="text-zinc-500 text-xs font-bold uppercase tracking-widest text-center">Customer Support</div>
+            <div className="text-3xl font-medium mb-1 tracking-tight">24/7</div>
+            <div className="text-zinc-600 text-[9px] font-semibold uppercase tracking-[0.25em] text-center">Customer Support</div>
           </div>
           <div className="flex flex-col items-center">
-            <div className="text-5xl font-black mb-2 tracking-tighter">100K+</div>
-            <div className="text-zinc-500 text-xs font-bold uppercase tracking-widest">Five Star Ratings</div>
+            <div className="text-3xl font-medium mb-1 tracking-tight">100K+</div>
+            <div className="text-zinc-600 text-[9px] font-semibold uppercase tracking-[0.25em]">Five Star Ratings</div>
           </div>
         </div>
       </div>
 
       {/* Products Section */}
-      <div className="max-w-[1400px] mx-auto px-8 mt-24">
-        <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-10 gap-6">
-          <h2 className="text-4xl font-black tracking-tight">Products</h2>
+      <div className="max-w-[1400px] mx-auto px-8 mt-16">
+        <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 gap-6">
+          <h2 className="text-xl font-medium tracking-tight">Products</h2>
           
-          <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
-            <div className="relative group">
-              <button className="bg-zinc-900 border border-zinc-800 rounded-xl px-5 py-3 text-sm font-bold flex items-center gap-3 hover:border-zinc-600 transition-all min-w-[160px]">
-                {productFilter}
-                <svg className="ml-auto w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="m6 9 6 6 6-6"/></svg>
-              </button>
-            </div>
+          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            <button className="bg-zinc-900/40 border border-zinc-800 rounded-lg px-3.5 py-1.5 text-[11px] font-normal flex items-center gap-2 hover:border-zinc-700 transition-all min-w-[130px] text-zinc-400">
+              {productFilter}
+              <svg className="ml-auto w-3 h-3 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
 
-            <div className="relative group">
-              <button className="bg-zinc-900 border border-zinc-800 rounded-xl px-5 py-3 text-sm font-bold flex items-center gap-3 hover:border-zinc-600 transition-all min-w-[160px]">
-                {termFilter}
-                <svg className="ml-auto w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="m6 9 6 6 6-6"/></svg>
-              </button>
-            </div>
+            <button className="bg-zinc-900/40 border border-zinc-800 rounded-lg px-3.5 py-1.5 text-[11px] font-normal flex items-center gap-2 hover:border-zinc-700 transition-all min-w-[130px] text-zinc-400">
+              {termFilter}
+              <svg className="ml-auto w-3 h-3 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
 
-            <div className="relative flex-1 md:flex-none md:w-[320px]">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <div className="relative flex-1 md:flex-none md:w-[240px]">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-700">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
               </div>
               <input 
                 type="text" 
                 placeholder="Search crypto"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl py-3 pl-12 pr-4 text-sm font-bold focus:border-[#d7ff20]/50 focus:ring-1 focus:ring-[#d7ff20]/20 outline-none transition-all placeholder:text-zinc-600"
+                className="w-full bg-zinc-900/40 border border-zinc-800 rounded-lg py-1.5 pl-9 pr-3 text-[11px] font-normal focus:border-zinc-700 outline-none transition-all placeholder:text-zinc-700 text-white"
               />
             </div>
           </div>
         </div>
 
-        {/* Products Table */}
-        <div className="bg-[#0a0a0a] border border-zinc-900 rounded-3xl overflow-hidden shadow-2xl">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="text-[12px] text-zinc-500 font-bold uppercase tracking-widest border-b border-zinc-900">
-                <th className="px-10 py-6 font-bold">Token</th>
-                <th className="px-10 py-6 font-bold">Market APY</th>
-                <th className="px-10 py-6 font-bold">Term</th>
-                <th className="px-10 py-6 text-right font-bold">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-900">
-              {earnProducts.length > 0 ? earnProducts.map((product) => (
-                <tr key={product.symbol} className="hover:bg-zinc-900/40 transition-colors group cursor-pointer">
-                  <td className="px-10 py-8">
-                    <div className="flex items-center gap-5">
-                      <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center overflow-hidden border border-white/5">
-                         <img src={`https://assets.coincap.io/assets/icons/${product.symbol.toLowerCase()}@2x.png`} className="w-full h-full object-cover" alt="" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-lg font-black text-white">{product.symbol}</span>
-                        <span className="text-[11px] text-zinc-500 font-bold uppercase tracking-tight">{product.name}</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-10 py-8">
-                    <span className="text-xl font-black text-white">{product.apy}%</span>
-                  </td>
-                  <td className="px-10 py-8">
-                    <div className="flex items-center gap-2">
-                       <span className="text-lg font-bold text-white">{product.term}</span>
-                    </div>
-                  </td>
-                  <td className="px-10 py-8 text-right">
-                    <div className="flex items-center justify-end gap-6">
-                      <button className="px-8 py-2.5 bg-white text-black text-sm font-black rounded-full hover:bg-[#d7ff20] transition-all opacity-0 group-hover:opacity-100 transform translate-x-4 group-hover:translate-x-0">
-                        Subscribe
-                      </button>
-                      <svg className="w-5 h-5 text-zinc-600 transition-transform group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="m9 18 6-6-6-6"/></svg>
-                    </div>
-                  </td>
+        {/* Products Table - Matches Markets.tsx style with thinner fonts */}
+        <div className="bg-zinc-950 border border-white/5 rounded-xl overflow-hidden shadow-2xl">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="text-[11px] text-zinc-600 font-normal border-b border-zinc-900 tracking-tight">
+                  <th className="px-8 py-3.5 font-normal">Token</th>
+                  <th className="px-8 py-3.5 font-normal">Market APY</th>
+                  <th className="px-8 py-3.5 font-normal">Term</th>
+                  <th className="px-8 py-3.5 text-right font-normal">Action</th>
                 </tr>
-              )) : (
-                <tr>
-                  <td colSpan={4} className="px-10 py-20 text-center">
-                    <div className="flex flex-col items-center gap-4">
-                      <div className="w-16 h-16 bg-zinc-900 rounded-2xl flex items-center justify-center text-zinc-700">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              </thead>
+              <tbody className="divide-y divide-zinc-900/50">
+                {earnProducts.length > 0 ? earnProducts.map((product) => (
+                  <tr key={product.symbol} className="hover:bg-zinc-900/20 transition-all group cursor-pointer">
+                    <td className="px-8 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-7 h-7 rounded-full bg-zinc-900 flex items-center justify-center overflow-hidden border border-white/5">
+                           <img src={`https://assets.coincap.io/assets/icons/${product.symbol.toLowerCase()}@2x.png`} className="w-full h-full object-cover" alt="" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-[13px] font-medium text-white group-hover:text-[#d7ff20] transition-colors">{product.symbol}</span>
+                          <span className="text-[9px] text-zinc-600 font-normal uppercase tracking-tight">{product.name}</span>
+                        </div>
                       </div>
-                      <p className="text-zinc-500 font-bold tracking-tight">No products found for "{searchQuery}"</p>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                    </td>
+                    <td className="px-8 py-4 font-mono">
+                      <span className="text-[13px] font-normal text-[#00d18e]">{product.apy}%</span>
+                    </td>
+                    <td className="px-8 py-4">
+                       <span className="text-[12px] text-zinc-500 font-normal">{product.term}</span>
+                    </td>
+                    <td className="px-8 py-4 text-right">
+                      <div className="flex items-center justify-end gap-3">
+                        <button className="px-3.5 py-1.5 bg-white text-black text-[10px] font-bold rounded-lg hover:bg-[#d7ff20] transition-all opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 uppercase tracking-tighter">
+                          Subscribe
+                        </button>
+                        <svg className="w-4 h-4 text-zinc-800 transition-colors group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6"/></svg>
+                      </div>
+                    </td>
+                  </tr>
+                )) : (
+                  <tr>
+                    <td colSpan={4} className="px-8 py-12 text-center">
+                      <p className="text-zinc-600 text-[11px] font-normal uppercase tracking-widest opacity-60">No products available</p>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        {/* Footer Info */}
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-12">
-          <div className="bg-zinc-950 border border-zinc-900 p-10 rounded-[40px] flex flex-col justify-between group">
+        {/* Info Cards */}
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-zinc-950/40 border border-white/5 p-8 rounded-xl flex flex-col justify-between group hover:border-zinc-800 transition-colors">
             <div>
-              <h3 className="text-2xl font-black mb-4">Quilex Simple Earn</h3>
-              <p className="text-zinc-500 text-sm leading-relaxed mb-8">
+              <h3 className="text-base font-medium mb-3 tracking-tight">Simple Earn Overview</h3>
+              <p className="text-zinc-500 text-[12px] leading-relaxed mb-6 font-normal opacity-80">
                 Simple Earn is a principal-protected product that provides flexible or fixed terms with daily rewards. Your assets are used to generate yield through institutional-grade DeFi and lending protocols.
               </p>
             </div>
-            <button className="text-[#d7ff20] text-xs font-black uppercase tracking-widest flex items-center gap-2 group-hover:translate-x-2 transition-transform">
-              Learn more about yield <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m9 18 6-6-6-6"/></svg>
+            <button className="text-[#d7ff20] text-[10px] font-semibold uppercase tracking-[0.2em] flex items-center gap-2 opacity-80 group-hover:opacity-100 transition-all">
+              Learn more about yield <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m9 18 6-6-6-6"/></svg>
             </button>
           </div>
-          <div className="bg-zinc-950 border border-zinc-900 p-10 rounded-[40px] flex flex-col justify-between group">
+          <div className="bg-zinc-950/40 border border-white/5 p-8 rounded-xl flex flex-col justify-between group hover:border-zinc-800 transition-colors">
             <div>
-              <h3 className="text-2xl font-black mb-4">Risk Protection</h3>
-              <p className="text-zinc-500 text-sm leading-relaxed mb-8">
-                Your principal is always protected. Quilex uses advanced risk management frameworks to ensure that rewards are distributed consistently while maintaining 100% solvency of the Earn pool.
+              <h3 className="text-base font-medium mb-3 tracking-tight">Safety & Security</h3>
+              <p className="text-zinc-500 text-[12px] leading-relaxed mb-6 font-normal opacity-80">
+                Your principal is protected by Quilex. We use industry-standard risk management frameworks to ensure that rewards are distributed consistently while maintaining 100% solvency of the pool.
               </p>
             </div>
-            <button className="text-[#d7ff20] text-xs font-black uppercase tracking-widest flex items-center gap-2 group-hover:translate-x-2 transition-transform">
-              Review safety report <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m9 18 6-6-6-6"/></svg>
+            <button className="text-[#d7ff20] text-[10px] font-semibold uppercase tracking-[0.2em] flex items-center gap-2 opacity-80 group-hover:opacity-100 transition-all">
+              Review safety report <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m9 18 6-6-6-6"/></svg>
             </button>
           </div>
         </div>
