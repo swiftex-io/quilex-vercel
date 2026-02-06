@@ -66,25 +66,24 @@ const Assets: React.FC = () => {
   }, []);
 
   const filteredBalances = useMemo(() => {
-    // Sort assets so those with balance > 0 come first
-    const sorted = [...balances].sort((a, b) => {
+    // 1. Filter by search
+    let result = balances.filter(asset => 
+      asset.symbol.toLowerCase().includes(assetSearch.toLowerCase()) ||
+      asset.name.toLowerCase().includes(assetSearch.toLowerCase())
+    );
+
+    // 2. Filter by zero balance if enabled
+    if (hideZero) {
+      result = result.filter(asset => asset.balance > 0);
+    }
+
+    // 3. Sort assets so those with balance > 0 come first
+    return [...result].sort((a, b) => {
       const aVal = a.balance > 0 ? 1 : 0;
       const bVal = b.balance > 0 ? 1 : 0;
       return bVal - aVal;
     });
-
-    return sorted.filter(asset => {
-      if (hideZero && asset.balance <= 0) return false;
-      return true;
-    });
-  }, [balances, hideZero]);
-
-  const searchableAssets = useMemo(() => {
-    return balances.filter(asset => 
-      asset.symbol.toLowerCase().includes(assetSearch.toLowerCase()) || 
-      asset.name.toLowerCase().includes(assetSearch.toLowerCase())
-    );
-  }, [balances, assetSearch]);
+  }, [balances, hideZero, assetSearch]);
 
   const handleFinishDeposit = async () => {
     await deposit(selectedAsset, 1000);
@@ -191,42 +190,90 @@ const Assets: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-zinc-950 border border-white/5 rounded-2xl shadow-2xl overflow-hidden mb-10">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead className="text-[10px] text-gray-600 font-medium uppercase tracking-widest border-b border-white/5">
-                <tr>
-                  <th className="px-8 py-4">Asset</th>
-                  <th className="px-8 py-4">Total Balance</th>
-                  <th className="px-8 py-4">Available</th>
-                  <th className="px-8 py-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {filteredBalances.map((asset) => {
-                  const hasBalance = asset.balance > 0;
-                  return (
-                    <tr 
-                      key={asset.symbol} 
-                      className={`transition-colors group ${hasBalance ? 'bg-zinc-900/40 hover:bg-zinc-800/50' : 'hover:bg-white/[0.02] opacity-60 hover:opacity-100'}`}
-                    >
-                      <td className="px-8 py-5">
-                        <div className="flex items-center gap-4">
-                          {renderCryptoIcon(asset.symbol)}
-                          <div>
-                            <div className="font-semibold text-sm">{asset.symbol}</div>
-                            <div className="text-[10px] text-gray-500 font-medium uppercase">{asset.name}</div>
+        {/* Assets Table Section with Header Controls */}
+        <div className="flex flex-col gap-4 mb-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <h2 className="text-xl font-bold tracking-tight">My Assets</h2>
+            
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6 ml-auto">
+              <div className="relative group">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-white transition-colors">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                </div>
+                <input 
+                  type="text" 
+                  placeholder="Search coins"
+                  value={assetSearch}
+                  onChange={(e) => setAssetSearch(e.target.value)}
+                  className="bg-zinc-900 border border-white/5 rounded-lg py-1.5 pl-8 pr-3 text-[11px] font-medium w-36 focus:w-48 focus:border-white/20 outline-none transition-all placeholder:text-gray-600 text-white"
+                />
+              </div>
+
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <div className="relative">
+                  <input 
+                    type="checkbox" 
+                    checked={hideZero}
+                    onChange={(e) => setHideZero(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-3.5 h-3.5 border-2 border-zinc-700 rounded-sm peer-checked:bg-white peer-checked:border-white transition-all"></div>
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 peer-checked:opacity-100 transition-opacity">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="4"><path d="M5 13l4 4L19 7"/></svg>
+                  </div>
+                </div>
+                <span className="text-[11px] font-semibold text-gray-500 group-hover:text-gray-300 transition-colors">Hide my balances</span>
+              </label>
+
+              <button className="text-[11px] font-semibold text-blue-500 hover:text-white transition-colors tracking-tight">
+                Convert small amounts to USDC
+              </button>
+            </div>
+          </div>
+
+          <div className="bg-zinc-950 border border-white/5 rounded-2xl shadow-2xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="text-[10px] text-gray-600 font-medium uppercase tracking-widest border-b border-white/5">
+                  <tr>
+                    <th className="px-8 py-4">Asset</th>
+                    <th className="px-8 py-4">Total Balance</th>
+                    <th className="px-8 py-4">Available</th>
+                    <th className="px-8 py-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {filteredBalances.length > 0 ? filteredBalances.map((asset) => {
+                    const hasBalance = asset.balance > 0;
+                    return (
+                      <tr 
+                        key={asset.symbol} 
+                        className={`transition-colors group ${hasBalance ? 'bg-zinc-900/40 hover:bg-zinc-800/50' : 'hover:bg-white/[0.02] opacity-60 hover:opacity-100'}`}
+                      >
+                        <td className="px-8 py-5">
+                          <div className="flex items-center gap-4">
+                            {renderCryptoIcon(asset.symbol)}
+                            <div>
+                              <div className="font-semibold text-sm">{asset.symbol}</div>
+                              <div className="text-[10px] text-gray-500 font-medium uppercase">{asset.name}</div>
+                            </div>
                           </div>
-                        </div>
+                        </td>
+                        <td className="px-8 py-5 font-mono text-xs font-medium">{asset.balance.toLocaleString(undefined, { maximumFractionDigits: 6 })}</td>
+                        <td className="px-8 py-5 font-mono text-xs text-white">${(asset.balance * asset.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                        <td className="px-8 py-5 text-right"><button className="text-[10px] font-semibold text-blue-500 hover:text-white uppercase tracking-widest transition-colors">Trade</button></td>
+                      </tr>
+                    );
+                  }) : (
+                    <tr>
+                      <td colSpan={4} className="px-8 py-10 text-center text-gray-600 text-xs font-medium uppercase tracking-widest">
+                        No assets found
                       </td>
-                      <td className="px-8 py-5 font-mono text-xs font-medium">{asset.balance.toLocaleString(undefined, { maximumFractionDigits: 6 })}</td>
-                      <td className="px-8 py-5 font-mono text-xs text-white">${(asset.balance * asset.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                      <td className="px-8 py-5 text-right"><button className="text-[10px] font-semibold text-blue-500 hover:text-white uppercase tracking-widest transition-colors">Trade</button></td>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
