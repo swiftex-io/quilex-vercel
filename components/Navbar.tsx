@@ -30,6 +30,9 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
   const [selectedCurrency, setSelectedCurrency] = useState('USD');
 
   const totalBalanceUSD = balances.reduce((acc, asset) => acc + (asset.balance * asset.price), 0);
+  const btcPrice = balances.find(b => b.symbol === 'BTC')?.price || 65000;
+  const totalInBTC = totalBalanceUSD / btcPrice;
+
   const maskedEmail = user?.email ? `${user.email.split('@')[0].slice(0, 3)}***@${user.email.split('@')[1]}` : 'guest@quilex.io';
   const displayUid = user?.id?.slice(0, 16) || '805418618808070350';
 
@@ -377,9 +380,14 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                   <div className={`${dropdownBaseClass} w-80 p-6`}>
                     <div className="mb-6">
                       <div className="text-[10px] font-bold text-gray-400 tracking-tight mb-1.5 opacity-80">Total balance</div>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-bold text-black tracking-tight">${totalBalanceUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                        <span className="text-[11px] font-bold text-gray-400">USD</span>
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-2xl font-bold text-black tracking-tight">${totalBalanceUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                          <span className="text-[11px] font-bold text-gray-400">USD</span>
+                        </div>
+                        <div className="text-[13px] font-medium text-gray-500 tracking-tight">
+                          ≈ {totalInBTC.toFixed(6)} BTC
+                        </div>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3 mb-6">

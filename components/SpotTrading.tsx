@@ -64,9 +64,66 @@ const SpotTrading: React.FC = () => {
   }, [balances, pairSearchQuery]);
 
   return (
-    <div className="flex flex-col lg:flex-row h-full bg-black overflow-hidden border-t border-zinc-900">
-      {/* Left/Middle Column */}
-      <div className="flex-1 flex flex-col min-w-0 border-r border-zinc-900 overflow-hidden">
+    <div className="flex h-full bg-black overflow-hidden border-t border-zinc-900">
+      
+      {/* Left Sidebar - Trading Pairs (OKX Style) */}
+      <div className="hidden lg:flex w-[280px] flex-col border-r border-zinc-900 bg-[#0a0a0a] shrink-0 overflow-hidden">
+        <div className="p-4 border-b border-zinc-900">
+          <div className="relative">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </div>
+            <input 
+              type="text" 
+              placeholder="Search pairs" 
+              value={pairSearchQuery}
+              onChange={(e) => setPairSearchQuery(e.target.value)}
+              className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg py-2 pl-9 pr-4 text-[11px] font-medium focus:border-zinc-500 outline-none transition-all placeholder:text-zinc-600 text-white" 
+            />
+          </div>
+        </div>
+        
+        <div className="flex px-2 pt-2 gap-1 border-b border-zinc-900">
+          {['All', 'Meme', 'Layer 1', 'DeFi'].map((cat, i) => (
+            <button key={cat} className={`px-3 py-1.5 text-[10px] font-bold rounded-t-lg transition-all ${i === 0 ? 'bg-zinc-900 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
+          <div className="grid grid-cols-12 px-4 py-2 text-[10px] font-black text-zinc-600 uppercase tracking-widest border-b border-zinc-900/30">
+            <div className="col-span-7">Pair</div>
+            <div className="col-span-5 text-right">Price</div>
+          </div>
+          {availablePairs.map((asset) => (
+            <div 
+              key={asset.symbol} 
+              className={`grid grid-cols-12 items-center px-4 py-2.5 hover:bg-zinc-900/50 transition-all cursor-pointer group ${asset.symbol === 'BTC' ? 'bg-zinc-900/30 border-l-2 border-white' : ''}`}
+            >
+              <div className="col-span-7 flex items-center gap-2">
+                <div className="w-5 h-5 rounded-full bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0">
+                  <img src={`https://assets.coincap.io/assets/icons/${asset.symbol.toLowerCase()}@2x.png`} alt={asset.symbol} className="w-full h-full object-cover" />
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-[12px] font-bold text-zinc-200 group-hover:text-white truncate">{asset.symbol}<span className="text-zinc-600 font-medium">/USDT</span></span>
+                  <span className={`text-[10px] font-bold ${asset.change24h >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>
+                    {asset.change24h >= 0 ? '+' : ''}{asset.change24h.toFixed(2)}%
+                  </span>
+                </div>
+              </div>
+              <div className="col-span-5 text-right">
+                <span className="text-[11px] font-mono font-bold text-zinc-200 block truncate">
+                  {asset.price.toLocaleString(undefined, { minimumFractionDigits: asset.price < 1 ? 4 : 2 })}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Main Content (Chart & History) */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden border-r border-zinc-900">
         
         {/* Ticker Header */}
         <div className="h-[72px] border-b border-zinc-900 flex items-center px-4 gap-10 bg-black shrink-0 relative z-50">
@@ -80,7 +137,8 @@ const SpotTrading: React.FC = () => {
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="text-xl font-bold tracking-tight">BTC/USDT</span>
-                <svg className={`w-4 h-4 text-zinc-500 group-hover:text-white transition-transform duration-200 ${isPairSelectorOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="m6 9 6 6 6-6"/></svg>
+                {/* Sakrivamo dropdown ikonicu ako je sidebar vec tu na desktopu, ali ostavljamo je za mobile interakciju */}
+                <svg className={`w-4 h-4 text-zinc-500 group-hover:text-white transition-transform duration-200 lg:hidden ${isPairSelectorOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="m6 9 6 6 6-6"/></svg>
               </div>
             </div>
             
@@ -88,34 +146,19 @@ const SpotTrading: React.FC = () => {
               <svg className="w-4 h-4 text-[#f5a623]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
             </button>
 
+            {/* Mobile Dropdown (Samo za rezolucije gde sidebar nije vidljiv) */}
             {isPairSelectorOpen && (
-              <div className="absolute top-[64px] left-4 w-[420px] bg-zinc-950 border border-zinc-800 rounded-2xl shadow-[0_32px_64px_rgba(0,0,0,0.8)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="lg:hidden absolute top-[64px] left-4 w-[320px] bg-zinc-950 border border-zinc-800 rounded-2xl shadow-[0_32px_64px_rgba(0,0,0,0.8)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                 <div className="p-4 border-b border-zinc-900">
-                  <div className="relative">
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                    </div>
-                    <input type="text" placeholder="Search coins" autoFocus value={pairSearchQuery} onChange={(e) => setPairSearchQuery(e.target.value)} className="w-full bg-zinc-900 border border-transparent rounded-xl py-2.5 pl-10 pr-4 text-xs font-medium focus:border-white/10 outline-none transition-all placeholder:text-zinc-700 text-white" />
-                  </div>
+                  <input type="text" placeholder="Search pairs" value={pairSearchQuery} onChange={(e) => setPairSearchQuery(e.target.value)} className="w-full bg-zinc-900 border border-transparent rounded-xl py-2 px-4 text-xs font-medium focus:border-white/10 outline-none transition-all placeholder:text-zinc-700 text-white" />
                 </div>
-                <div className="max-h-[480px] overflow-y-auto custom-scrollbar">
-                  <div className="grid grid-cols-12 px-6 py-3 text-[10px] font-black text-zinc-600 uppercase tracking-widest border-b border-zinc-900/50">
-                    <div className="col-span-6">Pair</div>
-                    <div className="col-span-3 text-right">Price</div>
-                    <div className="col-span-3 text-right">Change</div>
-                  </div>
-                  <div className="py-1">
-                    {availablePairs.map((asset) => (
-                      <div key={asset.symbol} onClick={() => { setIsPairSelectorOpen(false); setPairSearchQuery(''); }} className="grid grid-cols-12 items-center px-6 py-3 hover:bg-zinc-900/50 transition-all cursor-pointer group">
-                        <div className="col-span-6 flex items-center gap-3">
-                          <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center overflow-hidden"><img src={`https://assets.coincap.io/assets/icons/${asset.symbol.toLowerCase()}@2x.png`} alt={asset.symbol} className="w-full h-full object-cover" /></div>
-                          <span className="text-sm font-bold text-zinc-200 group-hover:text-white">{asset.symbol}<span className="text-zinc-600 font-medium">/USDT</span></span>
-                        </div>
-                        <div className="col-span-3 text-right"><span className="text-xs font-mono font-bold text-zinc-200">{asset.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></div>
-                        <div className={`col-span-3 text-right text-xs font-bold font-mono ${asset.change24h >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>{asset.change24h >= 0 ? '+' : ''}{asset.change24h.toFixed(2)}%</div>
-                      </div>
-                    ))}
-                  </div>
+                <div className="max-h-[300px] overflow-y-auto">
+                   {availablePairs.map(asset => (
+                     <div key={asset.symbol} className="px-4 py-3 hover:bg-zinc-900 flex justify-between items-center cursor-pointer" onClick={() => setIsPairSelectorOpen(false)}>
+                        <span className="text-sm font-bold">{asset.symbol}/USDT</span>
+                        <span className="text-sm font-mono">${asset.price.toLocaleString()}</span>
+                     </div>
+                   ))}
                 </div>
               </div>
             )}
@@ -126,7 +169,7 @@ const SpotTrading: React.FC = () => {
             <span className={`text-[12px] font-bold tabular-nums leading-none ${priceChange >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>{priceChange >= 0 ? '+' : ''}{absChange.toLocaleString(undefined, { minimumFractionDigits: 1 })} ({priceChange.toFixed(2)}%)</span>
           </div>
           
-          <div className="hidden lg:flex items-center gap-10">
+          <div className="hidden xl:flex items-center gap-10">
             {['24h low', '24h high', '24h volume (BTC)'].map((label, i) => (
               <div key={label} className="flex flex-col">
                 <span className="text-[11px] text-zinc-500 font-medium mb-1">{label}</span>
@@ -172,7 +215,7 @@ const SpotTrading: React.FC = () => {
       </div>
 
       {/* Right Column (Orderbook & Trade) */}
-      <div className="w-full lg:w-[320px] xl:w-[380px] flex flex-col bg-[#0a0a0a] shrink-0 overflow-hidden">
+      <div className="w-full lg:w-[320px] xl:w-[360px] flex flex-col bg-[#0a0a0a] shrink-0 overflow-hidden">
         <div className="flex-1 min-h-0 overflow-hidden">
            <OrderBook currentPrice={livePrice} />
         </div>

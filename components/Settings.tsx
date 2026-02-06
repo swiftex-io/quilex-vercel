@@ -7,8 +7,7 @@ const Settings: React.FC = () => {
   const { user, balances } = useExchangeStore();
 
   const tabs = [
-    'Overview', 'Profile', 'Security', 'Verification', 
-    'Preferences', 'Sub-accounts', 'API keys', 'Third-party authorization'
+    'Overview', 'Profile', 'Security', 'Verification', 'Preferences'
   ];
 
   const maskedEmail = user?.email ? `${user.email.split('@')[0].slice(0, 3)}***@${user.email.split('@')[1]}` : 'vir***@proton.me';
@@ -415,7 +414,7 @@ const Settings: React.FC = () => {
         {activeTab === 'Verification' && renderVerification()}
         {activeTab === 'Preferences' && renderPreferences()}
         
-        {/* Mock for other tabs */}
+        {/* Mock for other potential tabs */}
         {!['Overview', 'Profile', 'Security', 'Verification', 'Preferences'].includes(activeTab) && (
           <div className="flex flex-col items-center justify-center py-40 text-center animate-in fade-in duration-700">
              <div className="w-16 h-16 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-500 mb-6">
