@@ -66,9 +66,11 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
   },
 
   signOut: async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {}
     localStorage.removeItem('quilex_guest_session');
-    set({ user: null, profile: null, isGuest: false, tradeHistory: [], balances: [...MOCK_ASSETS] });
+    set({ user: null, profile: null, isGuest: false, tradeHistory: [...MOCK_TRADES], balances: [...MOCK_ASSETS] });
   },
 
   initialize: async () => {
@@ -81,21 +83,17 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
         set({ 
           user: guestUser, 
           profile: { nickname: guestUser.user_metadata?.nickname || 'Guest' },
-          isGuest: true,
-          balances: MOCK_ASSETS.map(b => {
-             if (b.symbol === 'USDT') return { ...b, balance: 10000, available: 10000 };
-             if (b.symbol === 'BTC') return { ...b, balance: 0.245, available: 0.245 };
-             return { ...b, balance: 0, available: 0 };
-          })
+          isGuest: true
         });
       } else {
-        const { data: { session } } = await supabase.auth.getSession();
+        const sessionResponse = await supabase.auth.getSession();
+        const session = sessionResponse?.data?.session;
         if (session?.user) {
           set({ user: session.user, isGuest: false });
         }
       }
     } catch (err) {
-      console.error("Initialization failed:", err);
+      console.error("Initialization error, falling back to clean state:", err);
     } finally {
       set({ isSyncing: false });
     }

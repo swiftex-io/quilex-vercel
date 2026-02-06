@@ -1,11 +1,37 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = (import.meta as any).env?.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
-const SUPABASE_ANON_KEY = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || 'placeholder-key';
+// Detekcija varijabli u zavisnosti od okruženja
+// Vite (Vercel) koristi import.meta.env
+// AI Studio može koristiti process.env
+const getEnv = (key: string) => {
+  try {
+    return (import.meta as any).env?.[key] || (window as any).process?.env?.[key] || '';
+  } catch {
+    return '';
+  }
+};
 
-if (SUPABASE_URL === 'https://placeholder.supabase.co') {
-  console.warn("Supabase URL nije podešen. Proveri Environment Variables na Vercelu.");
+const SUPABASE_URL = getEnv('VITE_SUPABASE_URL');
+const SUPABASE_ANON_KEY = getEnv('VITE_SUPABASE_ANON_KEY');
+
+const isPlaceholder = !SUPABASE_URL || 
+                      SUPABASE_URL.includes('placeholder') || 
+                      SUPABASE_URL === '';
+
+// Fail-safe klijent koji ne blokira renderovanje ako nema ključeva
+export const supabase = !isPlaceholder 
+  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : {
+      auth: {
+        getSession: async () => ({ data: { session: null }, error: null }),
+        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+        signOut: async () => ({ error: null }),
+        signInWithPassword: async () => ({ error: new Error("Supabase not configured") }),
+        signUp: async () => ({ error: new Error("Supabase not configured") }),
+      }
+    } as any;
+
+if (isPlaceholder) {
+  console.log("Exchange running in Local/Guest mode (No Supabase detected).");
 }
-
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
