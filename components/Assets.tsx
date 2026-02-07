@@ -37,6 +37,7 @@ const Assets: React.FC = () => {
   const { balances, deposit, isDepositModalOpen: showDepositFlow, setDepositModalOpen: setShowDepositFlow } = useExchangeStore();
   
   const [activeTab, setActiveTab] = useState('Overview');
+  const [activeFeeGroup, setActiveFeeGroup] = useState('Group 1');
   const [selectedAsset, setSelectedAsset] = useState('USDT');
   const [selectedNetwork, setSelectedNetwork] = useState<any>(null);
   const [isAssetDropdownOpen, setIsAssetDropdownOpen] = useState(false);
@@ -74,18 +75,15 @@ const Assets: React.FC = () => {
   }, [assetSearch, hideSmallBalances, activeTab]);
 
   const filteredBalances = useMemo(() => {
-    // 1. Filter by search
     let result = balances.filter(asset => 
       asset.symbol.toLowerCase().includes(assetSearch.toLowerCase()) ||
       asset.name.toLowerCase().includes(assetSearch.toLowerCase())
     );
 
-    // 2. Filter by small balance if enabled (threshold: 1 USD)
     if (hideSmallBalances) {
       result = result.filter(asset => (asset.balance * asset.price) >= 1);
     }
 
-    // 3. Sort assets so those with balance > 0 come first
     return [...result].sort((a, b) => {
       const aVal = a.balance > 0 ? 1 : 0;
       const bVal = b.balance > 0 ? 1 : 0;
@@ -93,18 +91,11 @@ const Assets: React.FC = () => {
     });
   }, [balances, hideSmallBalances, assetSearch]);
 
-  // Derived pagination data
   const totalPages = Math.ceil(filteredBalances.length / itemsPerPage);
   const paginatedBalances = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
     return filteredBalances.slice(start, start + itemsPerPage);
   }, [filteredBalances, currentPage]);
-
-  const handleFinishDeposit = async () => {
-    await deposit(selectedAsset, 1000);
-    setShowDepositFlow(false);
-    setSelectedNetwork(null);
-  };
 
   const renderCryptoIcon = (symbol: string, sizeClass: string = "w-9 h-9") => (
     <div className={`${sizeClass} rounded-xl bg-zinc-900 flex items-center justify-center font-bold text-[11px] text-gray-500 overflow-hidden relative`}>
@@ -117,58 +108,10 @@ const Assets: React.FC = () => {
     </div>
   );
 
-  const TransactionHistoryTable = () => (
-    <div className="bg-zinc-950 border border-white/5 rounded-2xl shadow-2xl overflow-hidden p-8 mt-10">
-      <div className="flex justify-between items-center mb-10">
-        <h2 className="text-2xl font-bold tracking-tight">Recent Transactions</h2>
-      </div>
-
-      <div className="space-y-1">
-        <div className="grid grid-cols-12 px-4 mb-4 text-[11px] font-medium text-gray-600 uppercase tracking-widest">
-          <div className="col-span-3">Type</div>
-          <div className="col-span-3">Amount</div>
-          <div className="col-span-4">Time</div>
-          <div className="col-span-2 text-right">Status</div>
-        </div>
-
-        {[
-          { id: '1', type: 'Deposit', asset: 'BNB', amount: '+0.000000001', time: '2026-02-03 10:26:38', status: 'Deposit successful' },
-          { id: '2', type: 'Deposit', asset: 'BNB', amount: '+0.006', time: '2026-02-03 10:26:38', status: 'Deposit successful' },
-        ].map((tx) => (
-          <div key={tx.id} className="grid grid-cols-12 items-center px-4 py-5 rounded-xl hover:bg-white/[0.04] transition-all cursor-pointer group">
-            <div className="col-span-3 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-gray-400 group-hover:text-white transition-colors overflow-hidden relative">
-                <img 
-                  src={`https://assets.coincap.io/assets/icons/${tx.asset.toLowerCase()}@2x.png`} 
-                  alt={tx.asset}
-                  className="w-full h-full object-cover relative z-10"
-                  onError={(e) => (e.target as HTMLImageElement).style.display = 'none'}
-                />
-                <span className="absolute z-0">↓</span>
-              </div>
-              <span className="text-sm font-semibold text-gray-200">{tx.type}</span>
-            </div>
-            <div className="col-span-3">
-              <span className="text-sm font-semibold tracking-tight text-white font-mono">{tx.amount} {tx.asset}</span>
-            </div>
-            <div className="col-span-4">
-              <span className="text-sm font-medium text-gray-400 font-mono tracking-tight group-hover:text-gray-300">{tx.time}</span>
-            </div>
-            <div className="col-span-2 flex justify-end items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]"></div>
-              <span className="text-[13px] font-semibold text-gray-200 tracking-tight whitespace-nowrap">{tx.status}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
   const renderOverview = () => (
     <div className="animate-in fade-in duration-500">
       <div className="grid grid-cols-1 gap-6 mb-12">
         <div className="bg-zinc-950 border border-white/5 rounded-2xl p-8 md:p-10 shadow-2xl relative overflow-hidden group">
-          {/* Subtle gradient background for the card */}
           <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-white/[0.015] blur-[100px] rounded-full -mr-40 -mt-40 pointer-events-none"></div>
           
           <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
@@ -196,151 +139,212 @@ const Assets: React.FC = () => {
             </div>
 
             <div className="flex gap-3 w-full md:w-auto">
-              <button 
-                onClick={() => setShowDepositFlow(true)} 
-                className="flex-1 md:flex-none px-8 py-3.5 bg-white text-black font-bold rounded-xl hover:bg-zinc-200 transition-all shadow-[0_10px_30px_rgba(255,255,255,0.1)] text-xs uppercase tracking-widest active:scale-95"
-              >
-                Deposit
-              </button>
-              <button 
-                className="flex-1 md:flex-none px-8 py-3.5 bg-zinc-900 text-white font-bold rounded-xl border border-white/10 hover:bg-zinc-800 transition-all text-xs uppercase tracking-widest active:scale-95"
-              >
-                Withdraw
-              </button>
+              <button onClick={() => setShowDepositFlow(true)} className="flex-1 md:flex-none px-8 py-3.5 bg-white text-black font-bold rounded-xl hover:bg-zinc-200 transition-all shadow-lg text-xs uppercase tracking-widest">Deposit</button>
+              <button className="flex-1 md:flex-none px-8 py-3.5 bg-zinc-900 text-white font-bold rounded-xl border border-white/10 hover:bg-zinc-800 transition-all text-xs uppercase tracking-widest">Withdraw</button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Assets Table Section */}
       <div className="flex flex-col gap-4 mb-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h2 className="text-xl font-bold tracking-tight">My Assets</h2>
-          
           <div className="flex flex-wrap items-center gap-4 sm:gap-6 ml-auto">
-            <div className="relative group">
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-white transition-colors">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-              </div>
-              <input 
+             <input 
                 type="text" 
                 placeholder="Search coins"
                 value={assetSearch}
                 onChange={(e) => setAssetSearch(e.target.value)}
-                className="bg-zinc-900 border border-white/5 rounded-lg py-1.5 pl-8 pr-3 text-[11px] font-medium w-36 focus:w-48 focus:border-white/20 outline-none transition-all placeholder:text-gray-600 text-white"
+                className="bg-zinc-900 border border-white/5 rounded-lg py-1.5 pl-3 pr-3 text-[11px] font-medium w-36 outline-none text-white"
               />
-            </div>
-
-            <label className="flex items-center gap-2 cursor-pointer group">
-              <div className="relative">
-                <input 
-                  type="checkbox" 
-                  checked={hideSmallBalances}
-                  onChange={(e) => setHideSmallBalances(e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-3.5 h-3.5 border-2 border-zinc-700 rounded-sm peer-checked:bg-white peer-checked:border-white transition-all"></div>
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 peer-checked:opacity-100 transition-opacity">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="4"><path d="M5 13l4 4L19 7"/></svg>
-                </div>
-              </div>
-              <span className="text-[11px] font-semibold text-gray-500 group-hover:text-gray-300 transition-colors">Hide small balances</span>
-            </label>
-
-            <button className="text-[11px] font-semibold text-blue-500 hover:text-white transition-colors tracking-tight">
-              Convert small amounts to USDC
-            </button>
           </div>
         </div>
 
         <div className="bg-zinc-950 border border-white/5 rounded-2xl shadow-2xl overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead className="text-[10px] text-gray-600 font-medium uppercase tracking-widest border-b border-white/5">
-                <tr>
-                  <th className="px-8 py-4">Asset</th>
-                  <th className="px-8 py-4">Total Balance</th>
-                  <th className="px-8 py-4">Available</th>
-                  <th className="px-8 py-4 text-right">Actions</th>
+          <table className="w-full text-left">
+            <thead className="text-[10px] text-gray-600 font-medium uppercase border-b border-white/5">
+              <tr>
+                <th className="px-8 py-4">Asset</th>
+                <th className="px-8 py-4">Total Balance</th>
+                <th className="px-8 py-4">Available</th>
+                <th className="px-8 py-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {paginatedBalances.map((asset) => (
+                <tr key={asset.symbol} className="hover:bg-zinc-900/40 transition-colors group">
+                  <td className="px-8 py-5 flex items-center gap-4">
+                    {renderCryptoIcon(asset.symbol)}
+                    <div>
+                      <div className="font-semibold text-sm">{asset.symbol}</div>
+                      <div className="text-[10px] text-gray-500 font-medium">{asset.name}</div>
+                    </div>
+                  </td>
+                  <td className="px-8 py-5 font-mono text-xs">{asset.balance.toLocaleString()}</td>
+                  <td className="px-8 py-5 font-mono text-xs text-white">${(asset.balance * asset.price).toLocaleString()}</td>
+                  <td className="px-8 py-5 text-right"><button className="text-[10px] font-semibold text-blue-500 uppercase">Trade</button></td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {paginatedBalances.length > 0 ? paginatedBalances.map((asset) => {
-                  const hasBalance = asset.balance > 0;
-                  return (
-                    <tr 
-                      key={asset.symbol} 
-                      className={`transition-colors group ${hasBalance ? 'bg-zinc-900/40 hover:bg-zinc-800/50' : 'hover:bg-white/[0.02] opacity-60 hover:opacity-100'}`}
-                    >
-                      <td className="px-8 py-5">
-                        <div className="flex items-center gap-4">
-                          {renderCryptoIcon(asset.symbol)}
-                          <div>
-                            <div className="font-semibold text-sm">{asset.symbol}</div>
-                            <div className="text-[10px] text-gray-500 font-medium uppercase">{asset.name}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-8 py-5 font-mono text-xs font-medium">{asset.balance.toLocaleString(undefined, { maximumFractionDigits: 6 })}</td>
-                      <td className="px-8 py-5 font-mono text-xs text-white">${(asset.balance * asset.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                      <td className="px-8 py-5 text-right"><button className="text-[10px] font-semibold text-blue-500 hover:text-white uppercase tracking-widest transition-colors">Trade</button></td>
-                    </tr>
-                  );
-                }) : (
-                  <tr>
-                    <td colSpan={4} className="px-8 py-10 text-center text-gray-600 text-xs font-medium uppercase tracking-widest">
-                      No assets found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="px-8 py-6 border-t border-white/5 flex items-center justify-between">
-              <div className="text-[11px] text-gray-500 font-medium">
-                Showing <span className="text-white">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="text-white">{Math.min(currentPage * itemsPerPage, filteredBalances.length)}</span> of <span className="text-white">{filteredBalances.length}</span> assets
-              </div>
-              <div className="flex items-center gap-1">
-                <button 
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                  className="p-2 rounded-lg hover:bg-zinc-900 text-gray-500 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-transparent"
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m15 18-6-6 6-6"/></svg>
-                </button>
-                
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`min-w-[32px] h-8 rounded-lg text-[11px] font-bold transition-all ${currentPage === page ? 'bg-white text-black' : 'text-gray-500 hover:text-white hover:bg-zinc-900'}`}
-                  >
-                    {page}
-                  </button>
-                ))}
-
-                <button 
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                  className="p-2 rounded-lg hover:bg-zinc-900 text-gray-500 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-transparent"
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m9 18 6-6-6-6"/></svg>
-                </button>
-              </div>
-            </div>
-          )}
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
-      <TransactionHistoryTable />
+    </div>
+  );
+
+  const renderFees = () => (
+    <div className="animate-in fade-in duration-700 space-y-12">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-zinc-900 pb-10">
+        <div>
+          <div className="text-zinc-500 text-[13px] font-medium mb-3">My fee tier</div>
+          <h1 className="text-5xl font-bold tracking-tight text-white mb-2">Regular user</h1>
+        </div>
+        <button className="text-[13px] font-bold text-zinc-400 hover:text-white transition-colors underline underline-offset-4 decoration-zinc-700">
+          Compare rates
+        </button>
+      </div>
+
+      {/* Fee Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {[1, 2, 3].map((group) => (
+          <div key={group} className="bg-zinc-950/40 border border-zinc-900 rounded-2xl p-8 relative overflow-hidden group hover:border-zinc-700 transition-all">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-white">Spot - Group {group}</span>
+                <svg className="w-4 h-4 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-8">
+              <div>
+                <div className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Maker fee</div>
+                <div className="text-2xl font-bold text-white tracking-tight">0.2000%</div>
+              </div>
+              <div>
+                <div className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Taker fee</div>
+                <div className="text-2xl font-bold text-white tracking-tight">0.3500%</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Withdrawal Limit Banner */}
+      <div className="bg-zinc-950/40 border border-zinc-900 rounded-2xl p-6 flex items-center justify-center gap-6">
+        <div className="w-12 h-12 bg-zinc-900 rounded-full flex items-center justify-center text-white shrink-0">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 3v13m0-13 4 4m-4-4-4 4M4 21h16"/></svg>
+        </div>
+        <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4">
+          <span className="text-[13px] font-bold text-zinc-500">24-hour withdrawal limit</span>
+          <span className="text-xl font-bold text-white">10,000,000 USD</span>
+        </div>
+      </div>
+
+      {/* Fee Table Section */}
+      <div className="space-y-6 pt-10">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <h2 className="text-2xl font-bold tracking-tight">Fee table</h2>
+          <button className="text-[13px] font-bold text-zinc-400 hover:text-white transition-all flex items-center gap-2">
+            Learn more about fee tiers <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="m9 5 7 7-7 7"/></svg>
+          </button>
+        </div>
+
+        {/* Group Tabs */}
+        <div className="flex gap-1 bg-zinc-950/40 p-1 border border-zinc-900 rounded-xl w-fit">
+          {['Group 1', 'Group 2', 'Group 3', 'Zero-fee pairs'].map((group) => (
+            <button 
+              key={group}
+              onClick={() => setActiveFeeGroup(group)}
+              className={`px-5 py-2 text-[12px] font-bold rounded-lg transition-all ${activeFeeGroup === group ? 'bg-zinc-800 text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-300'}`}
+            >
+              {group}
+            </button>
+          ))}
+        </div>
+
+        {/* Regular Users Table */}
+        <div className="space-y-4">
+          <div className="text-sm font-bold text-zinc-500 px-2 uppercase tracking-widest">Regular users</div>
+          <div className="bg-zinc-950 border border-zinc-900 rounded-2xl overflow-hidden shadow-2xl">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-zinc-900/30 text-[10px] font-bold text-zinc-500 uppercase border-b border-zinc-900 tracking-wider">
+                    <th className="px-8 py-5">Tier</th>
+                    <th className="px-8 py-5">Assets (USD)</th>
+                    <th className="px-4 py-5 text-center">or</th>
+                    <th className="px-8 py-5">30-day trading volume (USD)</th>
+                    <th className="px-8 py-5">Maker fee</th>
+                    <th className="px-8 py-5">Taker fee</th>
+                    <th className="px-8 py-5 text-right whitespace-nowrap">24h crypto withdrawal limit (USD)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-900">
+                  <tr className="bg-white/[0.02]">
+                    <td className="px-8 py-6 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                      <span className="text-sm font-bold text-white">Regular user</span>
+                    </td>
+                    <td className="px-8 py-6 text-sm font-medium text-zinc-300">0 - 100,000</td>
+                    <td className="px-4 py-6 text-center text-zinc-600">/</td>
+                    <td className="px-8 py-6 text-sm font-medium text-zinc-300">0 - 100,000</td>
+                    <td className="px-8 py-6 text-sm font-bold text-white">0.2000%</td>
+                    <td className="px-8 py-6 text-sm font-bold text-white">0.3500%</td>
+                    <td className="px-8 py-6 text-sm font-bold text-white text-right">10,000,000</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        {/* VIP Users Table */}
+        <div className="space-y-4 pt-10">
+          <div className="text-sm font-bold text-zinc-500 px-2 uppercase tracking-widest">VIP users</div>
+          <div className="bg-zinc-950 border border-zinc-900 rounded-2xl overflow-hidden shadow-2xl">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-zinc-900/30 text-[10px] font-bold text-zinc-500 uppercase border-b border-zinc-900 tracking-wider">
+                    <th className="px-8 py-5">Tier</th>
+                    <th className="px-8 py-5">Assets (USD)</th>
+                    <th className="px-4 py-5 text-center">or</th>
+                    <th className="px-8 py-5">30-day trading volume (USD)</th>
+                    <th className="px-8 py-5">Maker fee</th>
+                    <th className="px-8 py-5">Taker fee</th>
+                    <th className="px-8 py-5 text-right whitespace-nowrap">24h crypto withdrawal limit (USD)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-900">
+                  {[
+                    { tier: 'VIP 1', assets: '100,001 - 250,000', vol: '100,001 - 250,000', maker: '0.1000%', taker: '0.2000%', limit: '24,000,000' },
+                    { tier: 'VIP 2', assets: '250,001 - 500,000', vol: '250,001 - 500,000', maker: '0.0750%', taker: '0.1500%', limit: '32,000,000' },
+                    { tier: 'VIP 3', assets: '500,001 - 2,000,000', vol: '500,001 - 1,000,000', maker: '0.0600%', taker: '0.1250%', limit: '40,000,000' },
+                    { tier: 'VIP 4', assets: '2,000,001 - 5,000,000', vol: '1,000,001 - 2,500,000', maker: '0.0500%', taker: '0.1000%', limit: '48,000,000' },
+                    { tier: 'VIP 5', assets: '5,000,001 - 10,000,000', vol: '2,500,001 - 5,000,000', maker: '0.0450%', taker: '0.0800%', limit: '60,000,000' },
+                    { tier: 'VIP 6', assets: '10,000,001+', vol: '5,000,001 - 50,000,000', maker: '0.0400%', taker: '0.0700%', limit: '72,000,000' }
+                  ].map((vip) => (
+                    <tr key={vip.tier} className="hover:bg-white/[0.01] transition-colors">
+                      <td className="px-8 py-5 text-sm font-bold text-white">{vip.tier}</td>
+                      <td className="px-8 py-5 text-sm font-medium text-zinc-400">{vip.assets}</td>
+                      <td className="px-4 py-5 text-center text-zinc-700">/</td>
+                      <td className="px-8 py-5 text-sm font-medium text-zinc-400">{vip.vol}</td>
+                      <td className="px-8 py-5 text-sm font-bold text-zinc-200">{vip.maker}</td>
+                      <td className="px-8 py-5 text-sm font-bold text-zinc-200">{vip.taker}</td>
+                      <td className="px-8 py-5 text-sm font-bold text-zinc-200 text-right">{vip.limit}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-white/10 overflow-x-hidden">
-      {/* Wallet Tab Navigation - Consistent with Settings and Markets */}
       <div className="bg-[#0a0a0a] border-b border-zinc-900 px-8 sticky top-0 z-[45] backdrop-blur-xl">
         <div className="max-w-[1400px] mx-auto flex gap-8 overflow-x-auto no-scrollbar">
           {['Overview', 'Spot', 'Fees', 'Earn'].map((tab) => (
@@ -361,9 +365,9 @@ const Assets: React.FC = () => {
 
       <div className="max-w-[1400px] mx-auto px-8 lg:px-12 py-10">
         {activeTab === 'Overview' && renderOverview()}
+        {activeTab === 'Fees' && renderFees()}
         
-        {/* Placeholder for other tabs */}
-        {!['Overview'].includes(activeTab) && (
+        {!['Overview', 'Fees'].includes(activeTab) && (
           <div className="flex flex-col items-center justify-center py-40 text-center animate-in fade-in duration-700">
              <div className="w-16 h-16 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-500 mb-6">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 19l7-7-7-7M5 12h14"/></svg>
