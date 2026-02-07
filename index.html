@@ -32,6 +32,15 @@
             background: #555;
         }
 
+        /* Utility to hide scrollbar */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
         /* Light Theme Scrollbar Override */
         .light-scrollbar::-webkit-scrollbar-track {
             background: #f9f9f9 !important;

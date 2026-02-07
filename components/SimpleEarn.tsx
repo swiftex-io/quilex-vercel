@@ -33,8 +33,6 @@ const StakeModal: React.FC<StakeModalProps> = ({ asset, onClose }) => {
 
   const handleStake = () => {
     if (!agreed || !amount || parseFloat(amount) <= 0) return;
-    // In a real app, this would call a stake function. 
-    // For prototype, we'll just close it.
     alert(`Successfully staked ${amount} ${asset.symbol}`);
     onClose();
   };
@@ -56,7 +54,6 @@ const StakeModal: React.FC<StakeModalProps> = ({ asset, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[150] flex items-center justify-center p-4 animate-in fade-in duration-300">
       <div className="bg-[#111] border border-white/10 rounded-[24px] w-full max-w-[480px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-        {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-white/5">
           <h2 className="text-xl font-bold tracking-tight">Stake {asset.symbol}</h2>
           <button onClick={onClose} className="text-zinc-500 hover:text-white transition-colors">
@@ -64,9 +61,7 @@ const StakeModal: React.FC<StakeModalProps> = ({ asset, onClose }) => {
           </button>
         </div>
 
-        {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
-          {/* Term Selection */}
           <section>
             <h3 className="text-[13px] font-bold text-zinc-500 uppercase tracking-widest mb-4">Term</h3>
             <div className="grid grid-cols-3 gap-3">
@@ -90,7 +85,6 @@ const StakeModal: React.FC<StakeModalProps> = ({ asset, onClose }) => {
             </div>
           </section>
 
-          {/* Amount Selection */}
           <section>
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-[13px] font-bold text-zinc-500 uppercase tracking-widest">Amount</h3>
@@ -128,13 +122,11 @@ const StakeModal: React.FC<StakeModalProps> = ({ asset, onClose }) => {
             </div>
           </section>
 
-          {/* Tab Overview/FAQ */}
           <div className="border-b border-white/10 flex gap-6">
             <button className="pb-3 text-sm font-bold border-b-2 border-white text-white">Overview</button>
             <button className="pb-3 text-sm font-bold text-zinc-500 hover:text-zinc-300 transition-colors">FAQ</button>
           </div>
 
-          {/* Interest Stats */}
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-zinc-400 border-b border-dotted border-zinc-700">Est. Total Interest</span>
@@ -146,7 +138,6 @@ const StakeModal: React.FC<StakeModalProps> = ({ asset, onClose }) => {
             </div>
           </div>
 
-          {/* Process Timeline */}
           <div className="space-y-6">
             <h4 className="text-[13px] font-bold text-zinc-200">Daily interest; early redemption allowed</h4>
             <div className="relative pl-6 space-y-6">
@@ -167,7 +158,6 @@ const StakeModal: React.FC<StakeModalProps> = ({ asset, onClose }) => {
             </div>
           </div>
 
-          {/* Warning */}
           <div className="flex gap-3 p-4 bg-zinc-900/50 rounded-xl border border-white/5">
             <svg className="w-4 h-4 text-zinc-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
             <p className="text-[12px] font-medium text-zinc-500 leading-relaxed">
@@ -176,7 +166,6 @@ const StakeModal: React.FC<StakeModalProps> = ({ asset, onClose }) => {
           </div>
         </div>
 
-        {/* Footer Actions */}
         <div className="p-6 bg-zinc-900/30 border-t border-white/5 space-y-4">
           <label className="flex items-center gap-3 cursor-pointer group">
             <input 
@@ -213,15 +202,25 @@ const SimpleEarn: React.FC = () => {
   const [productFilter, setProductFilter] = useState('All products');
   const [termFilter, setTermFilter] = useState('All terms');
   
-  // Modal state
   const [selectedAssetForStaking, setSelectedAssetForStaking] = useState<any>(null);
   
-  // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   const vantaRef = useRef<HTMLDivElement>(null);
   const vantaEffectRef = useRef<any>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  const earnTabs: EarnCategory[] = ['Simple Earn', 'Staking', 'ETH Staking', 'Dual Investment'];
+
+  const carouselItems = [
+    { symbol: 'ETH', name: 'Ethereum', apr: '20.00%', term: '7 Day(s)' },
+    { symbol: 'SOL', name: 'Solana', apr: '20.00%', term: '7 Day(s)' },
+    { symbol: 'XRP', name: 'Ripple', apr: '10.00%', term: '7 Day(s)' },
+    { symbol: 'DOT', name: 'Polkadot', apr: '15.00%', term: '7 Day(s)' },
+    { symbol: 'ADA', name: 'Cardano', apr: '12.00%', term: '7 Day(s)' },
+    { symbol: 'AVAX', name: 'Avalanche', apr: '18.00%', term: '7 Day(s)' },
+  ];
 
   useEffect(() => {
     const initVanta = () => {
@@ -271,6 +270,27 @@ const SimpleEarn: React.FC = () => {
       observer.disconnect();
       destroyVanta();
     };
+  }, []);
+
+  // Auto-scroll logic for carousel
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (carouselRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
+        const firstChild = carouselRef.current.firstElementChild as HTMLElement;
+        const cardWidth = firstChild?.getBoundingClientRect().width || 0;
+        const gap = 24; // Equivalent to gap-6
+        const scrollAmount = cardWidth + gap;
+
+        if (Math.ceil(scrollLeft + clientWidth) >= scrollWidth - 5) {
+          carouselRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          carouselRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        }
+      }
+    }, 4000);
+
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -335,49 +355,38 @@ const SimpleEarn: React.FC = () => {
     return earnProducts.slice(start, start + itemsPerPage);
   }, [earnProducts, currentPage]);
 
-  const earnTabs = [
-    { 
-      title: 'Simple Earn' as EarnCategory, 
-      desc: 'Flexible savings with daily rewards',
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14H9V8h2v8zm4 0h-2V8h2v8z" />
-        </svg>
-      )
-    },
-    { 
-      title: 'Staking' as EarnCategory, 
-      desc: 'Earn high yields on your crypto',
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z" />
-        </svg>
-      )
-    },
-    { 
-      title: 'ETH Staking' as EarnCategory, 
-      desc: 'Stake ETH and receive BETH',
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2L4.5 14.5L12 19L19.5 14.5L12 2ZM12 21L4.5 15.5L12 19.5L19.5 15.5L12 21Z" />
-        </svg>
-      )
-    },
-    { 
-      title: 'Dual Investment' as EarnCategory, 
-      desc: 'Buy low or sell high with bonus yield',
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5.5-2.5l7-7.5H7v-2h10v2l-7 7.5h7v2h-10.5v-2z" />
-        </svg>
-      )
+  const activeCategoryDesc = useMemo(() => {
+    switch(activeEarnTab) {
+      case 'Simple Earn': return 'Flexible savings with daily rewards';
+      case 'Staking': return 'Earn high yields on your crypto';
+      case 'ETH Staking': return 'Stake ETH and receive BETH';
+      case 'Dual Investment': return 'Buy low or sell high with bonus yield';
+      default: return '';
     }
-  ];
+  }, [activeEarnTab]);
 
   return (
     <div className="bg-black min-h-screen text-white pb-32 selection:bg-[#d7ff20]/20 font-sans">
-      {/* Hero Section */}
-      <div ref={vantaRef} className="relative pt-24 pb-36 px-6 flex flex-col items-center text-center overflow-hidden">
+      {/* Sticky Sub-navigation */}
+      <div className="bg-[#0a0a0a] border-b border-zinc-900 px-8 sticky top-0 z-[45] backdrop-blur-xl">
+        <div className="max-w-[1400px] mx-auto flex gap-8 overflow-x-auto no-scrollbar">
+          {earnTabs.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveEarnTab(tab)}
+              className={`py-4 text-[13px] font-bold border-b-2 transition-all whitespace-nowrap tracking-tight ${
+                activeEarnTab === tab 
+                  ? 'border-white text-white' 
+                  : 'border-transparent text-zinc-500 hover:text-zinc-300'
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div ref={vantaRef} className="relative pt-16 pb-24 px-6 flex flex-col items-center text-center overflow-hidden">
         <div className="absolute inset-0 bg-black/60 pointer-events-none"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-gradient-to-b from-[#d7ff20]/10 via-transparent to-transparent blur-[120px] pointer-events-none opacity-40"></div>
 
@@ -389,7 +398,7 @@ const SimpleEarn: React.FC = () => {
             {activeEarnTab === 'Dual Investment' ? 'Up to 120% APR' : 'Stable yields for your assets'}
           </p>
           <p className="text-sm md:text-base text-zinc-500 mb-10 max-w-xl mx-auto font-normal leading-relaxed opacity-70">
-            {earnTabs.find(t => t.title === activeEarnTab)?.desc}. <br className="hidden md:block" />
+            {activeCategoryDesc}. <br className="hidden md:block" />
             Join the next generation of automated passive income.
           </p>
 
@@ -399,43 +408,40 @@ const SimpleEarn: React.FC = () => {
         </div>
       </div>
 
-      {/* Categories / Navigation Tabs Section */}
-      <div className="max-w-[1400px] mx-auto px-8 -mt-20 relative z-20">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {earnTabs.map((tab) => (
-            <button 
-              key={tab.title}
-              onClick={() => setActiveEarnTab(tab.title)}
-              className={`flex flex-col p-6 rounded-2xl border transition-all text-left group ${
-                activeEarnTab === tab.title 
-                  ? 'bg-zinc-900 border-[#d7ff20]/50 shadow-[0_20px_40px_rgba(0,0,0,0.4)]' 
-                  : 'bg-zinc-950/80 border-zinc-900 hover:border-zinc-700'
-              }`}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className={`p-2.5 rounded-xl transition-all ${activeEarnTab === tab.title ? 'bg-[#d7ff20] text-black shadow-[0_0_15px_rgba(215,255,32,0.3)]' : 'bg-zinc-800 text-zinc-400 group-hover:text-white'}`}>
-                  {tab.icon}
+      <div className="max-w-[1400px] mx-auto px-8 mt-12">
+        {/* Carousel Section - Fixed alignment to wrapper */}
+        <div className="relative mb-16 group">
+          <div 
+            ref={carouselRef}
+            className="flex gap-6 overflow-x-auto no-scrollbar scroll-smooth snap-x pb-4"
+          >
+            {carouselItems.map((item, idx) => (
+              <div 
+                key={idx} 
+                className="flex-shrink-0 w-[calc(33.333%-16px)] min-w-[320px] bg-[#0d0d0d] border border-white/5 rounded-[24px] p-8 flex flex-col justify-between h-48 snap-start hover:border-white/20 transition-all hover:bg-zinc-900/40 cursor-pointer"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center overflow-hidden border border-white/5">
+                    <img src={`https://assets.coincap.io/assets/icons/${item.symbol.toLowerCase()}@2x.png`} className="w-full h-full object-cover" alt="" />
+                  </div>
+                  <span className="text-xl font-bold tracking-tight">{item.symbol}</span>
                 </div>
-                {activeEarnTab === tab.title && (
-                   <div className="w-1.5 h-1.5 rounded-full bg-[#d7ff20] animate-pulse"></div>
-                )}
+                
+                <div className="flex justify-between items-end">
+                  <div className="flex flex-col">
+                    <span className="text-xs font-medium text-zinc-500 mb-1">Est. APR</span>
+                    <span className="text-3xl font-black tracking-tighter text-white">{item.apr}</span>
+                  </div>
+                  <div className="flex flex-col text-right">
+                    <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-1">Term</span>
+                    <span className="text-lg font-bold text-zinc-300">{item.term}</span>
+                  </div>
+                </div>
               </div>
-              <div className={`text-sm font-bold mb-1 transition-colors ${activeEarnTab === tab.title ? 'text-[#d7ff20]' : 'text-white'}`}>
-                {tab.title}
-              </div>
-              <div className="text-[11px] text-zinc-500 font-medium leading-tight opacity-80 group-hover:opacity-100 transition-opacity">
-                {tab.desc}
-              </div>
-              {activeEarnTab === tab.title && (
-                <div className="mt-4 w-6 h-0.5 bg-[#d7ff20] rounded-full"></div>
-              )}
-            </button>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Products Section */}
-      <div className="max-w-[1400px] mx-auto px-8 mt-24">
         <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 gap-6">
           <h2 className="text-xl font-medium tracking-tight">{activeEarnTab} Products</h2>
           
@@ -465,7 +471,6 @@ const SimpleEarn: React.FC = () => {
           </div>
         </div>
 
-        {/* Products Table */}
         <div className="bg-zinc-950 border border-white/5 rounded-xl overflow-hidden shadow-2xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
@@ -525,7 +530,6 @@ const SimpleEarn: React.FC = () => {
             </table>
           </div>
 
-          {/* Pagination Controls */}
           {totalPages > 1 && (
             <div className="px-8 py-6 border-t border-white/5 flex items-center justify-between bg-zinc-950/20">
               <div className="text-[11px] text-zinc-500 font-medium">
@@ -562,7 +566,6 @@ const SimpleEarn: React.FC = () => {
           )}
         </div>
 
-        {/* Info Cards */}
         <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-zinc-950/40 border border-white/5 p-8 rounded-xl flex flex-col justify-between group hover:border-zinc-800 transition-colors">
             <div>
@@ -589,7 +592,6 @@ const SimpleEarn: React.FC = () => {
         </div>
       </div>
 
-      {/* Stake Modal */}
       {selectedAssetForStaking && (
         <StakeModal 
           asset={selectedAssetForStaking} 
