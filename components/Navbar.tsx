@@ -397,7 +397,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
               {/* Deposit Button - Responsive (Hidden below lg) */}
               <button 
                 onClick={() => { onNavigate(Page.ASSETS); setDepositModalOpen(true); }} 
-                className="hidden lg:block px-5 py-2 bg-white text-black text-[11px] font-semibold tracking-tight rounded-xl hover:bg-gray-200 transition-all mr-3 shadow-md whitespace-nowrap shrink-0"
+                className="hidden lg:block px-5 py-2 bg-white text-black text-[11px] font-semibold tracking-tight rounded-full hover:bg-gray-200 transition-all mr-3 shadow-md whitespace-nowrap shrink-0"
               >
                 Deposit
               </button>
@@ -422,7 +422,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3 mb-6">
-                      <button onClick={() => { onNavigate(Page.ASSETS); setDepositModalOpen(true); setIsWalletOpen(false); }} className="py-3 bg-black text-white text-[11px] font-semibold rounded-2xl hover:bg-zinc-800 transition-all shadow-lg tracking-tight">Deposit</button>
+                      <button onClick={() => { onNavigate(Page.ASSETS); setDepositModalOpen(true); setIsWalletOpen(false); }} className="py-3 bg-black text-white text-[11px] font-semibold rounded-full hover:bg-zinc-800 transition-all shadow-lg tracking-tight">Deposit</button>
                       <button onClick={() => { onNavigate(Page.ASSETS); setIsWalletOpen(false); }} className="py-3 bg-gray-50 text-black text-[11px] font-semibold rounded-2xl border border-gray-100 hover:bg-gray-100 transition-all tracking-tight">Withdraw</button>
                     </div>
                     <div className="space-y-0.5 border-t border-gray-50 pt-5">
@@ -483,7 +483,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
               </div>
 
               <div className="h-6 w-[1px] bg-zinc-600/60 mx-3 hidden sm:block"></div>
-              <button onClick={() => setShowAuth(true)} className="px-6 py-2.5 bg-white text-black text-[11px] font-semibold tracking-tight rounded-xl hover:bg-gray-200 transition-all shadow-xl whitespace-nowrap shrink-0">Sign in</button>
+              <button onClick={() => setShowAuth(true)} className="px-6 py-2.5 bg-white text-black text-[11px] font-semibold tracking-tight rounded-full hover:bg-gray-200 transition-all shadow-xl whitespace-nowrap shrink-0">Sign in</button>
             </>
           )}
         </div>

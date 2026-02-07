@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useExchangeStore } from '../store';
 
@@ -82,11 +81,11 @@ const Home: React.FC<HomeProps> = ({ onTrade }) => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-24">
           <button 
             onClick={onTrade}
-            className="px-8 py-4 bg-white text-black font-bold rounded-xl text-base hover:bg-gray-200 transition-all transform hover:scale-105"
+            className="px-8 py-4 bg-white text-black font-bold rounded-full text-base hover:bg-gray-200 transition-all transform hover:scale-105"
           >
             Trade Now
           </button>
-          <button className="px-8 py-4 bg-zinc-900 text-white font-bold rounded-xl text-base border border-gray-800 hover:bg-zinc-800 transition-all">
+          <button className="px-8 py-4 bg-zinc-900 text-white font-bold rounded-full text-base border border-gray-800 hover:bg-zinc-800 transition-all">
             Learn More
           </button>
         </div>
