@@ -347,7 +347,7 @@ const Assets: React.FC = () => {
     <div className="min-h-screen bg-black text-white font-sans selection:bg-white/10 overflow-x-hidden">
       <div className="bg-[#0a0a0a] border-b border-zinc-900 px-8 sticky top-0 z-[45] backdrop-blur-xl">
         <div className="max-w-[1400px] mx-auto flex gap-8 overflow-x-auto no-scrollbar">
-          {['Overview', 'Spot', 'Fees', 'Earn'].map((tab) => (
+          {['Overview', 'Spot', 'Fees'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}

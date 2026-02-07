@@ -144,7 +144,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
           <span className={dropdownTextClass}>Support center</span>
         </button>
         <button className={dropdownItemClass}>
-          <span className={dropdownIconClass}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span>
+          <span className={dropdownIconClass}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M16 4h2a2 2 0 0 1-2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span>
           <span className={dropdownTextClass}>Open a Ticket</span>
         </button>
       </div>
@@ -429,8 +429,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                       {[
                         { label: 'Overview', page: Page.ASSETS, icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 12L16 10M12 12V7"/></svg> },
                         { label: 'Spot', page: Page.TRADE, icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5"/></svg> },
-                        { label: 'Fees', page: Page.SETTINGS, icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg> },
-                        { label: 'Earn', page: Page.ASSETS, icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 6v12m-3-2.818.879.659"/></svg> }
+                        { label: 'Fees', page: Page.SETTINGS, icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg> }
                       ].map((link) => (
                         <button key={link.label} onClick={() => { onNavigate(link.page); setIsWalletOpen(false); }} className={dropdownItemClass}>
                           <span className={dropdownIconClass}>{link.icon}</span>
