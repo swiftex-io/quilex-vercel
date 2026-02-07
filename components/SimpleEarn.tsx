@@ -9,12 +9,212 @@ declare global {
 
 type EarnCategory = 'Simple Earn' | 'Staking' | 'ETH Staking' | 'Dual Investment';
 
+interface StakeModalProps {
+  asset: any;
+  onClose: () => void;
+}
+
+const StakeModal: React.FC<StakeModalProps> = ({ asset, onClose }) => {
+  const [selectedTerm, setSelectedTerm] = useState('Flexible');
+  const [amount, setAmount] = useState('');
+  const [agreed, setAgreed] = useState(false);
+  const { balances, deposit } = useExchangeStore();
+
+  const usdtBalance = balances.find(b => b.symbol === 'USDT')?.available || 0;
+  const assetBalance = balances.find(b => b.symbol === asset.symbol)?.available || 0;
+
+  const terms = [
+    { id: 'Flexible', apr: asset.apy, label: 'Flexible', max: true },
+    { id: '7d', apr: (parseFloat(asset.apy) * 1.2).toFixed(2), label: '7 Day' },
+    { id: '30d', apr: (parseFloat(asset.apy) * 1.8).toFixed(2), label: '30 Day' },
+  ];
+
+  const currentTerm = terms.find(t => t.id === selectedTerm) || terms[0];
+
+  const handleStake = () => {
+    if (!agreed || !amount || parseFloat(amount) <= 0) return;
+    // In a real app, this would call a stake function. 
+    // For prototype, we'll just close it.
+    alert(`Successfully staked ${amount} ${asset.symbol}`);
+    onClose();
+  };
+
+  const today = new Date();
+  const formatDateTime = (date: Date) => {
+    return date.toISOString().replace('T', ' ').split('.')[0];
+  };
+
+  const stakingTime = today;
+  const interestAccruesOn = new Date(today);
+  interestAccruesOn.setDate(today.getDate() + 1);
+  interestAccruesOn.setHours(8, 0, 0, 0);
+
+  const maturityDate = new Date(today);
+  maturityDate.setDate(today.getDate() + (selectedTerm === '7d' ? 7 : selectedTerm === '30d' ? 30 : 1));
+  maturityDate.setHours(8, 0, 0, 0);
+
+  return (
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[150] flex items-center justify-center p-4 animate-in fade-in duration-300">
+      <div className="bg-[#111] border border-white/10 rounded-[24px] w-full max-w-[480px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-white/5">
+          <h2 className="text-xl font-bold tracking-tight">Stake {asset.symbol}</h2>
+          <button onClick={onClose} className="text-zinc-500 hover:text-white transition-colors">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+          {/* Term Selection */}
+          <section>
+            <h3 className="text-[13px] font-bold text-zinc-500 uppercase tracking-widest mb-4">Term</h3>
+            <div className="grid grid-cols-3 gap-3">
+              {terms.map((term) => (
+                <button
+                  key={term.id}
+                  onClick={() => setSelectedTerm(term.id)}
+                  className={`flex flex-col p-4 rounded-xl border text-left transition-all ${
+                    selectedTerm === term.id 
+                      ? 'bg-zinc-800 border-white' 
+                      : 'bg-zinc-900/50 border-white/5 hover:border-white/20'
+                  }`}
+                >
+                  <span className="text-[11px] font-bold text-zinc-400 mb-1">{term.label}</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-lg font-bold text-white">{term.apr}%</span>
+                    {term.max && <span className="text-[9px] font-black text-zinc-500 uppercase">Max</span>}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* Amount Selection */}
+          <section>
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-[13px] font-bold text-zinc-500 uppercase tracking-widest">Amount</h3>
+            </div>
+            <div className="relative group">
+              <input
+                type="number"
+                placeholder="≥ 0.01"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="w-full bg-zinc-900 border border-white/10 rounded-xl py-4 pl-4 pr-16 text-sm font-bold focus:border-white/40 outline-none transition-all placeholder:text-zinc-700"
+              />
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-3">
+                <span className="text-xs font-bold text-zinc-500">{asset.symbol}</span>
+                <button 
+                  onClick={() => setAmount(assetBalance.toString())}
+                  className="text-xs font-bold text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  Max
+                </button>
+              </div>
+            </div>
+            <div className="mt-3 space-y-1 text-[12px] font-medium">
+              <div className="flex justify-between">
+                <span className="text-zinc-500">Available Spot balance</span>
+                <span className="text-white flex items-center gap-1">
+                  {assetBalance.toLocaleString()} {asset.symbol}
+                  <svg className="w-3 h-3 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-zinc-500">Available to Stake</span>
+                <span className="text-white">100,000 {asset.symbol}</span>
+              </div>
+            </div>
+          </section>
+
+          {/* Tab Overview/FAQ */}
+          <div className="border-b border-white/10 flex gap-6">
+            <button className="pb-3 text-sm font-bold border-b-2 border-white text-white">Overview</button>
+            <button className="pb-3 text-sm font-bold text-zinc-500 hover:text-zinc-300 transition-colors">FAQ</button>
+          </div>
+
+          {/* Interest Stats */}
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-medium text-zinc-400 border-b border-dotted border-zinc-700">Est. Total Interest</span>
+              <span className="text-sm font-bold text-zinc-500">-- {asset.symbol}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-medium text-zinc-400">Est. APR</span>
+              <span className="text-sm font-bold text-white">{currentTerm.apr}%</span>
+            </div>
+          </div>
+
+          {/* Process Timeline */}
+          <div className="space-y-6">
+            <h4 className="text-[13px] font-bold text-zinc-200">Daily interest; early redemption allowed</h4>
+            <div className="relative pl-6 space-y-6">
+              <div className="absolute left-[7px] top-[10px] bottom-[10px] w-[2px] bg-zinc-800"></div>
+              
+              {[
+                { label: 'Staking Time', value: formatDateTime(stakingTime), active: true },
+                { label: 'Interest Accrues on', value: formatDateTime(interestAccruesOn), active: false },
+                { label: 'First Interest Distribution', value: 'Upon Redemption', active: false },
+                { label: 'Maturity Date', value: formatDateTime(maturityDate), active: false },
+              ].map((step, i) => (
+                <div key={i} className="relative flex justify-between items-center">
+                  <div className={`absolute -left-[23px] top-1/2 -translate-y-1/2 w-[10px] h-[10px] rounded-full border-2 border-[#111] ${step.active ? 'bg-white' : 'bg-zinc-800'}`}></div>
+                  <span className="text-sm font-medium text-zinc-500 border-b border-dotted border-zinc-800">{step.label}</span>
+                  <span className="text-sm font-bold text-zinc-300">{step.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Warning */}
+          <div className="flex gap-3 p-4 bg-zinc-900/50 rounded-xl border border-white/5">
+            <svg className="w-4 h-4 text-zinc-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <p className="text-[12px] font-medium text-zinc-500 leading-relaxed">
+              Early redemption will forfeit all earned interest. Redemption processing time may vary depending on network conditions.
+            </p>
+          </div>
+        </div>
+
+        {/* Footer Actions */}
+        <div className="p-6 bg-zinc-900/30 border-t border-white/5 space-y-4">
+          <label className="flex items-center gap-3 cursor-pointer group">
+            <input 
+              type="checkbox" 
+              checked={agreed} 
+              onChange={(e) => setAgreed(e.target.checked)} 
+              className="sr-only"
+            />
+            <div className={`w-4 h-4 rounded border-2 transition-all flex items-center justify-center ${agreed ? 'bg-blue-500 border-blue-500' : 'border-zinc-700 group-hover:border-zinc-500'}`}>
+              {agreed && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="m5 13 4 4L19 7"/></svg>}
+            </div>
+            <span className="text-[12px] font-medium text-zinc-400">
+              I have read and agree to the <span className="text-blue-400">Quilex Earn Service Agreement</span>
+            </span>
+          </label>
+
+          <button 
+            disabled={!agreed || !amount || parseFloat(amount) <= 0}
+            onClick={handleStake}
+            className="w-full py-4 bg-white text-black font-black rounded-full text-sm uppercase tracking-tighter disabled:opacity-20 disabled:cursor-not-allowed hover:bg-zinc-200 transition-all active:scale-[0.98]"
+          >
+            Stake Now
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const SimpleEarn: React.FC = () => {
   const { balances } = useExchangeStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeEarnTab, setActiveEarnTab] = useState<EarnCategory>('Simple Earn');
   const [productFilter, setProductFilter] = useState('All products');
   const [termFilter, setTermFilter] = useState('All terms');
+  
+  // Modal state
+  const [selectedAssetForStaking, setSelectedAssetForStaking] = useState<any>(null);
   
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,7 +223,6 @@ const SimpleEarn: React.FC = () => {
   const vantaRef = useRef<HTMLDivElement>(null);
   const vantaEffectRef = useRef<any>(null);
 
-  // Vanta.js DOTS effect with IntersectionObserver for resource saving
   useEffect(() => {
     const initVanta = () => {
       if (!vantaEffectRef.current && vantaRef.current && window.VANTA) {
@@ -74,16 +273,13 @@ const SimpleEarn: React.FC = () => {
     };
   }, []);
 
-  // Reset pagination on tab or search change
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, activeEarnTab]);
 
-  // Mock data mapping based on active category
   const earnProducts = useMemo(() => {
     let baseAssets = [...balances];
 
-    // Filter based on category logic
     if (activeEarnTab === 'ETH Staking') {
       baseAssets = baseAssets.filter(b => b.symbol === 'ETH');
     } else if (activeEarnTab === 'Dual Investment') {
@@ -91,7 +287,6 @@ const SimpleEarn: React.FC = () => {
     } else if (activeEarnTab === 'Staking') {
       baseAssets = baseAssets.filter(b => b.symbol !== 'USDT' && b.symbol !== 'USDC');
     } else {
-      // Simple Earn includes almost everything except stablecoins (usually)
       baseAssets = baseAssets.filter(b => b.symbol !== 'USDT' && b.symbol !== 'USDC');
     }
 
@@ -99,7 +294,6 @@ const SimpleEarn: React.FC = () => {
       let apyValue = 1.25;
       let term = 'Flexible';
 
-      // Category specific APY modifiers
       if (activeEarnTab === 'Staking') {
         apyValue = 5.5 + (asset.symbol.charCodeAt(0) % 15);
         term = '30/60/90 Days';
@@ -110,7 +304,6 @@ const SimpleEarn: React.FC = () => {
         apyValue = 15.0 + (asset.symbol.charCodeAt(0) % 80);
         term = 'High Yield';
       } else {
-        // Simple Earn
         if (asset.symbol === 'BTC') apyValue = 0.05;
         else if (asset.symbol === 'ETH') apyValue = 1.10;
         else if (asset.symbol === 'SOL') apyValue = 7.42;
@@ -188,7 +381,7 @@ const SimpleEarn: React.FC = () => {
         <div className="absolute inset-0 bg-black/60 pointer-events-none"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-gradient-to-b from-[#d7ff20]/10 via-transparent to-transparent blur-[120px] pointer-events-none opacity-40"></div>
 
-        <div className="relative z-10 max-w-4xl mx-auto animate-in fade-in zoom-in-95 duration-1000 key={activeEarnTab}">
+        <div className="relative z-10 max-w-4xl mx-auto animate-in fade-in zoom-in-95 duration-1000">
           <h1 className="text-4xl md:text-7xl font-black mb-3 tracking-tighter leading-none text-white">
             Quilex <br /> {activeEarnTab}
           </h1>
@@ -288,7 +481,7 @@ const SimpleEarn: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-zinc-900/50">
                 {paginatedProducts.length > 0 ? paginatedProducts.map((product) => (
-                  <tr key={product.symbol} className="hover:bg-zinc-900/20 transition-all group cursor-pointer">
+                  <tr key={product.symbol} onClick={() => setSelectedAssetForStaking(product)} className="hover:bg-zinc-900/20 transition-all group cursor-pointer">
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-3">
                         <div className="w-7 h-7 rounded-full bg-zinc-900 flex items-center justify-center overflow-hidden border border-white/5">
@@ -395,6 +588,14 @@ const SimpleEarn: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Stake Modal */}
+      {selectedAssetForStaking && (
+        <StakeModal 
+          asset={selectedAssetForStaking} 
+          onClose={() => setSelectedAssetForStaking(null)} 
+        />
+      )}
     </div>
   );
 };
