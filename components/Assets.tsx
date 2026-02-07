@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useExchangeStore } from '../store';
 
@@ -37,13 +36,13 @@ const ASSET_NETWORKS: Record<string, { id: string; name: string; fullName: strin
 const Assets: React.FC = () => {
   const { balances, deposit, isDepositModalOpen: showDepositFlow, setDepositModalOpen: setShowDepositFlow } = useExchangeStore();
   
+  const [activeTab, setActiveTab] = useState('Overview');
   const [selectedAsset, setSelectedAsset] = useState('USDT');
   const [selectedNetwork, setSelectedNetwork] = useState<any>(null);
   const [isAssetDropdownOpen, setIsAssetDropdownOpen] = useState(false);
   const [assetSearch, setAssetSearch] = useState('');
   
   const [hideSmallBalances, setHideSmallBalances] = useState(false);
-  const [activeTab, setActiveTab] = useState<'all' | 'funding' | 'trading'>('all');
   
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -72,7 +71,7 @@ const Assets: React.FC = () => {
   // Reset pagination when searching or filtering
   useEffect(() => {
     setCurrentPage(1);
-  }, [assetSearch, hideSmallBalances]);
+  }, [assetSearch, hideSmallBalances, activeTab]);
 
   const filteredBalances = useMemo(() => {
     // 1. Filter by search
@@ -107,11 +106,6 @@ const Assets: React.FC = () => {
     setSelectedNetwork(null);
   };
 
-  const copyAddress = () => {
-    navigator.clipboard.writeText('0x4813dca51ce7426d9ea6a0b212f758b7dbd4d313');
-    alert('Address copied to clipboard!');
-  };
-
   const renderCryptoIcon = (symbol: string, sizeClass: string = "w-9 h-9") => (
     <div className={`${sizeClass} rounded-xl bg-zinc-900 flex items-center justify-center font-bold text-[11px] text-gray-500 overflow-hidden relative`}>
       <img 
@@ -124,7 +118,7 @@ const Assets: React.FC = () => {
   );
 
   const TransactionHistoryTable = () => (
-    <div className="bg-zinc-950 border border-white/5 rounded-2xl shadow-2xl overflow-hidden p-8">
+    <div className="bg-zinc-950 border border-white/5 rounded-2xl shadow-2xl overflow-hidden p-8 mt-10">
       <div className="flex justify-between items-center mb-10">
         <h2 className="text-2xl font-bold tracking-tight">Recent Transactions</h2>
       </div>
@@ -170,166 +164,201 @@ const Assets: React.FC = () => {
     </div>
   );
 
-  return (
-    <div className="min-h-screen bg-black text-white p-6 lg:p-10 animate-in fade-in duration-500">
-      <div className="max-w-[1400px] mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tighter mb-1">My Wallet</h1>
-            <p className="text-gray-500 text-sm font-medium">Manage your funds across all accounts</p>
-          </div>
-          <div className="flex gap-3">
-            <button onClick={() => setShowDepositFlow(true)} className="px-6 py-3 bg-white text-black font-semibold rounded-xl hover:bg-gray-200 transition-all shadow-lg text-xs uppercase tracking-widest">Deposit</button>
-            <button className="px-6 py-3 bg-zinc-900 text-white font-medium rounded-xl border border-white/5 hover:bg-zinc-800 transition-all text-xs uppercase tracking-widest">Withdraw</button>
-          </div>
+  const renderOverview = () => (
+    <div className="animate-in fade-in duration-500">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tighter mb-1">My Wallet</h1>
+          <p className="text-gray-500 text-sm font-medium">Manage your funds across all accounts</p>
         </div>
+        <div className="flex gap-3">
+          <button onClick={() => setShowDepositFlow(true)} className="px-6 py-3 bg-white text-black font-semibold rounded-xl hover:bg-gray-200 transition-all shadow-lg text-xs uppercase tracking-widest">Deposit</button>
+          <button className="px-6 py-3 bg-zinc-900 text-white font-medium rounded-xl border border-white/5 hover:bg-zinc-800 transition-all text-xs uppercase tracking-widest">Withdraw</button>
+        </div>
+      </div>
 
-        <div className="grid grid-cols-1 gap-6 mb-10">
-          <div className="bg-zinc-950 border border-white/5 rounded-2xl p-8 shadow-2xl relative overflow-hidden group">
-            <div className="relative z-10">
-              <div className="flex items-center gap-2 text-gray-500 font-medium text-[10px] uppercase tracking-widest mb-4"><span>Total Assets Value</span></div>
-              <div className="flex flex-col sm:flex-row items-baseline gap-4 mb-3">
-                <span className="text-5xl font-bold tracking-tighter">${totalBalanceUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                <span className="text-xl font-medium text-gray-500 tracking-tight">≈ {totalInBTC.toFixed(6)} BTC</span>
-              </div>
-              
-              <div className="flex items-center gap-2 text-[13px] font-semibold">
-                <span className="text-zinc-500">Today's PNL:</span>
-                <span className={`${pnlAmount >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'} flex items-center gap-1`}>
-                  {pnlAmount >= 0 ? '+' : ''}${Math.abs(pnlAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  <span className="bg-current/10 px-1.5 py-0.5 rounded text-[11px]">
-                    {pnlAmount >= 0 ? '+' : ''}{pnlPercentage.toFixed(2)}%
-                  </span>
-                </span>
-              </div>
+      <div className="grid grid-cols-1 gap-6 mb-10">
+        <div className="bg-zinc-950 border border-white/5 rounded-2xl p-8 shadow-2xl relative overflow-hidden group">
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 text-gray-500 font-medium text-[10px] uppercase tracking-widest mb-4"><span>Total Assets Value</span></div>
+            <div className="flex flex-col sm:flex-row items-baseline gap-4 mb-3">
+              <span className="text-5xl font-bold tracking-tighter">${totalBalanceUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              <span className="text-xl font-medium text-gray-500 tracking-tight">≈ {totalInBTC.toFixed(6)} BTC</span>
             </div>
-          </div>
-        </div>
-
-        {/* Assets Table Section with Header Controls */}
-        <div className="flex flex-col gap-4 mb-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <h2 className="text-xl font-bold tracking-tight">My Assets</h2>
             
-            <div className="flex flex-wrap items-center gap-4 sm:gap-6 ml-auto">
-              <div className="relative group">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-white transition-colors">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                </div>
-                <input 
-                  type="text" 
-                  placeholder="Search coins"
-                  value={assetSearch}
-                  onChange={(e) => setAssetSearch(e.target.value)}
-                  className="bg-zinc-900 border border-white/5 rounded-lg py-1.5 pl-8 pr-3 text-[11px] font-medium w-36 focus:w-48 focus:border-white/20 outline-none transition-all placeholder:text-gray-600 text-white"
-                />
-              </div>
-
-              <label className="flex items-center gap-2 cursor-pointer group">
-                <div className="relative">
-                  <input 
-                    type="checkbox" 
-                    checked={hideSmallBalances}
-                    onChange={(e) => setHideSmallBalances(e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-3.5 h-3.5 border-2 border-zinc-700 rounded-sm peer-checked:bg-white peer-checked:border-white transition-all"></div>
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 peer-checked:opacity-100 transition-opacity">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="4"><path d="M5 13l4 4L19 7"/></svg>
-                  </div>
-                </div>
-                <span className="text-[11px] font-semibold text-gray-500 group-hover:text-gray-300 transition-colors">Hide small balances</span>
-              </label>
-
-              <button className="text-[11px] font-semibold text-blue-500 hover:text-white transition-colors tracking-tight">
-                Convert small amounts to USDC
-              </button>
+            <div className="flex items-center gap-2 text-[13px] font-semibold">
+              <span className="text-zinc-500">Today's PNL:</span>
+              <span className={`${pnlAmount >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'} flex items-center gap-1`}>
+                {pnlAmount >= 0 ? '+' : ''}${Math.abs(pnlAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                <span className="bg-current/10 px-1.5 py-0.5 rounded text-[11px]">
+                  {pnlAmount >= 0 ? '+' : ''}{pnlPercentage.toFixed(2)}%
+                </span>
+              </span>
             </div>
           </div>
+        </div>
+      </div>
 
-          <div className="bg-zinc-950 border border-white/5 rounded-2xl shadow-2xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead className="text-[10px] text-gray-600 font-medium uppercase tracking-widest border-b border-white/5">
-                  <tr>
-                    <th className="px-8 py-4">Asset</th>
-                    <th className="px-8 py-4">Total Balance</th>
-                    <th className="px-8 py-4">Available</th>
-                    <th className="px-8 py-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5">
-                  {paginatedBalances.length > 0 ? paginatedBalances.map((asset) => {
-                    const hasBalance = asset.balance > 0;
-                    return (
-                      <tr 
-                        key={asset.symbol} 
-                        className={`transition-colors group ${hasBalance ? 'bg-zinc-900/40 hover:bg-zinc-800/50' : 'hover:bg-white/[0.02] opacity-60 hover:opacity-100'}`}
-                      >
-                        <td className="px-8 py-5">
-                          <div className="flex items-center gap-4">
-                            {renderCryptoIcon(asset.symbol)}
-                            <div>
-                              <div className="font-semibold text-sm">{asset.symbol}</div>
-                              <div className="text-[10px] text-gray-500 font-medium uppercase">{asset.name}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-8 py-5 font-mono text-xs font-medium">{asset.balance.toLocaleString(undefined, { maximumFractionDigits: 6 })}</td>
-                        <td className="px-8 py-5 font-mono text-xs text-white">${(asset.balance * asset.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                        <td className="px-8 py-5 text-right"><button className="text-[10px] font-semibold text-blue-500 hover:text-white uppercase tracking-widest transition-colors">Trade</button></td>
-                      </tr>
-                    );
-                  }) : (
-                    <tr>
-                      <td colSpan={4} className="px-8 py-10 text-center text-gray-600 text-xs font-medium uppercase tracking-widest">
-                        No assets found
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+      {/* Assets Table Section */}
+      <div className="flex flex-col gap-4 mb-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <h2 className="text-xl font-bold tracking-tight">My Assets</h2>
+          
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6 ml-auto">
+            <div className="relative group">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-white transition-colors">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              </div>
+              <input 
+                type="text" 
+                placeholder="Search coins"
+                value={assetSearch}
+                onChange={(e) => setAssetSearch(e.target.value)}
+                className="bg-zinc-900 border border-white/5 rounded-lg py-1.5 pl-8 pr-3 text-[11px] font-medium w-36 focus:w-48 focus:border-white/20 outline-none transition-all placeholder:text-gray-600 text-white"
+              />
             </div>
 
-            {/* Pagination Controls */}
-            {totalPages > 1 && (
-              <div className="px-8 py-6 border-t border-white/5 flex items-center justify-between">
-                <div className="text-[11px] text-gray-500 font-medium">
-                  Showing <span className="text-white">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="text-white">{Math.min(currentPage * itemsPerPage, filteredBalances.length)}</span> of <span className="text-white">{filteredBalances.length}</span> assets
-                </div>
-                <div className="flex items-center gap-1">
-                  <button 
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                    className="p-2 rounded-lg hover:bg-zinc-900 text-gray-500 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-transparent"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m15 18-6-6 6-6"/></svg>
-                  </button>
-                  
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`min-w-[32px] h-8 rounded-lg text-[11px] font-bold transition-all ${currentPage === page ? 'bg-white text-black' : 'text-gray-500 hover:text-white hover:bg-zinc-900'}`}
-                    >
-                      {page}
-                    </button>
-                  ))}
-
-                  <button 
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                    className="p-2 rounded-lg hover:bg-zinc-900 text-gray-500 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-transparent"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m9 18 6-6-6-6"/></svg>
-                  </button>
+            <label className="flex items-center gap-2 cursor-pointer group">
+              <div className="relative">
+                <input 
+                  type="checkbox" 
+                  checked={hideSmallBalances}
+                  onChange={(e) => setHideSmallBalances(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-3.5 h-3.5 border-2 border-zinc-700 rounded-sm peer-checked:bg-white peer-checked:border-white transition-all"></div>
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 peer-checked:opacity-100 transition-opacity">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="4"><path d="M5 13l4 4L19 7"/></svg>
                 </div>
               </div>
-            )}
+              <span className="text-[11px] font-semibold text-gray-500 group-hover:text-gray-300 transition-colors">Hide small balances</span>
+            </label>
+
+            <button className="text-[11px] font-semibold text-blue-500 hover:text-white transition-colors tracking-tight">
+              Convert small amounts to USDC
+            </button>
           </div>
         </div>
 
-        <TransactionHistoryTable />
+        <div className="bg-zinc-950 border border-white/5 rounded-2xl shadow-2xl overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead className="text-[10px] text-gray-600 font-medium uppercase tracking-widest border-b border-white/5">
+                <tr>
+                  <th className="px-8 py-4">Asset</th>
+                  <th className="px-8 py-4">Total Balance</th>
+                  <th className="px-8 py-4">Available</th>
+                  <th className="px-8 py-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {paginatedBalances.length > 0 ? paginatedBalances.map((asset) => {
+                  const hasBalance = asset.balance > 0;
+                  return (
+                    <tr 
+                      key={asset.symbol} 
+                      className={`transition-colors group ${hasBalance ? 'bg-zinc-900/40 hover:bg-zinc-800/50' : 'hover:bg-white/[0.02] opacity-60 hover:opacity-100'}`}
+                    >
+                      <td className="px-8 py-5">
+                        <div className="flex items-center gap-4">
+                          {renderCryptoIcon(asset.symbol)}
+                          <div>
+                            <div className="font-semibold text-sm">{asset.symbol}</div>
+                            <div className="text-[10px] text-gray-500 font-medium uppercase">{asset.name}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-8 py-5 font-mono text-xs font-medium">{asset.balance.toLocaleString(undefined, { maximumFractionDigits: 6 })}</td>
+                      <td className="px-8 py-5 font-mono text-xs text-white">${(asset.balance * asset.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                      <td className="px-8 py-5 text-right"><button className="text-[10px] font-semibold text-blue-500 hover:text-white uppercase tracking-widest transition-colors">Trade</button></td>
+                    </tr>
+                  );
+                }) : (
+                  <tr>
+                    <td colSpan={4} className="px-8 py-10 text-center text-gray-600 text-xs font-medium uppercase tracking-widest">
+                      No assets found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="px-8 py-6 border-t border-white/5 flex items-center justify-between">
+              <div className="text-[11px] text-gray-500 font-medium">
+                Showing <span className="text-white">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="text-white">{Math.min(currentPage * itemsPerPage, filteredBalances.length)}</span> of <span className="text-white">{filteredBalances.length}</span> assets
+              </div>
+              <div className="flex items-center gap-1">
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="p-2 rounded-lg hover:bg-zinc-900 text-gray-500 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-transparent"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`min-w-[32px] h-8 rounded-lg text-[11px] font-bold transition-all ${currentPage === page ? 'bg-white text-black' : 'text-gray-500 hover:text-white hover:bg-zinc-900'}`}
+                  >
+                    {page}
+                  </button>
+                ))}
+
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="p-2 rounded-lg hover:bg-zinc-900 text-gray-500 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-transparent"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+      <TransactionHistoryTable />
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-black text-white font-sans selection:bg-white/10 overflow-x-hidden">
+      {/* Wallet Tab Navigation - Consistent with Settings and Markets */}
+      <div className="bg-[#0a0a0a] border-b border-zinc-900 px-8 sticky top-0 z-[45] backdrop-blur-xl">
+        <div className="max-w-[1400px] mx-auto flex gap-8 overflow-x-auto no-scrollbar">
+          {['Overview', 'Spot', 'Fees', 'Earn'].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`py-4 text-[13px] font-bold border-b-2 transition-all whitespace-nowrap tracking-tight ${
+                activeTab === tab 
+                  ? 'border-white text-white' 
+                  : 'border-transparent text-zinc-500 hover:text-zinc-300'
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="max-w-[1400px] mx-auto px-8 lg:px-12 py-10">
+        {activeTab === 'Overview' && renderOverview()}
+        
+        {/* Placeholder for other tabs */}
+        {!['Overview'].includes(activeTab) && (
+          <div className="flex flex-col items-center justify-center py-40 text-center animate-in fade-in duration-700">
+             <div className="w-16 h-16 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-500 mb-6">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 19l7-7-7-7M5 12h14"/></svg>
+             </div>
+             <h3 className="text-2xl font-bold mb-2">{activeTab}</h3>
+             <p className="text-zinc-500 text-sm max-w-xs">This section is currently under development as part of the wallet infrastructure upgrade.</p>
+          </div>
+        )}
       </div>
 
       {showDepositFlow && (
