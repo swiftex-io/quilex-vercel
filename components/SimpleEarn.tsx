@@ -203,6 +203,7 @@ const SimpleEarn: React.FC = () => {
   const [termFilter, setTermFilter] = useState('All terms');
   
   const [selectedAssetForStaking, setSelectedAssetForStaking] = useState<any>(null);
+  const [isCarouselHovered, setIsCarouselHovered] = useState(false);
   
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -272,8 +273,10 @@ const SimpleEarn: React.FC = () => {
     };
   }, []);
 
-  // Auto-scroll logic for carousel
+  // Auto-scroll logic for carousel with pause on hover
   useEffect(() => {
+    if (isCarouselHovered) return;
+
     const interval = setInterval(() => {
       if (carouselRef.current) {
         const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
@@ -291,7 +294,7 @@ const SimpleEarn: React.FC = () => {
     }, 4000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isCarouselHovered]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -410,7 +413,11 @@ const SimpleEarn: React.FC = () => {
 
       <div className="max-w-[1400px] mx-auto px-8 mt-12">
         {/* Carousel Section - Fixed alignment to wrapper */}
-        <div className="relative mb-16 group">
+        <div 
+          className="relative mb-16 group"
+          onMouseEnter={() => setIsCarouselHovered(true)}
+          onMouseLeave={() => setIsCarouselHovered(false)}
+        >
           <div 
             ref={carouselRef}
             className="flex gap-6 overflow-x-auto no-scrollbar scroll-smooth snap-x pb-4"
