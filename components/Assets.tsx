@@ -178,7 +178,7 @@ const Assets: React.FC = () => {
                 <span>Total Assets Value</span>
               </div>
               <div className="flex flex-col sm:flex-row items-baseline gap-4 mb-4">
-                <span className="text-2xl md:text-4xl font-bold tracking-tighter text-white">${totalBalanceUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span className="text-2xl md:text-4xl font-medium tracking-tighter text-white">${totalBalanceUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 <span className="text-base md:text-lg font-medium text-zinc-500 tracking-tight">≈ {totalInBTC.toFixed(6)} BTC</span>
               </div>
               
