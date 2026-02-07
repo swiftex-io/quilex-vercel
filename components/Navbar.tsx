@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Page } from '../types';
 import { useExchangeStore } from '../store';
@@ -349,7 +348,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
               <button onClick={() => item.page && onNavigate(item.page)} className={`transition-all hover:text-white flex items-center gap-1.5 h-full ${currentPage === item.page ? 'text-white' : 'text-gray-400'}`}>
                 {item.label}
                 {item.label === 'Earn' && (
-                  <span className="ml-1 hidden xl:inline-block bg-amber-400 text-black text-[9px] font-bold px-2 py-0.5 rounded-full tracking-tighter whitespace-nowrap">Up to 58% APR</span>
+                  <span className="ml-1 hidden xl:inline-block apr-badge-glow text-black text-[9px] font-bold px-2 py-0.5 rounded-full tracking-tighter whitespace-nowrap">Up to 58% APR</span>
                 )}
                 <svg className={`w-3 h-3 transition-transform duration-300 ${item.open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="m6 9 6 6 6-6"/></svg>
               </button>
@@ -485,14 +484,4 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
               </div>
 
               <div className="h-6 w-[1px] bg-zinc-600/60 mx-3 hidden sm:block"></div>
-              <button onClick={() => setShowAuth(true)} className="px-6 py-2.5 bg-white text-black text-[11px] font-semibold tracking-tight rounded-xl hover:bg-gray-200 transition-all shadow-xl whitespace-nowrap shrink-0">Sign in</button>
-            </>
-          )}
-        </div>
-      </nav>
-      {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
-    </>
-  );
-};
-
-export default Navbar;
+              <button onClick={() => setShowAuth(true)} className="px-6 py-2.5 bg-white text-black text-[11px] font-semibold tracking-tight rounded-
