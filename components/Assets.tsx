@@ -166,34 +166,47 @@ const Assets: React.FC = () => {
 
   const renderOverview = () => (
     <div className="animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tighter mb-1">My Wallet</h1>
-          <p className="text-gray-500 text-sm font-medium">Manage your funds across all accounts</p>
-        </div>
-        <div className="flex gap-3">
-          <button onClick={() => setShowDepositFlow(true)} className="px-6 py-3 bg-white text-black font-semibold rounded-xl hover:bg-gray-200 transition-all shadow-lg text-xs uppercase tracking-widest">Deposit</button>
-          <button className="px-6 py-3 bg-zinc-900 text-white font-medium rounded-xl border border-white/5 hover:bg-zinc-800 transition-all text-xs uppercase tracking-widest">Withdraw</button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 mb-10">
-        <div className="bg-zinc-950 border border-white/5 rounded-2xl p-8 shadow-2xl relative overflow-hidden group">
-          <div className="relative z-10">
-            <div className="flex items-center gap-2 text-gray-500 font-medium text-[10px] uppercase tracking-widest mb-4"><span>Total Assets Value</span></div>
-            <div className="flex flex-col sm:flex-row items-baseline gap-4 mb-3">
-              <span className="text-5xl font-bold tracking-tighter">${totalBalanceUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-              <span className="text-xl font-medium text-gray-500 tracking-tight">≈ {totalInBTC.toFixed(6)} BTC</span>
+      <div className="grid grid-cols-1 gap-6 mb-12">
+        <div className="bg-zinc-950 border border-white/5 rounded-2xl p-8 md:p-10 shadow-2xl relative overflow-hidden group">
+          {/* Subtle gradient background for the card */}
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-white/[0.015] blur-[100px] rounded-full -mr-40 -mt-40 pointer-events-none"></div>
+          
+          <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 text-gray-500 font-medium text-[10px] uppercase tracking-widest mb-4">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="opacity-60"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                <span>Total Assets Value</span>
+              </div>
+              <div className="flex flex-col sm:flex-row items-baseline gap-4 mb-4">
+                <span className="text-4xl md:text-6xl font-black tracking-tighter text-white">${totalBalanceUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span className="text-lg md:text-xl font-medium text-zinc-500 tracking-tight">≈ {totalInBTC.toFixed(6)} BTC</span>
+              </div>
+              
+              <div className="flex items-center gap-3 text-[13px] font-semibold">
+                <div className="flex items-center gap-1.5 bg-white/5 px-3 py-1 rounded-full">
+                  <span className="text-zinc-500 font-medium">Today's PNL:</span>
+                  <span className={`${pnlAmount >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'} flex items-center gap-1`}>
+                    {pnlAmount >= 0 ? '+' : ''}${Math.abs(pnlAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    <span className="text-[11px] opacity-80">
+                      ({pnlAmount >= 0 ? '+' : ''}{pnlPercentage.toFixed(2)}%)
+                    </span>
+                  </span>
+                </div>
+              </div>
             </div>
-            
-            <div className="flex items-center gap-2 text-[13px] font-semibold">
-              <span className="text-zinc-500">Today's PNL:</span>
-              <span className={`${pnlAmount >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'} flex items-center gap-1`}>
-                {pnlAmount >= 0 ? '+' : ''}${Math.abs(pnlAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                <span className="bg-current/10 px-1.5 py-0.5 rounded text-[11px]">
-                  {pnlAmount >= 0 ? '+' : ''}{pnlPercentage.toFixed(2)}%
-                </span>
-              </span>
+
+            <div className="flex gap-3 w-full md:w-auto">
+              <button 
+                onClick={() => setShowDepositFlow(true)} 
+                className="flex-1 md:flex-none px-8 py-3.5 bg-white text-black font-bold rounded-xl hover:bg-zinc-200 transition-all shadow-[0_10px_30px_rgba(255,255,255,0.1)] text-xs uppercase tracking-widest active:scale-95"
+              >
+                Deposit
+              </button>
+              <button 
+                className="flex-1 md:flex-none px-8 py-3.5 bg-zinc-900 text-white font-bold rounded-xl border border-white/10 hover:bg-zinc-800 transition-all text-xs uppercase tracking-widest active:scale-95"
+              >
+                Withdraw
+              </button>
             </div>
           </div>
         </div>
