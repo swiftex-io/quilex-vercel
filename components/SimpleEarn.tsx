@@ -204,6 +204,7 @@ const SimpleEarn: React.FC = () => {
   
   const [selectedAssetForStaking, setSelectedAssetForStaking] = useState<any>(null);
   const [isCarouselHovered, setIsCarouselHovered] = useState(false);
+  const [hideBalances, setHideBalances] = useState(false);
   
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -389,25 +390,55 @@ const SimpleEarn: React.FC = () => {
         </div>
       </div>
 
-      <div ref={vantaRef} className="relative pt-16 pb-24 px-6 flex flex-col items-center text-center overflow-hidden">
+      {/* Hero Section - Center Aligned */}
+      <div ref={vantaRef} className="relative pt-24 pb-24 px-8 md:px-12 flex flex-col items-center text-center overflow-hidden">
         <div className="absolute inset-0 bg-black/60 pointer-events-none"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-gradient-to-b from-[#d7ff20]/10 via-transparent to-transparent blur-[120px] pointer-events-none opacity-40"></div>
 
-        <div className="relative z-10 max-w-4xl mx-auto animate-in fade-in zoom-in-95 duration-1000">
-          <h1 className="text-4xl md:text-7xl font-black mb-3 tracking-tighter leading-none text-white">
-            Quilex <br /> {activeEarnTab}
+        <div className="relative z-10 max-w-[1400px] w-full mx-auto animate-in fade-in zoom-in-95 duration-1000">
+          <div className="mb-2 text-xl font-medium lowercase tracking-tight opacity-70">quilex</div>
+          <h1 className="text-4xl md:text-7xl font-black mb-4 tracking-tighter leading-none text-white">
+            {activeEarnTab}
           </h1>
           <p className="text-lg md:text-xl font-light text-[#d7ff20] mb-8 tracking-wide opacity-90">
             {activeEarnTab === 'Dual Investment' ? 'Up to 120% APR' : 'Stable yields for your assets'}
           </p>
-          <p className="text-sm md:text-base text-zinc-500 mb-10 max-w-xl mx-auto font-normal leading-relaxed opacity-70">
-            {activeCategoryDesc}. <br className="hidden md:block" />
-            Join the next generation of automated passive income.
-          </p>
+          
+          <div className="flex flex-wrap gap-12 mt-12 items-end justify-center">
+            <div className="flex flex-col items-center gap-2 group cursor-pointer">
+              <div className="flex items-center gap-1.5 text-zinc-500 text-[13px] font-medium border-b border-dotted border-zinc-700 w-fit pb-0.5">
+                My Holdings 
+                <button onClick={(e) => { e.stopPropagation(); setHideBalances(!hideBalances); }} className="hover:text-white transition-colors ml-1">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    {hideBalances ? <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24M1 1l22 22"/> : <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>}
+                  </svg>
+                </button>
+              </div>
+              <div className="text-4xl font-bold flex items-center gap-2 tracking-tight">
+                {hideBalances ? '******' : '0.00'} 
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-zinc-500"><path d="m9 18 6-6-6-6"/></svg>
+              </div>
+            </div>
 
-          <button className="px-10 py-3.5 bg-[#d7ff20] text-black font-semibold rounded-xl text-[11px] hover:bg-white transition-all shadow-[0_0_30px_rgba(215,255,32,0.15)] active:scale-95 uppercase tracking-[0.2em]">
-            Start {activeEarnTab === 'Dual Investment' ? 'Investing' : 'Staking'}
-          </button>
+            <div className="flex flex-col items-center gap-2 group cursor-pointer">
+              <div className="text-zinc-500 text-[13px] font-medium border-b border-dotted border-zinc-700 w-fit pb-0.5">
+                Interest Accrued
+              </div>
+              <div className="text-4xl font-bold flex items-center gap-2 tracking-tight">
+                {hideBalances ? '******' : '0.00'}
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-zinc-500"><path d="m9 18 6-6-6-6"/></svg>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-center gap-2">
+              <div className="text-zinc-500 text-[13px] font-medium border-b border-dotted border-zinc-700 w-fit pb-0.5">
+                Yesterday's Interest
+              </div>
+              <div className="text-4xl font-bold tracking-tight">
+                {hideBalances ? '******' : '0.00'}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
