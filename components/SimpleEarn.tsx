@@ -10,17 +10,12 @@ declare global {
 const SimpleEarn: React.FC = () => {
   const { balances } = useExchangeStore();
   const [searchQuery, setSearchQuery] = useState('');
-  const [productFilter, setProductFilter] = useState('All products');
-  const [termFilter, setTermFilter] = useState('All terms');
-  
-  // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   const vantaRef = useRef<HTMLDivElement>(null);
   const vantaEffectRef = useRef<any>(null);
 
-  // Vanta.js DOTS effect with IntersectionObserver for resource saving
   useEffect(() => {
     const initVanta = () => {
       if (!vantaEffectRef.current && vantaRef.current && window.VANTA) {
@@ -34,10 +29,10 @@ const SimpleEarn: React.FC = () => {
           scale: 1.00,
           scaleMobile: 1.00,
           color: 0xd7ff20,
-          color2: 0x444444,
-          size: 2.50, // Slightly smaller for cleaner look
-          spacing: 35.00, // Increased spacing to ensure no "line" perception
-          showLines: false, // Ensure lines are explicitly disabled if version supports it
+          color2: 0x222222,
+          size: 2.20,
+          spacing: 35.00,
+          showLines: false,
           backgroundColor: 0x000000
         });
       }
@@ -58,12 +53,10 @@ const SimpleEarn: React.FC = () => {
           destroyVanta();
         }
       },
-      { threshold: 0.1 } // Trigger when 10% is visible
+      { threshold: 0.05 }
     );
 
-    if (vantaRef.current) {
-      observer.observe(vantaRef.current);
-    }
+    if (vantaRef.current) observer.observe(vantaRef.current);
 
     return () => {
       observer.disconnect();
@@ -71,15 +64,12 @@ const SimpleEarn: React.FC = () => {
     };
   }, []);
 
-  // Reset pagination on search
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery]);
 
-  // Mock APY and TVL data mapped to balances
   const earnProducts = useMemo(() => {
     const assetsWithAPY = balances.filter(b => b.symbol !== 'USDT' && b.symbol !== 'USDC').map(asset => {
-      // Deterministic mock APY
       let apy = 1.25;
       if (asset.symbol === 'BTC') apy = 0.03;
       if (asset.symbol === 'ETH') apy = 1.86;
@@ -88,11 +78,8 @@ const SimpleEarn: React.FC = () => {
       if (asset.symbol === 'ATOM') apy = 16.74;
       if (apy === 1.25) apy = 2.45 + (asset.symbol.charCodeAt(0) % 10);
 
-      // Mock Locked Amount & TVL
       const seed = asset.symbol.charCodeAt(0) + asset.symbol.charCodeAt(asset.symbol.length - 1);
-      const lockedAmount = asset.price > 1000 
-        ? (seed * 12.5) 
-        : (seed * 15420.5);
+      const lockedAmount = asset.price > 1000 ? (seed * 12.5) : (seed * 15420.5);
       const tvl = lockedAmount * asset.price;
 
       return {
@@ -100,7 +87,7 @@ const SimpleEarn: React.FC = () => {
         apy: apy.toFixed(2),
         term: 'Flexible',
         lockedAmount: lockedAmount.toLocaleString(undefined, { maximumFractionDigits: 0 }),
-        tvl: tvl.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+        tvl: tvl.toLocaleString(undefined, { maximumFractionDigits: 0 })
       };
     });
 
@@ -110,7 +97,6 @@ const SimpleEarn: React.FC = () => {
     );
   }, [balances, searchQuery]);
 
-  // Derived pagination data
   const totalPages = Math.ceil(earnProducts.length / itemsPerPage);
   const paginatedProducts = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
@@ -119,91 +105,50 @@ const SimpleEarn: React.FC = () => {
 
   return (
     <div className="bg-black min-h-screen text-white pb-32 selection:bg-[#d7ff20]/20 font-sans">
-      {/* Hero Section */}
       <div ref={vantaRef} className="relative pt-24 pb-36 px-6 flex flex-col items-center text-center overflow-hidden">
         <div className="absolute inset-0 bg-black/60 pointer-events-none"></div>
-        
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-gradient-to-b from-[#d7ff20]/10 via-transparent to-transparent blur-[120px] pointer-events-none opacity-40"></div>
-
         <div className="relative z-10 max-w-4xl mx-auto animate-in fade-in zoom-in-95 duration-1000">
-          <h1 className="text-4xl md:text-7xl font-black mb-3 tracking-tighter leading-none text-white">
-            Quilex Earn
-          </h1>
-          <p className="text-lg md:text-xl font-light text-[#d7ff20] mb-8 tracking-wide opacity-90">
-            New user exclusive: Up to 600% APR
-          </p>
+          <h1 className="text-4xl md:text-7xl font-black mb-3 tracking-tighter leading-none text-white">Quilex Earn</h1>
+          <p className="text-lg md:text-xl font-light text-[#d7ff20] mb-8 tracking-wide opacity-90">New user exclusive: Up to 600% APR</p>
           <p className="text-sm md:text-base text-zinc-500 mb-10 max-w-xl mx-auto font-normal leading-relaxed opacity-70">
             Hold crypto, earn rewards, it's that simple. <br className="hidden md:block" />
-            Join the next generation of automated passive income.
+            Join the next generation of passive income.
           </p>
-
-          <button className="px-10 py-3.5 bg-[#d7ff20] text-black font-semibold rounded-xl text-[11px] hover:bg-white transition-all shadow-[0_0_30px_rgba(215,255,32,0.15)] active:scale-95 uppercase tracking-[0.2em]">
-            Start Staking
-          </button>
+          <button className="px-10 py-3.5 bg-[#d7ff20] text-black font-semibold rounded-xl text-[11px] hover:bg-white transition-all shadow-[0_0_30px_rgba(215,255,32,0.15)] active:scale-95 uppercase tracking-[0.2em]">Start Staking</button>
         </div>
       </div>
 
-      {/* Stats Section */}
       <div className="max-w-[1400px] mx-auto px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-0 border-y border-zinc-900 py-12">
-          <div className="flex flex-col items-center md:border-r border-zinc-900">
-            <div className="text-3xl font-medium mb-1 tracking-tight">1M+</div>
-            <div className="text-zinc-600 text-[9px] font-semibold uppercase tracking-[0.25em]">Users Worldwide</div>
-          </div>
-          <div className="flex flex-col items-center md:border-r border-zinc-900 px-8">
-            <div className="text-3xl font-medium mb-1 tracking-tight">24/7</div>
-            <div className="text-zinc-600 text-[9px] font-semibold uppercase tracking-[0.25em] text-center">Customer Support</div>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="text-3xl font-medium mb-1 tracking-tight">100K+</div>
-            <div className="text-zinc-600 text-[9px] font-semibold uppercase tracking-[0.25em]">Five Star Ratings</div>
-          </div>
+          <div className="flex flex-col items-center md:border-r border-zinc-900"><div className="text-3xl font-medium mb-1 tracking-tight">1M+</div><div className="text-zinc-600 text-[9px] font-semibold uppercase tracking-[0.25em]">Users Worldwide</div></div>
+          <div className="flex flex-col items-center md:border-r border-zinc-900 px-8"><div className="text-3xl font-medium mb-1 tracking-tight">24/7</div><div className="text-zinc-600 text-[9px] font-semibold uppercase tracking-[0.25em] text-center">Support</div></div>
+          <div className="flex flex-col items-center"><div className="text-3xl font-medium mb-1 tracking-tight">100K+</div><div className="text-zinc-600 text-[9px] font-semibold uppercase tracking-[0.25em]">Global Ratings</div></div>
         </div>
       </div>
 
-      {/* Products Section */}
       <div className="max-w-[1400px] mx-auto px-8 mt-16">
         <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 gap-6">
-          <h2 className="text-xl font-medium tracking-tight">Products</h2>
-          
-          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-            <button className="bg-zinc-900/40 border border-zinc-800 rounded-lg px-3.5 py-1.5 text-[11px] font-normal flex items-center gap-2 hover:border-zinc-700 transition-all min-w-[130px] text-zinc-400">
-              {productFilter}
-              <svg className="ml-auto w-3 h-3 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6"/></svg>
-            </button>
-
-            <button className="bg-zinc-900/40 border border-zinc-800 rounded-lg px-3.5 py-1.5 text-[11px] font-normal flex items-center gap-2 hover:border-zinc-700 transition-all min-w-[130px] text-zinc-400">
-              {termFilter}
-              <svg className="ml-auto w-3 h-3 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6"/></svg>
-            </button>
-
-            <div className="relative flex-1 md:flex-none md:w-[240px]">
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-700">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-              </div>
-              <input 
-                type="text" 
-                placeholder="Search crypto"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-zinc-900/40 border border-zinc-800 rounded-lg py-1.5 pl-9 pr-3 text-[11px] font-normal focus:border-zinc-700 outline-none transition-all placeholder:text-zinc-700 text-white"
-              />
+          <h2 className="text-xl font-medium tracking-tight">Yield Products</h2>
+          <div className="relative flex-1 md:flex-none md:w-[240px]">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-700">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
             </div>
+            <input type="text" placeholder="Search tokens" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full bg-zinc-900/40 border border-zinc-800 rounded-lg py-1.5 pl-9 pr-3 text-[11px] font-normal focus:border-zinc-700 outline-none transition-all text-white" />
           </div>
         </div>
 
-        {/* Products Table */}
         <div className="bg-zinc-950 border border-white/5 rounded-xl overflow-hidden shadow-2xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="text-[11px] text-zinc-600 font-normal border-b border-zinc-900 tracking-tight">
-                  <th className="px-8 py-4 font-normal">Token</th>
-                  <th className="px-8 py-4 font-normal">Market APY</th>
-                  <th className="px-8 py-4 font-normal text-right">Total Locked</th>
-                  <th className="px-8 py-4 font-normal text-right">TVL (USD)</th>
-                  <th className="px-8 py-4 font-normal text-center">Term</th>
-                  <th className="px-8 py-4 text-right font-normal">Action</th>
+                  <th className="px-8 py-4">Token</th>
+                  <th className="px-8 py-4">Market APY</th>
+                  <th className="px-8 py-4 text-right">Total Locked</th>
+                  <th className="px-8 py-4 text-right">TVL (USD)</th>
+                  <th className="px-8 py-4 text-center">Term</th>
+                  <th className="px-8 py-4 text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-900/50">
@@ -212,7 +157,7 @@ const SimpleEarn: React.FC = () => {
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-3">
                         <div className="w-7 h-7 rounded-full bg-zinc-900 flex items-center justify-center overflow-hidden border border-white/5">
-                           <img src={`https://assets.coincap.io/assets/icons/${product.symbol.toLowerCase()}@2x.png`} className="w-full h-full object-cover" alt="" />
+                          <img src={`https://assets.coincap.io/assets/icons/${product.symbol.toLowerCase()}@2x.png`} className="w-full h-full object-cover" alt="" />
                         </div>
                         <div className="flex flex-col">
                           <span className="text-[13px] font-medium text-white group-hover:text-[#d7ff20] transition-colors">{product.symbol}</span>
@@ -220,99 +165,33 @@ const SimpleEarn: React.FC = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-8 py-5 font-mono">
-                      <span className="text-[13px] font-normal text-[#00d18e]">{product.apy}%</span>
-                    </td>
-                    <td className="px-8 py-5 text-right font-mono">
-                      <span className="text-[12px] text-zinc-300 font-normal">{product.lockedAmount} {product.symbol}</span>
-                    </td>
-                    <td className="px-8 py-5 text-right font-mono">
-                      <span className="text-[12px] text-zinc-500 font-normal">${product.tvl}</span>
-                    </td>
-                    <td className="px-8 py-5 text-center">
-                       <span className="text-[12px] text-zinc-500 font-normal">{product.term}</span>
-                    </td>
+                    <td className="px-8 py-5 font-mono text-[13px] text-[#00d18e]">{product.apy}%</td>
+                    <td className="px-8 py-5 text-right font-mono text-[12px] text-zinc-300">{product.lockedAmount} {product.symbol}</td>
+                    <td className="px-8 py-5 text-right font-mono text-[12px] text-zinc-500">${product.tvl}</td>
+                    <td className="px-8 py-5 text-center text-[12px] text-zinc-500">{product.term}</td>
                     <td className="px-8 py-5 text-right">
                       <div className="flex items-center justify-end gap-3">
-                        <button className="px-3.5 py-1.5 bg-white text-black text-[10px] font-bold rounded-lg hover:bg-[#d7ff20] transition-all opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 uppercase tracking-tighter">
-                          Subscribe
-                        </button>
-                        <svg className="w-4 h-4 text-zinc-800 transition-colors group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6"/></svg>
+                        <button className="px-3.5 py-1.5 bg-white text-black text-[10px] font-bold rounded-lg hover:bg-[#d7ff20] transition-all opacity-0 group-hover:opacity-100 uppercase tracking-tighter">Subscribe</button>
+                        <svg className="w-4 h-4 text-zinc-800 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6"/></svg>
                       </div>
                     </td>
                   </tr>
                 )) : (
-                  <tr>
-                    <td colSpan={6} className="px-8 py-12 text-center">
-                      <p className="text-zinc-600 text-[11px] font-normal uppercase tracking-widest opacity-60">No products available</p>
-                    </td>
-                  </tr>
+                  <tr><td colSpan={6} className="px-8 py-12 text-center text-zinc-600 text-[11px] uppercase">No results found</td></tr>
                 )}
               </tbody>
             </table>
           </div>
 
-          {/* Pagination Controls - Standard Quilex Style */}
           {totalPages > 1 && (
             <div className="px-8 py-6 border-t border-white/5 flex items-center justify-between bg-zinc-950/20">
-              <div className="text-[11px] text-zinc-500 font-medium">
-                Showing <span className="text-white">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="text-white">{Math.min(currentPage * itemsPerPage, earnProducts.length)}</span> of <span className="text-white">{earnProducts.length}</span> products
-              </div>
+              <div className="text-[11px] text-zinc-500 font-medium">Page <span className="text-white">{currentPage}</span> of <span className="text-white">{totalPages}</span></div>
               <div className="flex items-center gap-1">
-                <button 
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                  className="p-2 rounded-lg hover:bg-zinc-900 text-zinc-500 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-transparent"
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m15 18-6-6 6-6"/></svg>
-                </button>
-                
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`min-w-[32px] h-8 rounded-lg text-[11px] font-bold transition-all ${currentPage === page ? 'bg-white text-black' : 'text-zinc-500 hover:text-white hover:bg-zinc-900'}`}
-                  >
-                    {page}
-                  </button>
-                ))}
-
-                <button 
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                  className="p-2 rounded-lg hover:bg-zinc-900 text-zinc-500 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-transparent"
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m9 18 6-6-6-6"/></svg>
-                </button>
+                <button onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1} className="p-2 rounded-lg hover:bg-zinc-900 text-zinc-500 hover:text-white disabled:opacity-30"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m15 18-6-6 6-6"/></svg></button>
+                <button onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))} disabled={currentPage === totalPages} className="p-2 rounded-lg hover:bg-zinc-900 text-zinc-500 hover:text-white disabled:opacity-30"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m9 18 6-6-6-6"/></svg></button>
               </div>
             </div>
           )}
-        </div>
-
-        {/* Info Cards */}
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-zinc-950/40 border border-white/5 p-8 rounded-xl flex flex-col justify-between group hover:border-zinc-800 transition-colors">
-            <div>
-              <h3 className="text-base font-medium mb-3 tracking-tight">Simple Earn Overview</h3>
-              <p className="text-zinc-500 text-[12px] leading-relaxed mb-6 font-normal opacity-80">
-                Simple Earn is a principal-protected product that provides flexible or fixed terms with daily rewards. Your assets are used to generate yield through institutional-grade DeFi and lending protocols.
-              </p>
-            </div>
-            <button className="text-[#d7ff20] text-[10px] font-semibold uppercase tracking-[0.2em] flex items-center gap-2 opacity-80 group-hover:opacity-100 transition-all">
-              Learn more about yield <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m9 18 6-6-6-6"/></svg>
-            </button>
-          </div>
-          <div className="bg-zinc-950/40 border border-white/5 p-8 rounded-xl flex flex-col justify-between group hover:border-zinc-800 transition-colors">
-            <div>
-              <h3 className="text-base font-medium mb-3 tracking-tight">Safety & Security</h3>
-              <p className="text-zinc-500 text-[12px] leading-relaxed mb-6 font-normal opacity-80">
-                Your principal is protected by Quilex. We use industry-standard risk management frameworks to ensure that rewards are distributed consistently while maintaining 100% solvency of the pool.
-              </p>
-            </div>
-            <button className="text-[#d7ff20] text-[10px] font-semibold uppercase tracking-[0.2em] flex items-center gap-2 opacity-80 group-hover:opacity-100 transition-all">
-              Review safety report <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m9 18 6-6-6-6"/></svg>
-            </button>
-          </div>
         </div>
       </div>
     </div>
