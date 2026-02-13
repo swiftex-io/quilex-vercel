@@ -7,7 +7,8 @@ export enum Page {
   SETTINGS = 'settings',
   HOME = 'home',
   MARKETS = 'markets',
-  SIMPLE_EARN = 'simple_earn'
+  SIMPLE_EARN = 'simple_earn',
+  SPOT_DCA = 'spot_dca'
 }
 
 export type LayoutType = 'default' | 'trading' | 'none';

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Page, LayoutType } from './types';
 import Navbar from './components/Navbar';
@@ -10,6 +9,7 @@ import Settings from './components/Settings';
 import Footer from './components/Footer';
 import Markets from './components/Markets';
 import SimpleEarn from './components/SimpleEarn';
+import SpotDCA from './components/SpotDCA';
 import { useExchangeStore } from './store';
 
 const App: React.FC = () => {
@@ -61,6 +61,7 @@ const App: React.FC = () => {
       case Page.AFFILIATE: return <Referral isAffiliate />;
       case Page.SETTINGS: return <Settings />;
       case Page.SIMPLE_EARN: return <SimpleEarn />;
+      case Page.SPOT_DCA: return <SpotDCA />;
       default: return <Home onTrade={() => setCurrentPage(Page.TRADE)} />;
     }
   };

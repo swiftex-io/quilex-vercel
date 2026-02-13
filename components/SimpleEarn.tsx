@@ -395,7 +395,7 @@ const SimpleEarn: React.FC = () => {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-gradient-to-b from-[#d7ff20]/10 via-transparent to-transparent blur-[120px] pointer-events-none opacity-40"></div>
 
         <div className="relative z-10 max-w-[1400px] w-full mx-auto animate-in fade-in zoom-in-95 duration-1000">
-          <div className="mb-2 text-xl font-medium lowercase tracking-tight opacity-70">quilex</div>
+          <div className="mb-3 text-[14px] font-bold uppercase tracking-[0.8em] opacity-40 ml-[0.8em]">QUILEX</div>
           <h1 className="text-4xl md:text-7xl font-black mb-4 tracking-tighter leading-none text-white">
             {activeEarnTab}
           </h1>

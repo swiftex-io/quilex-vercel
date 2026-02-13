@@ -260,14 +260,14 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
           {[
             { title: 'Convert', desc: 'Quick conversion, zero fees', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8l4 4-4 4M8 12h7"/></svg> },
             { title: 'Spot', desc: 'Buy and sell crypto with ease', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9-9a9 9 0 0 0-9 9"/></svg> },
-            { title: 'Spot DCA', desc: 'Automated recurring buy strategy', isNew: true, icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9-9a9 9 0 0 0-9 9"/><path d="M12 7v5l3 3"/></svg> },
+            { title: 'Spot DCA', desc: 'Automated recurring buy strategy', isNew: true, page: Page.SPOT_DCA, icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9-9a9 9 0 0 0-9 9"/><path d="M12 7v5l3 3"/></svg> },
             { title: 'Futures', desc: 'Up to 125x leverage', soon: true, icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> }
           ].map((item, idx) => (
             <button 
               key={idx} 
               onClick={() => { 
                 if (!item.soon) {
-                  onNavigate(Page.TRADE); 
+                  onNavigate(item.page || Page.TRADE); 
                 }
                 setIsTradeOpen(false); 
               }} 
