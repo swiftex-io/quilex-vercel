@@ -292,7 +292,7 @@ const SimpleEarn: React.FC = () => {
           carouselRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
         }
       }
-    }, 4000);
+    }, 2500); // Reduced from 4000 to 2500 for faster movement
 
     return () => clearInterval(interval);
   }, [isCarouselHovered]);
