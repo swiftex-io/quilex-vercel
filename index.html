@@ -101,18 +101,18 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Rolling Text Logic */
+        /* Rolling Text Logic - Snappier & Stable */
         .rolling-text-container {
-            display: block;
+            display: inline-block;
             position: relative;
             overflow: hidden;
-            height: 1.2em;
-            line-height: 1.2em;
+            height: 14px; /* Fixed height to match 11px font + leading */
+            line-height: 14px;
         }
 
         .rolling-text-inner {
             display: block;
-            transition: transform 0.25s cubic-bezier(0.65, 0, 0.35, 1);
+            transition: transform 0.2s cubic-bezier(0.65, 0, 0.35, 1);
         }
 
         .group:hover .rolling-text-inner {

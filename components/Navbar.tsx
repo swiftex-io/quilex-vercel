@@ -417,10 +417,10 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
 
           {user ? (
             <>
-              {/* Updated Deposit Button with Rolling Text Animation & Gradient */}
+              {/* Refined Deposit Button - Stabilized shadow/size & rolling mask */}
               <button 
                 onClick={() => { onNavigate(Page.ASSETS); setDepositModalOpen(true); }} 
-                className="hidden lg:block group px-5 py-2.5 apr-badge-glow text-black text-[11px] font-bold tracking-tight rounded-full hover:scale-[1.02] active:scale-95 transition-all mr-3 shadow-[0_0_20px_rgba(79,230,241,0.15)] whitespace-nowrap shrink-0 overflow-hidden"
+                className="hidden lg:block group px-5 py-2.5 apr-badge-glow text-black text-[11px] font-bold tracking-tight rounded-full active:scale-95 transition-all mr-3 shadow-[0_0_15px_rgba(79,230,241,0.2)] hover:shadow-[0_0_25px_rgba(79,230,241,0.5)] whitespace-nowrap shrink-0 overflow-hidden"
               >
                 <span className="rolling-text-container">
                   <span className="rolling-text-inner">
