@@ -4,7 +4,15 @@ import { useExchangeStore } from '../store';
 const SpotDCA: React.FC = () => {
   const { balances } = useExchangeStore();
   const [searchToken, setSearchToken] = useState('');
-  const [activeRange, setActiveRange] = useState('5Y');
+  
+  // Track selected range for each token individually
+  const [tokenRanges, setTokenRanges] = useState<Record<string, string>>({
+    BTC: '5Y',
+    ETH: '5Y',
+    SOL: '5Y',
+    BNB: '5Y',
+    XRP: '5Y',
+  });
 
   const featuredCards = [
     {
@@ -33,15 +41,75 @@ const SpotDCA: React.FC = () => {
     }
   ];
 
+  // Mock ROI data for different timeframes
   const dcaTokens = [
-    { symbol: 'BTC', name: 'Bitcoin', roi: '+48.21%', isNegative: false },
-    { symbol: 'ETH', name: 'Ethereum', roi: '+38.08%', isNegative: false },
-    { symbol: 'SOL', name: 'Solana', roi: '+124.5%', isNegative: false },
-    { symbol: 'BNB', name: 'BNB', roi: '+12.4%', isNegative: false },
-    { symbol: 'XRP', name: 'Ripple', roi: '-5.2%', isNegative: true },
+    { 
+      symbol: 'BTC', 
+      name: 'Bitcoin', 
+      roiData: {
+        '5Y': { val: '+48.21%', neg: false },
+        '3Y': { val: '+32.15%', neg: false },
+        '1Y': { val: '+12.44%', neg: false },
+        '6M': { val: '+8.10%', neg: false },
+        '3M': { val: '-2.11%', neg: true },
+        '1M': { val: '-0.85%', neg: true }
+      }
+    },
+    { 
+      symbol: 'ETH', 
+      name: 'Ethereum', 
+      roiData: {
+        '5Y': { val: '+38.08%', neg: false },
+        '3Y': { val: '+25.12%', neg: false },
+        '1Y': { val: '+9.30%', neg: false },
+        '6M': { val: '+4.20%', neg: false },
+        '3M': { val: '-3.45%', neg: true },
+        '1M': { val: '-1.12%', neg: true }
+      }
+    },
+    { 
+      symbol: 'SOL', 
+      name: 'Solana', 
+      roiData: {
+        '5Y': { val: '+124.5%', neg: false },
+        '3Y': { val: '+98.20%', neg: false },
+        '1Y': { val: '+45.15%', neg: false },
+        '6M': { val: '+22.40%', neg: false },
+        '3M': { val: '+10.12%', neg: false },
+        '1M': { val: '+5.67%', neg: false }
+      }
+    },
+    { 
+      symbol: 'BNB', 
+      name: 'BNB', 
+      roiData: {
+        '5Y': { val: '+12.4%', neg: false },
+        '3Y': { val: '+18.5%', neg: false },
+        '1Y': { val: '+7.82%', neg: false },
+        '6M': { val: '+2.10%', neg: false },
+        '3M': { val: '-1.50%', neg: true },
+        '1M': { val: '-0.25%', neg: true }
+      }
+    },
+    { 
+      symbol: 'XRP', 
+      name: 'Ripple', 
+      roiData: {
+        '5Y': { val: '-5.2%', neg: true },
+        '3Y': { val: '-12.4%', neg: true },
+        '1Y': { val: '-8.12%', neg: true },
+        '6M': { val: '-4.30%', neg: true },
+        '3M': { val: '+2.15%', neg: false },
+        '1M': { val: '+1.05%', neg: false }
+      }
+    },
   ];
 
   const ranges = ['5Y', '3Y', '1Y', '6M', '3M', '1M'];
+
+  const handleRangeChange = (symbol: string, range: string) => {
+    setTokenRanges(prev => ({ ...prev, [symbol]: range }));
+  };
 
   const renderIcon = (symbol: string, size: string = "w-6 h-6") => (
     <div className={`${size} rounded-full bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0 border border-white/5`}>
@@ -181,41 +249,59 @@ const SpotDCA: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-900">
-                  {dcaTokens.map((token) => (
-                    <tr key={token.symbol} className="hover:bg-zinc-900/10 transition-all group">
-                      <td className="px-8 py-7">
-                        <div className="flex items-center gap-4">
-                          {renderIcon(token.symbol, "w-10 h-10")}
-                          <span className="text-lg font-bold group-hover:text-white transition-colors">{token.symbol}</span>
-                        </div>
-                      </td>
-                      <td className="px-8 py-7">
-                        <div className="flex items-center gap-10">
-                          <div className="flex items-center gap-2 min-w-[120px]">
-                             <span className={`text-lg font-bold ${token.isNegative ? 'text-[#ff4d4f]' : 'text-[#00d18e]'}`}>{token.roi}</span>
-                             <svg width="18" height="18" className={token.isNegative ? 'text-[#ff4d4f]' : 'text-[#00d18e]'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                               <path d="M3 17l6-6 4 4 8-8"/><polyline points="14 7 21 7 21 14"/>
-                             </svg>
+                  {dcaTokens.map((token) => {
+                    const selectedRange = tokenRanges[token.symbol] || '5Y';
+                    const activeRoi = token.roiData[selectedRange as keyof typeof token.roiData];
+                    
+                    return (
+                      <tr key={token.symbol} className="hover:bg-zinc-900/10 transition-all group">
+                        <td className="px-8 py-7">
+                          <div className="flex items-center gap-4">
+                            {renderIcon(token.symbol, "w-10 h-10")}
+                            <span className="text-lg font-bold group-hover:text-white transition-colors">{token.symbol}</span>
                           </div>
-                          
-                          <div className="bg-[#111318] p-1 rounded-[10px] flex items-center">
-                            {ranges.map(r => (
-                              <button 
-                                key={r}
-                                onClick={() => setActiveRange(r)}
-                                className={`px-3.5 py-1.5 rounded-lg text-[13px] font-bold transition-all ${activeRange === r ? 'bg-[#1e222d] text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
-                              >
-                                {r}
-                              </button>
-                            ))}
+                        </td>
+                        <td className="px-8 py-7">
+                          <div className="flex items-center gap-10">
+                            <div className="flex items-center gap-2 min-w-[120px]">
+                               <span className={`text-lg font-bold transition-colors ${activeRoi.neg ? 'text-[#ff4d4f]' : 'text-[#00d18e]'}`}>
+                                 {activeRoi.val}
+                               </span>
+                               <svg 
+                                 width="18" 
+                                 height="18" 
+                                 className={`transition-all ${activeRoi.neg ? 'text-[#ff4d4f] rotate-180' : 'text-[#00d18e]'}`} 
+                                 viewBox="0 0 24 24" 
+                                 fill="none" 
+                                 stroke="currentColor" 
+                                 strokeWidth="2.5"
+                               >
+                                 <path d="M3 17l6-6 4 4 8-8"/><polyline points="14 7 21 7 21 14"/>
+                               </svg>
+                            </div>
+                            
+                            <div className="bg-[#111318] p-1 rounded-[10px] flex items-center">
+                              {ranges.map(r => (
+                                <button 
+                                  key={r}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRangeChange(token.symbol, r);
+                                  }}
+                                  className={`px-3.5 py-1.5 rounded-lg text-[13px] font-bold transition-all ${selectedRange === r ? 'bg-[#1e222d] text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                >
+                                  {r}
+                                </button>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-8 py-7 text-right">
-                        <button className="px-8 py-2.5 bg-white text-black text-[13px] font-bold rounded-full hover:bg-gray-200 transition-all shadow-xl">Create DCA Bot</button>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                        <td className="px-8 py-7 text-right">
+                          <button className="px-8 py-2.5 bg-white text-black text-[13px] font-bold rounded-full hover:bg-gray-200 transition-all shadow-xl">Create DCA Bot</button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
