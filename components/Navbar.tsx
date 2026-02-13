@@ -417,12 +417,17 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
 
           {user ? (
             <>
-              {/* Deposit Button - Responsive (Hidden below lg) */}
+              {/* Updated Deposit Button with Rolling Text Animation & Gradient */}
               <button 
                 onClick={() => { onNavigate(Page.ASSETS); setDepositModalOpen(true); }} 
-                className="hidden lg:block px-5 py-2 bg-white text-black text-[11px] font-semibold tracking-tight rounded-full hover:bg-gray-200 transition-all mr-3 shadow-md whitespace-nowrap shrink-0"
+                className="hidden lg:block group px-5 py-2.5 apr-badge-glow text-black text-[11px] font-bold tracking-tight rounded-full hover:scale-[1.02] active:scale-95 transition-all mr-3 shadow-[0_0_20px_rgba(79,230,241,0.15)] whitespace-nowrap shrink-0 overflow-hidden"
               >
-                Deposit
+                <span className="rolling-text-container">
+                  <span className="rolling-text-inner">
+                    <span className="block">Deposit</span>
+                    <span className="block">Deposit</span>
+                  </span>
+                </span>
               </button>
 
               <div className="relative h-16 flex items-center" onMouseEnter={() => setIsWalletOpen(true)} onMouseLeave={() => setIsWalletOpen(false)}>

@@ -101,6 +101,24 @@
             100% { background-position: 0% 50%; }
         }
 
+        /* Rolling Text Logic */
+        .rolling-text-container {
+            display: block;
+            position: relative;
+            overflow: hidden;
+            height: 1.2em;
+            line-height: 1.2em;
+        }
+
+        .rolling-text-inner {
+            display: block;
+            transition: transform 0.25s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        .group:hover .rolling-text-inner {
+            transform: translateY(-50%);
+        }
+
         /* Tabular numbers for all prices */
         .font-mono, [class*="price"], [class*="roi"] {
             font-variant-numeric: tabular-nums;
