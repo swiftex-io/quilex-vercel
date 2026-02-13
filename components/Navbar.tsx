@@ -20,6 +20,17 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
   const [isLearnOpen, setIsLearnOpen] = useState(false);
   const [isUserOpen, setIsUserOpen] = useState(false);
   
+  // Badge text cycle
+  const [badgeIndex, setBadgeIndex] = useState(0);
+  const badgeItems = ['ETH 25.1%', 'UNI 59.0%', 'SOL 12.4%', 'PEPE 180%', 'BTC 0.05%'];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setBadgeIndex((prev) => (prev + 1) % badgeItems.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [badgeItems.length]);
+
   // Search state
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -249,6 +260,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
           {[
             { title: 'Convert', desc: 'Quick conversion, zero fees', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8l4 4-4 4M8 12h7"/></svg> },
             { title: 'Spot', desc: 'Buy and sell crypto with ease', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9-9a9 9 0 0 0-9 9"/></svg> },
+            { title: 'Spot DCA', desc: 'Automated recurring buy strategy', isNew: true, icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9-9a9 9 0 0 0-9 9"/><path d="M12 7v5l3 3"/></svg> },
             { title: 'Futures', desc: 'Up to 125x leverage', soon: true, icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> }
           ].map((item, idx) => (
             <button 
@@ -267,6 +279,9 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                   <div className={dropdownTextClass}>{item.title}</div>
                   {item.soon && (
                     <span className="bg-blue-500/10 text-blue-500 text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Soon</span>
+                  )}
+                  {item.isNew && (
+                    <span className="apr-badge-glow text-white text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ml-1.5">NEW</span>
                   )}
                 </div>
                 <p className="text-[11px] text-gray-400 font-medium leading-tight mt-0.5">{item.desc}</p>
@@ -348,7 +363,15 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
               <button onClick={() => item.page && onNavigate(item.page)} className={`transition-all hover:text-white flex items-center gap-1.5 h-full ${currentPage === item.page ? 'text-white' : 'text-gray-400'}`}>
                 {item.label}
                 {item.label === 'Earn' && (
-                  <span className="ml-1 hidden xl:inline-block apr-badge-glow text-black text-[9px] font-bold px-2 py-0.5 rounded-full tracking-tighter whitespace-nowrap">Up to 58% APR</span>
+                  <span className="ml-1 hidden xl:inline-block apr-badge-glow text-white text-[9px] font-bold px-2.5 py-0.5 rounded-full tracking-tighter whitespace-nowrap overflow-hidden h-[20px] min-w-[70px]">
+                    <div className="relative h-full badge-text-slide-up" style={{ transform: `translateY(-${badgeIndex * 100}%)` }}>
+                      {badgeItems.map((bi, i) => (
+                        <div key={i} className="h-full flex items-center justify-center">
+                          {bi}
+                        </div>
+                      ))}
+                    </div>
+                  </span>
                 )}
                 <svg className={`w-3 h-3 transition-transform duration-300 ${item.open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="m6 9 6 6 6-6"/></svg>
               </button>
