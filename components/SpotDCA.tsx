@@ -4,7 +4,7 @@ import { useExchangeStore } from '../store';
 const SpotDCA: React.FC = () => {
   const { balances } = useExchangeStore();
   const [searchToken, setSearchToken] = useState('');
-  const [activeRange, setActiveRange] = useState('1Y');
+  const [activeRange, setActiveRange] = useState('5Y');
 
   const featuredCards = [
     {
@@ -34,7 +34,7 @@ const SpotDCA: React.FC = () => {
   ];
 
   const dcaTokens = [
-    { symbol: 'BTC', name: 'Bitcoin', roi: '+48.20%', isNegative: false },
+    { symbol: 'BTC', name: 'Bitcoin', roi: '+48.21%', isNegative: false },
     { symbol: 'ETH', name: 'Ethereum', roi: '+38.08%', isNegative: false },
     { symbol: 'SOL', name: 'Solana', roi: '+124.5%', isNegative: false },
     { symbol: 'BNB', name: 'BNB', roi: '+12.4%', isNegative: false },
@@ -96,7 +96,7 @@ const SpotDCA: React.FC = () => {
             </div>
 
             <div className="flex gap-4">
-              <button className="px-8 py-3 bg-blue-600 text-white font-bold rounded-full hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20 tracking-tight">Create DCA Bot</button>
+              <button className="px-8 py-3 bg-white text-black font-bold rounded-full hover:bg-gray-200 transition-all shadow-xl tracking-tight">Create DCA Bot</button>
               <button className="px-8 py-3 bg-zinc-900 border border-zinc-800 text-zinc-300 font-bold rounded-full hover:bg-zinc-800 transition-all tracking-tight">My DCA Bots</button>
             </div>
           </div>
@@ -114,7 +114,7 @@ const SpotDCA: React.FC = () => {
                     {card.users} Users
                   </div>
                 </div>
-                <button className="px-4 py-1.5 bg-blue-600/10 text-blue-400 text-[11px] font-bold rounded-full hover:bg-blue-600 hover:text-white transition-all">Create DCA Bot</button>
+                <button className="px-4 py-1.5 bg-white text-black text-[11px] font-bold rounded-full hover:bg-gray-200 transition-all">Create DCA Bot</button>
               </div>
 
               <div className="flex justify-between items-end mb-8">
@@ -161,7 +161,7 @@ const SpotDCA: React.FC = () => {
                 placeholder="Search Token"
                 value={searchToken}
                 onChange={(e) => setSearchToken(e.target.value)}
-                className="bg-[#0d0d0d] border border-white/5 rounded-full py-2.5 pl-12 pr-6 text-sm font-medium w-64 focus:border-blue-500/50 outline-none transition-all placeholder:text-zinc-700"
+                className="bg-[#0d0d0d] border border-white/5 rounded-full py-2.5 pl-12 pr-6 text-sm font-medium w-64 focus:border-white outline-none transition-all placeholder:text-zinc-700"
               />
             </div>
           </div>
@@ -169,36 +169,41 @@ const SpotDCA: React.FC = () => {
           <div className="space-y-2">
             <div className="text-[12px] font-bold text-zinc-600 uppercase tracking-[0.2em] mb-8">DCA Tokens</div>
             
-            <div className="bg-[#080808] rounded-xl overflow-hidden">
+            <div className="bg-black rounded-xl overflow-hidden">
               <table className="w-full text-left">
-                <thead className="bg-zinc-900/40 text-[11px] text-zinc-500 uppercase font-bold tracking-widest border-b border-white/5">
+                <thead className="bg-[#111318] text-[11px] text-zinc-500 uppercase font-bold tracking-widest">
                   <tr>
                     <th className="px-8 py-4 font-bold">Token</th>
-                    <th className="px-8 py-4 font-bold text-center">Historical ROI</th>
+                    <th className="px-8 py-4 font-bold text-left">
+                       <span className="border-b border-zinc-700 border-dotted pb-0.5">Historical ROI</span>
+                    </th>
                     <th className="px-8 py-4 font-bold text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-zinc-900">
                   {dcaTokens.map((token) => (
-                    <tr key={token.symbol} className="hover:bg-zinc-900/20 transition-all group">
-                      <td className="px-8 py-6">
+                    <tr key={token.symbol} className="hover:bg-zinc-900/10 transition-all group">
+                      <td className="px-8 py-7">
                         <div className="flex items-center gap-4">
                           {renderIcon(token.symbol, "w-10 h-10")}
-                          <span className="text-lg font-bold group-hover:text-blue-400 transition-colors">{token.symbol}</span>
+                          <span className="text-lg font-bold group-hover:text-white transition-colors">{token.symbol}</span>
                         </div>
                       </td>
-                      <td className="px-8 py-6">
-                        <div className="flex flex-col items-center gap-4">
-                          <div className="flex items-center gap-2">
-                             <span className={`text-base font-bold ${token.isNegative ? 'text-red-500' : 'text-green-500'}`}>{token.roi}</span>
-                             <svg width="14" height="14" className={token.isNegative ? 'text-red-500' : 'text-green-500'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M12 20V4M5 11l7-7 7 7"/></svg>
+                      <td className="px-8 py-7">
+                        <div className="flex items-center gap-10">
+                          <div className="flex items-center gap-2 min-w-[120px]">
+                             <span className={`text-lg font-bold ${token.isNegative ? 'text-[#ff4d4f]' : 'text-[#00d18e]'}`}>{token.roi}</span>
+                             <svg width="18" height="18" className={token.isNegative ? 'text-[#ff4d4f]' : 'text-[#00d18e]'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                               <path d="M3 17l6-6 4 4 8-8"/><polyline points="14 7 21 7 21 14"/>
+                             </svg>
                           </div>
-                          <div className="flex gap-1.5">
+                          
+                          <div className="bg-[#111318] p-1 rounded-[10px] flex items-center">
                             {ranges.map(r => (
                               <button 
                                 key={r}
                                 onClick={() => setActiveRange(r)}
-                                className={`px-3 py-1 rounded text-[10px] font-black uppercase tracking-wider transition-all ${activeRange === r ? 'bg-zinc-800 text-white' : 'text-zinc-600 hover:text-zinc-400'}`}
+                                className={`px-3.5 py-1.5 rounded-lg text-[13px] font-bold transition-all ${activeRange === r ? 'bg-[#1e222d] text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
                               >
                                 {r}
                               </button>
@@ -206,8 +211,8 @@ const SpotDCA: React.FC = () => {
                           </div>
                         </div>
                       </td>
-                      <td className="px-8 py-6 text-right">
-                        <button className="px-6 py-2 bg-blue-600 text-white text-xs font-bold rounded-full hover:bg-blue-500 transition-all">Create DCA Bot</button>
+                      <td className="px-8 py-7 text-right">
+                        <button className="px-8 py-2.5 bg-white text-black text-[13px] font-bold rounded-full hover:bg-gray-200 transition-all shadow-xl">Create DCA Bot</button>
                       </td>
                     </tr>
                   ))}
