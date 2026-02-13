@@ -363,10 +363,10 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
               <button onClick={() => item.page && onNavigate(item.page)} className={`transition-all hover:text-white flex items-center gap-1.5 h-full ${currentPage === item.page ? 'text-white' : 'text-gray-400'}`}>
                 {item.label}
                 {item.label === 'Earn' && (
-                  <span className="ml-1 hidden xl:inline-block apr-badge-glow text-white text-[9px] font-bold px-2.5 py-0.5 rounded-full tracking-tighter whitespace-nowrap overflow-hidden h-[20px] min-w-[70px]">
-                    <div className="relative h-full badge-text-slide-up" style={{ transform: `translateY(-${badgeIndex * 100}%)` }}>
+                  <span className="ml-1 hidden xl:inline-flex items-center justify-center apr-badge-glow text-white text-[9px] font-black px-2.5 rounded-full tracking-tighter whitespace-nowrap overflow-hidden h-[20px] min-w-[72px]">
+                    <div className="relative h-full w-full badge-text-slide-up" style={{ transform: `translateY(-${badgeIndex * 100}%)` }}>
                       {badgeItems.map((bi, i) => (
-                        <div key={i} className="h-full flex items-center justify-center">
+                        <div key={i} className="h-full flex items-center justify-center pt-[2px] leading-none">
                           {bi}
                         </div>
                       ))}
