@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { useExchangeStore } from '../store';
 
@@ -10,17 +9,14 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
   const { balances, marketsActiveTab, setMarketsActiveTab } = useExchangeStore();
   const [cryptoFilter, setCryptoFilter] = useState('All');
   
-  // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // Reset pagination when filter changes
   useEffect(() => {
     setCurrentPage(1);
   }, [cryptoFilter]);
 
   const filteredAssets = useMemo(() => {
-    // Basic mock filtering based on categories
     let result = [...balances];
     
     if (cryptoFilter === 'Meme') {
@@ -60,10 +56,8 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
 
   const renderMarketsTab = () => (
     <div className="animate-in fade-in duration-500">
-      {/* Top 4 Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-        {/* Hot Crypto Card */}
-        <div className="bg-[#111111] p-6 rounded-2xl group transition-all shadow-xl">
+        <div className="bg-[#111111] p-6 rounded-2xl group transition-all shadow-xl text-left">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-[14px] font-bold text-white tracking-tight flex items-center gap-1">
               Hot crypto <svg className="w-3 h-3 text-zinc-600 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="m9 5 7 7-7 7"/></svg>
@@ -91,8 +85,7 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
           </div>
         </div>
 
-        {/* New Listings Card */}
-        <div className="bg-[#111111] p-6 rounded-2xl group transition-all shadow-xl">
+        <div className="bg-[#111111] p-6 rounded-2xl group transition-all shadow-xl text-left">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-[14px] font-bold text-white tracking-tight flex items-center gap-1">
               New listings <svg className="w-3 h-3 text-zinc-600 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="m9 5 7 7-7 7"/></svg>
@@ -116,8 +109,7 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
           </div>
         </div>
 
-        {/* Macro Data Card */}
-        <div className="bg-[#111111] p-6 rounded-2xl group transition-all shadow-xl">
+        <div className="bg-[#111111] p-6 rounded-2xl group transition-all shadow-xl text-left">
           <h3 className="text-[14px] font-bold text-white tracking-tight mb-6 flex items-center gap-1">
             Macro data <svg className="w-3 h-3 text-zinc-600 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="m9 5 7 7-7 7"/></svg>
           </h3>
@@ -144,8 +136,7 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
           </div>
         </div>
 
-        {/* ETF Flows Card */}
-        <div className="bg-[#111111] p-6 rounded-2xl group transition-all shadow-xl">
+        <div className="bg-[#111111] p-6 rounded-2xl group transition-all shadow-xl text-left">
           <h3 className="text-[14px] font-bold text-white tracking-tight mb-6 flex items-center gap-1">
             BTC ETF flows <svg className="w-3 h-3 text-zinc-600 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="m9 5 7 7-7 7"/></svg>
           </h3>
@@ -167,7 +158,6 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
         </div>
       </div>
 
-      {/* Main Table Controls */}
       <div className="flex items-center gap-6 mb-8 overflow-x-auto no-scrollbar border-b border-zinc-900 py-2">
         {[
           { label: 'Favorites', soon: false },
@@ -202,7 +192,6 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
         </button>
       </div>
 
-      {/* Main Market Table */}
       <div className="bg-zinc-950 border border-white/5 rounded-2xl shadow-2xl overflow-hidden">
         <table className="w-full text-left">
           <thead>
@@ -220,7 +209,7 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
             {paginatedAssets.length > 0 ? paginatedAssets.map((asset) => (
               <tr key={asset.symbol} onClick={onTrade} className="hover:bg-zinc-900/30 transition-all group cursor-pointer">
                 <td className="px-8 py-5">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 text-left">
                     <button onClick={(e) => e.stopPropagation()} className="text-zinc-800 hover:text-amber-500 transition-colors"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg></button>
                     <img src={`https://assets.coincap.io/assets/icons/${asset.symbol.toLowerCase()}@2x.png`} className="w-8 h-8 rounded-full" alt="" />
                     <div className="flex flex-col">
@@ -251,10 +240,9 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
                 </td>
                 <td className="px-8 py-5 text-sm text-zinc-400 font-normal">${(Math.random() * 500).toFixed(2)}B</td>
                 <td className="px-8 py-5 text-right">
-                  <div className="flex items-center justify-end gap-3 text-[12px] font-normal">
-                    <button onClick={(e) => { e.stopPropagation(); }} className="text-zinc-600 hover:text-white transition-colors">Details</button>
-                    <span className="text-zinc-900">|</span>
-                    <button className="text-white hover:text-blue-400 transition-colors">Trade</button>
+                  <div className="flex items-center justify-end gap-3">
+                    <button onClick={(e) => { e.stopPropagation(); }} className="text-[13px] font-bold text-zinc-500 hover:text-white transition-colors">Details</button>
+                    <button className="px-6 py-1.5 bg-white text-black text-[13px] font-bold rounded-full hover:bg-zinc-200 transition-all shadow-lg">Trade</button>
                   </div>
                 </td>
               </tr>
@@ -268,7 +256,6 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
           </tbody>
         </table>
 
-        {/* Pagination Controls - Identical to Assets.tsx */}
         {totalPages > 1 && (
           <div className="px-8 py-6 border-t border-white/5 flex items-center justify-between bg-zinc-950">
             <div className="text-[11px] text-zinc-500 font-medium">
@@ -320,7 +307,7 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500">
         {categories.map((cat, i) => (
-          <div key={i} className="bg-[#111111] rounded-2xl p-6 shadow-xl group/card">
+          <div key={i} className="bg-[#111111] rounded-2xl p-6 shadow-xl group/card text-left">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-[14px] font-bold text-white tracking-tight flex items-center gap-2">
                 <span className="text-zinc-500">
@@ -365,8 +352,7 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
   };
 
   return (
-    <div className="bg-black min-h-screen text-white font-sans selection:bg-white/10 pb-20 overflow-x-hidden">
-      {/* Markets Top Navigation Sub-Tabs (Settings style) */}
+    <div className="bg-black min-h-screen text-white pb-20 overflow-x-hidden">
       <div className="bg-[#0a0a0a] border-b border-zinc-900 px-8 sticky top-0 z-40 backdrop-blur-xl">
         <div className="max-w-[1400px] mx-auto flex gap-8 overflow-x-auto no-scrollbar">
           {['Markets Overview', 'Rankings'].map((item) => (

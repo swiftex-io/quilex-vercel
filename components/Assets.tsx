@@ -39,13 +39,11 @@ const Assets: React.FC = () => {
   const [activeTab, setActiveTab] = useState('Overview');
   const [activeFeeGroup, setActiveFeeGroup] = useState('Group 1');
   const [selectedAsset, setSelectedAsset] = useState('USDT');
-  const [selectedNetwork, setSelectedNetwork] = useState<any>(null);
   const [isAssetDropdownOpen, setIsAssetDropdownOpen] = useState(false);
   const [assetSearch, setAssetSearch] = useState('');
   
   const [hideSmallBalances, setHideSmallBalances] = useState(false);
   
-  // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -55,8 +53,7 @@ const Assets: React.FC = () => {
   const btcPrice = balances.find(b => b.symbol === 'BTC')?.price || 65000;
   const totalInBTC = totalBalanceUSD / btcPrice;
 
-  // Mock PNL data
-  const pnlAmount = totalBalanceUSD * 0.0245; // 2.45% gain
+  const pnlAmount = totalBalanceUSD * 0.0245; 
   const pnlPercentage = 2.45;
 
   useEffect(() => {
@@ -69,7 +66,6 @@ const Assets: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Reset pagination when searching or filtering
   useEffect(() => {
     setCurrentPage(1);
   }, [assetSearch, hideSmallBalances, activeTab]);
@@ -111,7 +107,7 @@ const Assets: React.FC = () => {
   const renderOverview = () => (
     <div className="animate-in fade-in duration-500">
       <div className="grid grid-cols-1 gap-6 mb-12">
-        <div className="bg-zinc-950 border border-white/5 rounded-2xl p-8 md:p-10 shadow-2xl relative overflow-hidden group">
+        <div className="bg-zinc-950 border border-white/5 rounded-2xl p-8 md:p-10 shadow-2xl relative overflow-hidden group text-left">
           <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-white/[0.015] blur-[100px] rounded-full -mr-40 -mt-40 pointer-events-none"></div>
           
           <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
@@ -175,14 +171,17 @@ const Assets: React.FC = () => {
                 <tr key={asset.symbol} className="hover:bg-zinc-900/40 transition-colors group">
                   <td className="px-8 py-5 flex items-center gap-4">
                     {renderCryptoIcon(asset.symbol)}
-                    <div>
+                    <div className="text-left">
                       <div className="font-semibold text-sm">{asset.symbol}</div>
                       <div className="text-[10px] text-gray-500 font-medium">{asset.name}</div>
                     </div>
                   </td>
                   <td className="px-8 py-5 font-mono text-xs">{asset.balance.toLocaleString()}</td>
                   <td className="px-8 py-5 font-mono text-xs text-white">${(asset.balance * asset.price).toLocaleString()}</td>
-                  <td className="px-8 py-5 text-right"><button className="text-[10px] font-semibold text-blue-500 uppercase">Trade</button></td>
+                  <td className="px-8 py-5 text-right">
+                    {/* Synchronized Action Button: 13px, rounded-full */}
+                    <button className="px-6 py-1.5 bg-white text-black text-[13px] font-bold rounded-full hover:bg-zinc-200 transition-all shadow-lg">Trade</button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -194,8 +193,7 @@ const Assets: React.FC = () => {
 
   const renderFees = () => (
     <div className="animate-in fade-in duration-700 space-y-12">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-zinc-900 pb-10">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-zinc-900 pb-10 text-left">
         <div>
           <div className="text-zinc-500 text-[13px] font-medium mb-3">My fee tier</div>
           <h1 className="text-5xl font-bold tracking-tight text-white mb-2">Regular user</h1>
@@ -205,8 +203,7 @@ const Assets: React.FC = () => {
         </button>
       </div>
 
-      {/* Fee Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
         {[1, 2, 3].map((group) => (
           <div key={group} className="bg-zinc-950/40 border border-zinc-900 rounded-2xl p-8 relative overflow-hidden group hover:border-zinc-700 transition-all">
             <div className="flex items-center justify-between mb-8">
@@ -229,7 +226,6 @@ const Assets: React.FC = () => {
         ))}
       </div>
 
-      {/* Withdrawal Limit Banner */}
       <div className="bg-zinc-950/40 border border-zinc-900 rounded-2xl p-6 flex items-center justify-center gap-6">
         <div className="w-12 h-12 bg-zinc-900 rounded-full flex items-center justify-center text-white shrink-0">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 3v13m0-13 4 4m-4-4-4 4M4 21h16"/></svg>
@@ -240,8 +236,7 @@ const Assets: React.FC = () => {
         </div>
       </div>
 
-      {/* Fee Table Section */}
-      <div className="space-y-6 pt-10">
+      <div className="space-y-6 pt-10 text-left">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h2 className="text-2xl font-bold tracking-tight">Fee table</h2>
           <button className="text-[13px] font-bold text-zinc-400 hover:text-white transition-all flex items-center gap-2">
@@ -249,7 +244,6 @@ const Assets: React.FC = () => {
           </button>
         </div>
 
-        {/* Group Tabs */}
         <div className="flex gap-1 bg-zinc-950/40 p-1 border border-zinc-900 rounded-xl w-fit">
           {['Group 1', 'Group 2', 'Group 3', 'Zero-fee pairs'].map((group) => (
             <button 
@@ -262,7 +256,6 @@ const Assets: React.FC = () => {
           ))}
         </div>
 
-        {/* Regular Users Table */}
         <div className="space-y-4">
           <div className="text-sm font-bold text-zinc-500 px-2 uppercase tracking-widest">Regular users</div>
           <div className="bg-zinc-950 border border-zinc-900 rounded-2xl overflow-hidden shadow-2xl">
@@ -297,54 +290,12 @@ const Assets: React.FC = () => {
             </div>
           </div>
         </div>
-
-        {/* VIP Users Table */}
-        <div className="space-y-4 pt-10">
-          <div className="text-sm font-bold text-zinc-500 px-2 uppercase tracking-widest">VIP users</div>
-          <div className="bg-zinc-950 border border-zinc-900 rounded-2xl overflow-hidden shadow-2xl">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="bg-zinc-900/30 text-[10px] font-bold text-zinc-500 uppercase border-b border-zinc-900 tracking-wider">
-                    <th className="px-8 py-5">Tier</th>
-                    <th className="px-8 py-5">Assets (USD)</th>
-                    <th className="px-4 py-5 text-center">or</th>
-                    <th className="px-8 py-5">30-day trading volume (USD)</th>
-                    <th className="px-8 py-5">Maker fee</th>
-                    <th className="px-8 py-5">Taker fee</th>
-                    <th className="px-8 py-5 text-right whitespace-nowrap">24h crypto withdrawal limit (USD)</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-900">
-                  {[
-                    { tier: 'VIP 1', assets: '100,001 - 250,000', vol: '100,001 - 250,000', maker: '0.1000%', taker: '0.2000%', limit: '24,000,000' },
-                    { tier: 'VIP 2', assets: '250,001 - 500,000', vol: '250,001 - 500,000', maker: '0.0750%', taker: '0.1500%', limit: '32,000,000' },
-                    { tier: 'VIP 3', assets: '500,001 - 2,000,000', vol: '500,001 - 1,000,000', maker: '0.0600%', taker: '0.1250%', limit: '40,000,000' },
-                    { tier: 'VIP 4', assets: '2,000,001 - 5,000,000', vol: '1,000,001 - 2,500,000', maker: '0.0500%', taker: '0.1000%', limit: '48,000,000' },
-                    { tier: 'VIP 5', assets: '5,000,001 - 10,000,000', vol: '2,500,001 - 5,000,000', maker: '0.0450%', taker: '0.0800%', limit: '60,000,000' },
-                    { tier: 'VIP 6', assets: '10,000,001+', vol: '5,000,001 - 50,000,000', maker: '0.0400%', taker: '0.0700%', limit: '72,000,000' }
-                  ].map((vip) => (
-                    <tr key={vip.tier} className="hover:bg-white/[0.01] transition-colors">
-                      <td className="px-8 py-5 text-sm font-bold text-white">{vip.tier}</td>
-                      <td className="px-8 py-5 text-sm font-medium text-zinc-400">{vip.assets}</td>
-                      <td className="px-4 py-5 text-center text-zinc-700">/</td>
-                      <td className="px-8 py-5 text-sm font-medium text-zinc-400">{vip.vol}</td>
-                      <td className="px-8 py-5 text-sm font-bold text-zinc-200">{vip.maker}</td>
-                      <td className="px-8 py-5 text-sm font-bold text-zinc-200">{vip.taker}</td>
-                      <td className="px-8 py-5 text-sm font-bold text-zinc-200 text-right">{vip.limit}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-black text-white font-sans selection:bg-white/10 overflow-x-hidden">
+    <div className="min-h-screen bg-black text-white selection:bg-white/10 overflow-x-hidden">
       <div className="bg-[#0a0a0a] border-b border-zinc-900 px-8 sticky top-0 z-[45] backdrop-blur-xl">
         <div className="max-w-[1400px] mx-auto flex gap-8 overflow-x-auto no-scrollbar">
           {['Overview', 'Spot', 'Fees'].map((tab) => (
@@ -373,7 +324,7 @@ const Assets: React.FC = () => {
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 19l7-7-7-7M5 12h14"/></svg>
              </div>
              <h3 className="text-2xl font-bold mb-2">{activeTab}</h3>
-             <p className="text-zinc-500 text-sm max-w-xs">This section is currently under development as part of the wallet infrastructure upgrade.</p>
+             <p className="text-zinc-500 text-sm max-w-xs">This section is currently under development.</p>
           </div>
         )}
       </div>
@@ -394,7 +345,7 @@ const Assets: React.FC = () => {
                <div className="max-w-7xl mx-auto flex flex-col gap-16">
                  <div className="flex flex-col lg:flex-row gap-16">
                    <div className="flex-1 space-y-16">
-                      <section>
+                      <section className="text-left">
                         <h3 className="text-xl font-bold mb-6 tracking-tight flex items-center gap-3"><span className="hidden sm:inline text-zinc-500 text-sm">01</span> Select Crypto</h3>
                         <div className="relative" ref={dropdownRef}>
                           <div onClick={() => setIsAssetDropdownOpen(!isAssetDropdownOpen)} className={`bg-zinc-900/40 border rounded-xl p-6 flex items-center justify-between cursor-pointer transition-all group ${isAssetDropdownOpen ? 'border-white' : 'border-white/5 hover:border-white/20'}`}>

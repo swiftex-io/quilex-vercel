@@ -67,7 +67,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col font-sans selection:bg-blue-500/30">
+    <div className="min-h-screen bg-black text-white flex flex-col selection:bg-blue-500/30">
       <Navbar currentPage={currentPage} onNavigate={setCurrentPage} />
       
       <main className={`flex-1 ${layout === 'trading' ? 'overflow-hidden' : 'overflow-auto'}`}>

@@ -12,15 +12,16 @@ type EarnCategory = 'Simple Earn' | 'Staking' | 'ETH Staking' | 'Dual Investment
 interface StakeModalProps {
   asset: any;
   onClose: () => void;
+  activeEarnTab: EarnCategory;
 }
 
-const StakeModal: React.FC<StakeModalProps> = ({ asset, onClose }) => {
+const StakeModal: React.FC<StakeModalProps> = ({ asset, onClose, activeEarnTab }) => {
   const [selectedTerm, setSelectedTerm] = useState('Flexible');
   const [amount, setAmount] = useState('');
   const [agreed, setAgreed] = useState(false);
   const { balances } = useExchangeStore();
 
-  const assetBalance = balances.find(b => b.symbol === asset.symbol)?.available || 0;
+  const assetBalance = balances.find(b => b.symbol === 'ETH' && activeEarnTab === 'ETH Staking' ? b.symbol === 'ETH' : b.symbol === asset.symbol)?.available || 0;
 
   const terms = [
     { id: 'Flexible', apr: asset.apy, label: 'Flexible', max: true },
@@ -42,6 +43,7 @@ const StakeModal: React.FC<StakeModalProps> = ({ asset, onClose }) => {
   };
 
   const stakingTime = today;
+  // Fixed: correctly declare interestAccruesOn without the unexpected space
   const interestAccruesOn = new Date(today);
   interestAccruesOn.setDate(today.getDate() + 1);
   interestAccruesOn.setHours(8, 0, 0, 0);
@@ -273,7 +275,6 @@ const SimpleEarn: React.FC = () => {
     };
   }, []);
 
-  // Auto-scroll logic for carousel with pause on hover
   useEffect(() => {
     if (isCarouselHovered) return;
 
@@ -282,7 +283,7 @@ const SimpleEarn: React.FC = () => {
         const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
         const firstChild = carouselRef.current.firstElementChild as HTMLElement;
         const cardWidth = firstChild?.getBoundingClientRect().width || 0;
-        const gap = 24; // Equivalent to gap-6
+        const gap = 24; 
         const scrollAmount = cardWidth + gap;
 
         if (Math.ceil(scrollLeft + clientWidth) >= scrollWidth - 5) {
@@ -358,19 +359,8 @@ const SimpleEarn: React.FC = () => {
     return earnProducts.slice(start, start + itemsPerPage);
   }, [earnProducts, currentPage]);
 
-  const activeCategoryDesc = useMemo(() => {
-    switch(activeEarnTab) {
-      case 'Simple Earn': return 'Flexible savings with daily rewards';
-      case 'Staking': return 'Earn high yields on your crypto';
-      case 'ETH Staking': return 'Stake ETH and receive BETH';
-      case 'Dual Investment': return 'Buy low or sell high with bonus yield';
-      default: return '';
-    }
-  }, [activeEarnTab]);
-
   return (
-    <div className="bg-black min-h-screen text-white pb-32 selection:bg-[#d7ff20]/20 font-sans">
-      {/* Sticky Sub-navigation */}
+    <div className="bg-black min-h-screen text-white pb-32 selection:bg-[#d7ff20]/20">
       <div className="bg-[#0a0a0a] border-b border-zinc-900 px-8 sticky top-0 z-[45] backdrop-blur-xl">
         <div className="max-w-[1400px] mx-auto flex gap-8 overflow-x-auto no-scrollbar">
           {earnTabs.map((tab) => (
@@ -389,7 +379,6 @@ const SimpleEarn: React.FC = () => {
         </div>
       </div>
 
-      {/* Hero Section - Center Aligned */}
       <div ref={vantaRef} className="relative pt-24 pb-24 px-8 md:px-12 flex flex-col items-center text-center overflow-hidden">
         <div className="absolute inset-0 bg-black/60 pointer-events-none"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-gradient-to-b from-[#d7ff20]/10 via-transparent to-transparent blur-[120px] pointer-events-none opacity-40"></div>
@@ -449,7 +438,6 @@ const SimpleEarn: React.FC = () => {
       </div>
 
       <div className="max-w-[1400px] mx-auto px-8 mt-12">
-        {/* Carousel Section - Fixed alignment to wrapper */}
         <div 
           className="relative mb-16 group"
           onMouseEnter={() => setIsCarouselHovered(true)}
@@ -556,7 +544,8 @@ const SimpleEarn: React.FC = () => {
                     </td>
                     <td className="px-8 py-5 text-right">
                       <div className="flex items-center justify-end gap-3">
-                        <button className="px-3.5 py-1.5 bg-white text-black text-[10px] font-bold rounded-lg hover:bg-[#d7ff20] transition-all opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 tracking-tighter">
+                        {/* Synchronized Stake Button: 13px, rounded-full, increased padding */}
+                        <button className="px-6 py-2 bg-white text-black text-[13px] font-bold rounded-full hover:bg-[#d7ff20] transition-all opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 tracking-tight shadow-xl">
                           Stake
                         </button>
                         <svg className="w-4 h-4 text-zinc-800 transition-colors group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6"/></svg>
@@ -640,6 +629,7 @@ const SimpleEarn: React.FC = () => {
         <StakeModal 
           asset={selectedAssetForStaking} 
           onClose={() => setSelectedAssetForStaking(null)} 
+          activeEarnTab={activeEarnTab}
         />
       )}
     </div>

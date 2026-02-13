@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useExchangeStore } from '../store';
 
@@ -386,7 +385,7 @@ const Settings: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white font-sans selection:bg-white/10 selection:text-white">
+    <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-white/10 selection:text-white">
       {/* Settings Tab Navigation - Fiksiran na top-0 jer main kontejner počinje posle headera */}
       <div className="bg-[#0a0a0a] border-b border-zinc-900 px-8 sticky top-0 z-[45] backdrop-blur-xl">
         <div className="max-w-[1400px] mx-auto flex gap-8 overflow-x-auto no-scrollbar">
