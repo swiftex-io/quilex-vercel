@@ -64,23 +64,23 @@
             background: #d1d1d1 !important;
         }
 
-        /* Dropdown Animation - Precise move-down fadeIn and move-up fadeOut */
+        /* Dropdown Animation Classes */
         .dropdown-container {
             pointer-events: none;
             opacity: 0;
-            visibility: hidden;
-            transform: translateY(-12px); /* Initial position is slightly above */
-            transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1), 
-                        opacity 0.2s cubic-bezier(0.23, 1, 0.32, 1),
+            transform: translateY(2px) scale(0.99);
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
+                        opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
                         visibility 0.2s;
+            visibility: hidden;
             will-change: transform, opacity;
         }
 
         .dropdown-container.is-visible {
             pointer-events: auto;
             opacity: 1;
+            transform: translateY(0) scale(1);
             visibility: visible;
-            transform: translateY(0); /* Ends at the actual position (moves down) */
         }
 
         /* Updated Earn Badge Gradient */
@@ -101,12 +101,12 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Rolling Text Logic */
+        /* Rolling Text Logic - Snappier & Stable */
         .rolling-text-container {
             display: inline-block;
             position: relative;
             overflow: hidden;
-            height: 14px; 
+            height: 14px; /* Fixed height to match 11px font + leading */
             line-height: 14px;
         }
 
@@ -119,6 +119,7 @@
             transform: translateY(-50%);
         }
 
+        /* Tabular numbers for all prices */
         .font-mono, [class*="price"], [class*="roi"] {
             font-variant-numeric: tabular-nums;
         }

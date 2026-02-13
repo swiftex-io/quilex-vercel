@@ -366,7 +366,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                   <span className="ml-1 hidden xl:inline-flex items-center justify-center apr-badge-glow text-white text-[9px] font-black px-2.5 rounded-full tracking-tighter whitespace-nowrap overflow-hidden h-[20px] min-w-[72px]">
                     <div className="relative h-full w-full badge-text-slide-up" style={{ transform: `translateY(-${badgeIndex * 100}%)` }}>
                       {badgeItems.map((bi, i) => (
-                        <div key={i} className="h-full flex items-center justify-center pt-[2px] leading-none">
+                        <div key={i} className="h-full flex items-center justify-center pt-[2px]">
                           {bi}
                         </div>
                       ))}
