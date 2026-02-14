@@ -146,9 +146,6 @@ const Referral: React.FC<ReferralProps> = ({ isAffiliate }) => {
           
           {/* Benefit Matrix */}
           <div className="lg:col-span-2 bg-[#0d0d0d] border border-white/5 rounded-2xl p-10 shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-8">
-              <svg width="60" height="60" className="text-white/5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m21 16-4-4 4-4"/><path d="M17 12H3"/><path d="m7 20-4-4 4-4"/></svg>
-            </div>
             <h3 className="text-2xl font-black mb-10 tracking-tight">Status Perks Matrix</h3>
             <div className="space-y-4">
               {(Object.keys(TIER_DATA) as ReferralTier[]).map((t) => (
@@ -218,42 +215,39 @@ const Referral: React.FC<ReferralProps> = ({ isAffiliate }) => {
                    <span className="text-xs text-zinc-600 font-bold ml-1 uppercase">/mo</span>
                  </div>
                </div>
-               <div className="absolute -bottom-4 -right-4 text-white/5">
-                 <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-               </div>
             </div>
           </div>
         </div>
 
         {/* Invitation Center */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
-          <div className="lg:col-span-3 bg-[#0d0d0d] border border-white/5 p-12 rounded-2xl shadow-2xl relative overflow-hidden">
+          <div className="lg:col-span-3 bg-[#0d0d0d] border border-white/5 p-10 rounded-2xl shadow-2xl relative overflow-hidden">
              <div className="relative z-10">
-                <h2 className="text-4xl font-black mb-4 tracking-tighter">Ready to Expand?</h2>
-                <p className="text-zinc-500 font-medium mb-12 max-w-lg">Your elite invitation link tracks everything from first click to thousandth trade.</p>
+                <h2 className="text-3xl font-black mb-3 tracking-tighter">Ready to Expand?</h2>
+                <p className="text-zinc-500 font-medium mb-10 max-w-md text-sm">Your elite invitation link tracks everything from first click to thousandth trade.</p>
                 
-                <div className="flex flex-col sm:flex-row gap-4 mb-12">
-                   <div className="flex-1 bg-black border border-white/10 rounded-xl p-4 flex items-center justify-between group hover:border-white/40 transition-all">
+                <div className="flex flex-col sm:flex-row gap-4 mb-10">
+                   <div className="flex-1 bg-black border border-white/10 rounded-xl py-3 px-4 flex items-center justify-between group hover:border-white/40 transition-all">
                       <div className="flex flex-col">
-                        <span className="text-[9px] font-black text-zinc-600 uppercase mb-1">Lifetime Link</span>
-                        <span className="font-mono text-lg text-zinc-300 group-hover:text-white">quilex.io/ref/{referralCode}</span>
+                        <span className="text-[9px] font-black text-zinc-600 uppercase mb-0.5">Lifetime Link</span>
+                        <span className="font-mono text-base text-zinc-300 group-hover:text-white">quilex.io/ref/{referralCode}</span>
                       </div>
                       <button 
                         onClick={copyToClipboard} 
-                        className="p-2.5 bg-white text-black rounded-lg hover:bg-zinc-100 transition-all flex items-center justify-center active:scale-95"
+                        className="p-2 bg-white text-black rounded-lg hover:bg-zinc-100 transition-all flex items-center justify-center active:scale-95"
                         title="Copy Invitation Link"
                       >
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                       </button>
                    </div>
-                   <button className="px-10 py-5 bg-gradient-to-tr from-blue-600 to-purple-600 text-white font-black rounded-xl hover:shadow-[0_0_30px_rgba(37,99,235,0.4)] transition-all uppercase tracking-widest text-xs">
+                   <button className="px-6 py-3.5 bg-gradient-to-tr from-blue-600 to-purple-600 text-white font-black rounded-xl hover:shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all uppercase tracking-widest text-[11px]">
                      Generate QR
                    </button>
                 </div>
 
-                <div className="flex flex-wrap gap-3">
-                   {['Twitter', 'Telegram', 'WhatsApp', 'Facebook'].map(plat => (
-                     <button key={plat} className="px-6 py-3 bg-zinc-900 border border-white/5 rounded-lg text-[11px] font-bold hover:bg-zinc-800 transition-all uppercase tracking-widest text-zinc-400 hover:text-white">
+                <div className="flex flex-wrap gap-2.5">
+                   {['Twitter', 'Telegram', 'WhatsApp'].map(plat => (
+                     <button key={plat} className="px-4 py-2.5 bg-zinc-900 border border-white/5 rounded-lg text-[10px] font-bold hover:bg-zinc-800 transition-all uppercase tracking-widest text-zinc-400 hover:text-white">
                        {plat}
                      </button>
                    ))}
