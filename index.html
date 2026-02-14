@@ -130,6 +130,18 @@
         .font-mono, [class*="price"], [class*="roi"] {
             font-variant-numeric: tabular-nums;
         }
+
+        /* Search Placeholder Fade In/Out Animation */
+        .coin-placeholder-fade {
+            animation: coin-placeholder-sequence 3s linear forwards;
+        }
+
+        @keyframes coin-placeholder-sequence {
+            0% { opacity: 0; transform: translateY(3px); }
+            8% { opacity: 1; transform: translateY(0); }
+            92% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-3px); }
+        }
     </style>
 <script type="importmap">
 {

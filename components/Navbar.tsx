@@ -25,17 +25,15 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
   const badgeItems = ['ETH 25.1%', 'UNI 59.0%', 'SOL 12.4%', 'PEPE 180%', 'BTC 0.05%'];
 
   // Search placeholder cycle
-  const [searchPlaceholderIndex, setSearchPlaceholderIndex] = useState(0);
   const hotSearchItems = ['BTC', 'ETH', 'SOL', 'PEPE', 'DOGE'];
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [searchPlaceholderIndex, setSearchPlaceholderIndex] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setBadgeIndex((prev) => (prev + 1) % badgeItems.length);
       setSearchPlaceholderIndex((prev) => (prev + 1) % hotSearchItems.length);
     }, 3000);
     return () => clearInterval(timer);
-  }, [badgeItems.length, hotSearchItems.length]);
+  }, [hotSearchItems.length]);
 
   // Search state
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -88,7 +86,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
           {searchQuery ? 'Search results' : 'Popular searches'}
         </div>
         <div className="space-y-0.5">
-          {searchResults.map((asset, idx) => (
+          {searchResults.map((asset) => (
             <button 
               key={asset.symbol} 
               onClick={() => {
@@ -161,7 +159,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
           <span className={dropdownTextClass}>Support center</span>
         </button>
         <button className={dropdownItemClass}>
-          <span className={dropdownIconClass}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M16 4h2a2 2 0 0 1-2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span>
+          <span className={dropdownIconClass}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M16 4h2a2 2 0 0 1-2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1-2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span>
           <span className={dropdownTextClass}>Open a Ticket</span>
         </button>
       </div>
@@ -177,7 +175,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
           </div>
           <div className="flex flex-col min-w-0">
             <span className="text-sm font-semibold truncate tracking-tight">{maskedEmail}</span>
-            <span className="text-[10px] text-gray-400 font-bold tracking-tight mt-0.5 opacity-80">UID: {displayUid}</span>
+            <span className="text-[10px] text-gray-400 font-bold tracking-tight mt-0.5 UID: ">UID: {displayUid}</span>
           </div>
         </div>
         <div className="px-5 pb-4 border-b border-gray-50">
@@ -410,8 +408,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                 ref={inputRef}
                 type="text" 
                 value={searchQuery}
-                onFocus={() => { setIsSearchOpen(true); setIsSearchFocused(true); }}
-                onBlur={() => setIsSearchFocused(false)}
+                onFocus={() => { setIsSearchOpen(true); }}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
                   setIsSearchOpen(true);
@@ -419,18 +416,13 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                 className="bg-zinc-800/60 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-[11px] font-medium w-32 focus:w-48 focus:bg-zinc-800 focus:border-white/20 outline-none transition-all placeholder:text-gray-500 placeholder:tracking-tighter text-white shadow-inner relative z-[1]"
               />
               
-              {!searchQuery && !isSearchFocused && (
-                <div className="absolute left-10 top-1/2 -translate-y-1/2 pointer-events-none flex items-center gap-1 overflow-hidden h-[16px] z-[2]">
-                  <span className="text-[10px] shrink-0 transform -translate-y-[0.5px]">🔥</span>
-                  <div 
-                    className="flex flex-col transition-transform duration-700 cubic-bezier(0.65, 0, 0.35, 1)" 
-                    style={{ transform: `translateY(-${searchPlaceholderIndex * 16}px)` }}
-                  >
-                    {hotSearchItems.map(item => (
-                      <span key={item} className="text-[11px] text-gray-500 font-medium h-[16px] leading-[16px] whitespace-nowrap">
-                        {item}
-                      </span>
-                    ))}
+              {!searchQuery && (
+                <div className="absolute left-10 top-1/2 -translate-y-1/2 pointer-events-none flex items-center h-[20px] z-[2]">
+                  <div key={searchPlaceholderIndex} className="coin-placeholder-fade flex items-center gap-1.5">
+                    <span className="text-[10px] transform -translate-y-[0.5px]">🔥</span>
+                    <span className="text-[11px] text-gray-400 font-medium whitespace-nowrap">
+                      {hotSearchItems[searchPlaceholderIndex]}
+                    </span>
                   </div>
                 </div>
               )}
