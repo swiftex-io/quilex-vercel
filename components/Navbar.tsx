@@ -69,7 +69,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
     ).slice(0, 10);
   }, [balances, searchQuery]);
 
-  // Standardized UI constants - Cleaned up Tailwind animation classes to avoid conflict with custom CSS transitions
+  // Standardized UI constants
   const dropdownBaseClass = "bg-white text-black rounded-2xl shadow-[0_32px_64px_rgba(0,0,0,0.18)] overflow-hidden border border-gray-100";
   const dropdownItemClass = "w-full flex items-center gap-3.5 px-5 py-3 hover:bg-gray-50 transition-all text-left group";
   const dropdownTextClass = "text-[13px] font-medium text-gray-800 group-hover:text-black tracking-tight"; 
@@ -418,7 +418,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
             <>
               <button 
                 onClick={() => { onNavigate(Page.ASSETS); setDepositModalOpen(true); }} 
-                className="hidden lg:block group px-5 py-2.5 apr-badge-glow text-black text-[11px] font-bold tracking-tight rounded-full active:scale-95 transition-all mr-3 shadow-[0_0_15px_rgba(79,230,241,0.2)] hover:shadow-[0_0_25px_rgba(79,230,241,0.5)] whitespace-nowrap shrink-0 overflow-hidden"
+                className="hidden lg:block group px-5 py-2 apr-badge-glow text-black text-[12px] font-bold tracking-tight rounded-full active:scale-95 transition-all mr-3 shadow-[0_0_15px_rgba(79,230,241,0.2)] hover:shadow-[0_0_25px_rgba(79,230,241,0.5)] whitespace-nowrap shrink-0 overflow-hidden"
               >
                 <span className="rolling-text-container">
                   <span className="rolling-text-inner">
@@ -509,7 +509,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
               </div>
 
               <div className="h-6 w-[1px] bg-zinc-600/60 mx-3 hidden sm:block"></div>
-              <button onClick={() => setShowAuth(true)} className="group px-6 py-2.5 bg-white text-black text-[11px] font-semibold tracking-tight rounded-full hover:bg-gray-200 transition-all shadow-xl whitespace-nowrap shrink-0 overflow-hidden">
+              <button onClick={() => setShowAuth(true)} className="group px-6 py-2.5 bg-white text-black text-[12px] font-bold tracking-tight rounded-full hover:bg-gray-200 transition-all shadow-xl whitespace-nowrap shrink-0 overflow-hidden">
                 <span className="rolling-text-container">
                   <span className="rolling-text-inner">
                     <span className="block">Sign in</span>
