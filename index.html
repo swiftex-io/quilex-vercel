@@ -64,23 +64,29 @@
             background: #d1d1d1 !important;
         }
 
-        /* Dropdown Animation Classes */
+        /* 
+           PRECISE DROPDOWN ANIMATION
+           Base state: Hidden, slightly moved up.
+        */
         .dropdown-container {
-            pointer-events: none;
+            position: absolute !important;
             opacity: 0;
-            transform: translateY(2px) scale(0.99);
-            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
-                        opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-                        visibility 0.2s;
             visibility: hidden;
+            transform: translateY(-12px);
+            transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), 
+                        opacity 0.2s cubic-bezier(0.2, 0, 0, 1),
+                        visibility 0.2s;
+            pointer-events: none;
+            z-index: 100;
             will-change: transform, opacity;
         }
 
+        /* Visible state: At the destination. */
         .dropdown-container.is-visible {
-            pointer-events: auto;
             opacity: 1;
-            transform: translateY(0) scale(1);
             visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
         }
 
         /* Updated Earn Badge Gradient */

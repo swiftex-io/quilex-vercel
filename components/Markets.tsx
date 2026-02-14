@@ -57,7 +57,7 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
   const renderMarketsTab = () => (
     <div className="animate-in fade-in duration-500">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-        <div className="bg-[#111111] p-6 rounded-2xl group transition-all shadow-xl text-left">
+        <div className="bg-[#111111] p-6 rounded-2xl group transition-all shadow-xl text-left border border-white/5">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-[14px] font-bold text-white tracking-tight flex items-center gap-1">
               Hot crypto <svg className="w-3 h-3 text-zinc-600 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="m9 5 7 7-7 7"/></svg>
@@ -85,7 +85,7 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
           </div>
         </div>
 
-        <div className="bg-[#111111] p-6 rounded-2xl group transition-all shadow-xl text-left">
+        <div className="bg-[#111111] p-6 rounded-2xl group transition-all shadow-xl text-left border border-white/5">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-[14px] font-bold text-white tracking-tight flex items-center gap-1">
               New listings <svg className="w-3 h-3 text-zinc-600 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="m9 5 7 7-7 7"/></svg>
@@ -109,7 +109,7 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
           </div>
         </div>
 
-        <div className="bg-[#111111] p-6 rounded-2xl group transition-all shadow-xl text-left">
+        <div className="bg-[#111111] p-6 rounded-2xl group transition-all shadow-xl text-left border border-white/5">
           <h3 className="text-[14px] font-bold text-white tracking-tight mb-6 flex items-center gap-1">
             Macro data <svg className="w-3 h-3 text-zinc-600 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="m9 5 7 7-7 7"/></svg>
           </h3>
@@ -136,7 +136,7 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
           </div>
         </div>
 
-        <div className="bg-[#111111] p-6 rounded-2xl group transition-all shadow-xl text-left">
+        <div className="bg-[#111111] p-6 rounded-2xl group transition-all shadow-xl text-left border border-white/5">
           <h3 className="text-[14px] font-bold text-white tracking-tight mb-6 flex items-center gap-1">
             BTC ETF flows <svg className="w-3 h-3 text-zinc-600 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="m9 5 7 7-7 7"/></svg>
           </h3>
@@ -296,18 +296,18 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
 
   const renderRankingsTab = () => {
     const categories = [
-      { name: 'Hot crypto', assets: balances.slice(0, 7) },
-      { name: 'Top gainers', assets: balances.filter(b => b.change24h > 0).sort((a,b) => b.change24h - a.change24h).slice(0, 7) },
-      { name: 'Top losers', assets: balances.filter(b => b.change24h < 0).sort((a,b) => a.change24h - b.change24h).slice(0, 7) },
-      { name: 'New listings', assets: balances.slice(5, 12) },
-      { name: 'Largest market cap', assets: balances.slice(0, 7) },
-      { name: 'Highest turnover', assets: balances.slice(1, 8) }
+      { name: 'Hot crypto', assets: balances.slice(0, 4), hasCta: true },
+      { name: 'Top gainers', assets: balances.filter(b => b.change24h > 0).sort((a,b) => b.change24h - a.change24h).slice(0, 5) },
+      { name: 'Top losers', assets: balances.filter(b => b.change24h < 0).sort((a,b) => a.change24h - b.change24h).slice(0, 5) },
+      { name: 'New listings', assets: balances.slice(5, 10) },
+      { name: 'Largest market cap', assets: balances.slice(0, 5) },
+      { name: 'Highest turnover', assets: balances.slice(1, 6) }
     ];
 
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500">
         {categories.map((cat, i) => (
-          <div key={i} className="bg-[#111111] rounded-2xl p-6 shadow-xl group/card text-left">
+          <div key={i} className="bg-[#111111] rounded-2xl p-6 shadow-xl group/card text-left border border-white/5">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-[14px] font-bold text-white tracking-tight flex items-center gap-2">
                 <span className="text-zinc-500">
@@ -327,7 +327,7 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
                 <div key={idx} onClick={onTrade} className="grid grid-cols-12 items-center cursor-pointer hover:bg-white/[0.04] -mx-2 px-2 py-2 rounded-lg transition-all group/row">
                   <div className="col-span-8 flex items-center gap-3">
                     <span className="text-[11px] font-bold text-zinc-700 w-3">{idx + 1}</span>
-                    <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center overflow-hidden">
+                    <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center overflow-hidden border border-white/5">
                       <img src={`https://assets.coincap.io/assets/icons/${asset.symbol.toLowerCase()}@2x.png`} className="w-full h-full object-cover" alt="" />
                     </div>
                     <div className="flex flex-col">
@@ -344,6 +344,26 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
                   </div>
                 </div>
               ))}
+              
+              {cat.hasCta && (
+                <div className="grid grid-cols-12 items-center bg-blue-500/5 border border-dashed border-blue-500/20 -mx-2 mt-2 p-3 rounded-lg cursor-pointer hover:bg-blue-500/10 transition-all group/cta">
+                  <div className="col-span-8 flex items-center gap-3">
+                    <span className="text-[11px] font-bold text-blue-500/50 w-3">5</span>
+                    <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M12 5v14M5 12h14"/></svg>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[13px] font-bold text-blue-400">Promote your coin</span>
+                      <span className="text-[9px] text-blue-500/60 font-bold tracking-tight uppercase">Get listed here</span>
+                    </div>
+                  </div>
+                  <div className="col-span-4 text-right">
+                    <button className="bg-white hover:bg-zinc-200 text-black text-[9px] px-3 py-1 rounded-full font-black uppercase tracking-wider transition-all transform active:scale-95 shadow-lg">
+                      Promote
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         ))}

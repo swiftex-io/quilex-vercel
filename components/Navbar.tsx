@@ -69,14 +69,14 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
     ).slice(0, 10);
   }, [balances, searchQuery]);
 
-  // Standardized UI constants
-  const dropdownBaseClass = "bg-white text-black rounded-2xl shadow-[0_32px_64px_rgba(0,0,0,0.18)] overflow-hidden border border-gray-100 animate-in fade-in zoom-in-95 duration-200";
+  // Standardized UI constants - Cleaned up Tailwind animation classes to avoid conflict with custom CSS transitions
+  const dropdownBaseClass = "bg-white text-black rounded-2xl shadow-[0_32px_64px_rgba(0,0,0,0.18)] overflow-hidden border border-gray-100";
   const dropdownItemClass = "w-full flex items-center gap-3.5 px-5 py-3 hover:bg-gray-50 transition-all text-left group";
   const dropdownTextClass = "text-[13px] font-medium text-gray-800 group-hover:text-black tracking-tight"; 
   const dropdownIconClass = "text-gray-400 group-hover:text-black transition-colors shrink-0";
 
   const SearchDropdownContent = () => (
-    <div className={`absolute top-full right-0 xl:left-0 mt-2 z-[100] dropdown-container ${isSearchOpen ? 'is-visible' : ''}`}>
+    <div className={`absolute top-full right-0 xl:left-0 mt-2 dropdown-container ${isSearchOpen ? 'is-visible' : ''}`}>
       <div className={`${dropdownBaseClass} w-[310px] py-4`}>
         <div className="px-5 pb-3 text-[13px] font-bold text-black tracking-tight">
           {searchQuery ? 'Search results' : 'Popular searches'}
@@ -124,7 +124,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
   );
 
   const EarnDropdownContent = () => (
-    <div className={`absolute top-full left-0 z-[100] dropdown-container ${isEarnNavOpen ? 'is-visible' : ''}`}>
+    <div className={`top-full left-0 dropdown-container ${isEarnNavOpen ? 'is-visible' : ''}`}>
       <div className={`${dropdownBaseClass} w-[380px] py-4`}>
         <div className="px-5 pb-3 text-[10px] font-bold text-gray-400 tracking-tight border-b border-gray-50 mb-3">Passive income</div>
         <div className="space-y-1 px-2">
@@ -148,7 +148,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
   );
 
   const SupportDropdownContent = () => (
-    <div className={`absolute top-full right-0 z-[100] dropdown-container ${isSupportOpen ? 'is-visible' : ''}`}>
+    <div className={`top-full right-0 dropdown-container ${isSupportOpen ? 'is-visible' : ''}`}>
       <div className={`${dropdownBaseClass} w-64 p-3`}>
         <button className={dropdownItemClass}>
           <span className={dropdownIconClass}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
@@ -163,7 +163,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
   );
 
   const UserDropdownContent = () => (
-    <div className={`absolute top-full right-0 z-[100] dropdown-container ${isUserOpen ? 'is-visible' : ''}`}>
+    <div className={`top-full right-0 dropdown-container ${isUserOpen ? 'is-visible' : ''}`}>
       <div className={`${dropdownBaseClass} w-[300px] py-4`}>
         <div className="px-5 pb-5 flex items-center gap-4">
           <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-100 shadow-sm">
@@ -206,7 +206,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
   );
 
   const LanguageDropdownContent = () => (
-    <div className={`absolute top-full right-0 z-[100] dropdown-container ${isLanguageOpen ? 'is-visible' : ''}`}>
+    <div className={`top-full right-0 dropdown-container ${isLanguageOpen ? 'is-visible' : ''}`}>
       <div className={`${dropdownBaseClass} w-[640px] p-8`}>
         <div className="grid grid-cols-2 gap-10">
           <div>
@@ -253,7 +253,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
   );
 
   const TradeDropdownContent = () => (
-    <div className={`absolute top-full left-0 z-[100] dropdown-container ${isTradeOpen ? 'is-visible' : ''}`}>
+    <div className={`top-full left-0 dropdown-container ${isTradeOpen ? 'is-visible' : ''}`}>
       <div className={`${dropdownBaseClass} w-[380px] py-4`}>
         <div className="px-5 pb-3 text-[10px] font-bold text-gray-400 tracking-tight border-b border-gray-50 mb-3">Trading instruments</div>
         <div className="space-y-1 px-2">
@@ -294,7 +294,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
   );
 
   const MarketsDropdownContent = () => (
-    <div className={`absolute top-full left-0 z-[100] dropdown-container ${isMarketsOpen ? 'is-visible' : ''}`}>
+    <div className={`top-full left-0 dropdown-container ${isMarketsOpen ? 'is-visible' : ''}`}>
       <div className={`${dropdownBaseClass} w-[300px] py-4 px-2`}>
         <div className="space-y-1">
           {[
@@ -323,7 +323,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
   );
 
   const LearnDropdownContent = () => (
-    <div className={`absolute top-full left-0 z-[100] dropdown-container ${isLearnOpen ? 'is-visible' : ''}`}>
+    <div className={`top-full left-0 dropdown-container ${isLearnOpen ? 'is-visible' : ''}`}>
       <div className={`${dropdownBaseClass} w-[340px] py-4 px-2`}>
         <div className="space-y-1">
           {[
@@ -389,7 +389,6 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
         </div>
 
         <div className="ml-auto flex items-center gap-1">
-          {/* Enhanced Search Component - Responsive */}
           <div className="flex items-center relative mr-2 group" ref={searchRef}>
             <button 
               onClick={() => {
@@ -417,7 +416,6 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
 
           {user ? (
             <>
-              {/* Refined Deposit Button - Stabilized shadow/size & rolling mask */}
               <button 
                 onClick={() => { onNavigate(Page.ASSETS); setDepositModalOpen(true); }} 
                 className="hidden lg:block group px-5 py-2.5 apr-badge-glow text-black text-[11px] font-bold tracking-tight rounded-full active:scale-95 transition-all mr-3 shadow-[0_0_15px_rgba(79,230,241,0.2)] hover:shadow-[0_0_25px_rgba(79,230,241,0.5)] whitespace-nowrap shrink-0 overflow-hidden"
@@ -435,7 +433,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
                   <span className="hidden xl:block text-[11px] font-semibold tracking-tight">Wallet</span>
                 </button>
-                <div className={`absolute top-full right-0 z-[100] dropdown-container ${isWalletOpen ? 'is-visible' : ''}`}>
+                <div className={`absolute top-full right-0 dropdown-container ${isWalletOpen ? 'is-visible' : ''}`}>
                   <div className={`${dropdownBaseClass} w-80 p-6`}>
                     <div className="mb-6">
                       <div className="text-[10px] font-bold text-gray-400 tracking-tight mb-1.5 opacity-80">Total balance</div>
