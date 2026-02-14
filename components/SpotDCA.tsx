@@ -49,7 +49,7 @@ const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ initialTokens, onClos
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[150] flex items-center justify-center p-4 animate-in fade-in duration-300">
-      <div className="bg-[#111] border border-white/10 rounded-[28px] w-full max-w-[480px] shadow-2xl overflow-hidden flex flex-col max-h-[95vh]">
+      <div className="bg-[#111] border border-white/10 rounded-2xl w-full max-w-[480px] shadow-2xl overflow-hidden flex flex-col max-h-[95vh]">
         {/* Header */}
         <div className="flex items-center justify-between px-8 py-6 border-b border-white/5">
           <h2 className="text-xl font-bold tracking-tight">Create Plan</h2>
@@ -312,7 +312,7 @@ const SpotDCA: React.FC = () => {
         {/* Featured Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
           {featuredCards.map((card, idx) => (
-            <div key={idx} className="bg-[#0d0d0d] border border-white/5 rounded-3xl p-8 hover:border-white/10 transition-all group text-left">
+            <div key={idx} className="bg-[#0d0d0d] border border-white/5 rounded-2xl p-8 hover:border-white/10 transition-all group text-left">
               <div className="flex justify-between items-start mb-8">
                 <div>
                   <h3 className="text-lg font-bold mb-1">{card.title}</h3>
@@ -406,7 +406,7 @@ const SpotDCA: React.FC = () => {
                                <span className={`text-lg font-bold transition-colors ${activeRoi.neg ? 'text-[#ff4d4f]' : 'text-[#00d18e]'}`}>{activeRoi.val}</span>
                                <svg width="18" height="18" className={`transition-all ${activeRoi.neg ? 'text-[#ff4d4f] rotate-180' : 'text-[#00d18e]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 17l6-6 4 4 8-8"/><polyline points="14 7 21 7 21 14"/></svg>
                             </div>
-                            <div className="bg-[#111318] p-1 rounded-[10px] flex items-center">
+                            <div className="bg-[#111318] p-1 rounded-lg flex items-center">
                               {ranges.map(r => (
                                 <button key={r} onClick={(e) => { e.stopPropagation(); handleRangeChange(token.symbol, r); }} className={`px-3.5 py-1.5 rounded-lg text-[13px] font-bold transition-all ${selectedRange === r ? 'bg-[#1e222d] text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}>{r}</button>
                               ))}

@@ -43,7 +43,6 @@ const StakeModal: React.FC<StakeModalProps> = ({ asset, onClose, activeEarnTab }
   };
 
   const stakingTime = today;
-  // Fixed: correctly declare interestAccruesOn without the unexpected space
   const interestAccruesOn = new Date(today);
   interestAccruesOn.setDate(today.getDate() + 1);
   interestAccruesOn.setHours(8, 0, 0, 0);
@@ -54,7 +53,7 @@ const StakeModal: React.FC<StakeModalProps> = ({ asset, onClose, activeEarnTab }
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[150] flex items-center justify-center p-4 animate-in fade-in duration-300">
-      <div className="bg-[#111] border border-white/10 rounded-[24px] w-full max-w-[480px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="bg-[#111] border border-white/10 rounded-2xl w-full max-w-[480px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         <div className="flex items-center justify-between p-6 border-b border-white/5">
           <h2 className="text-xl font-bold tracking-tight">Stake {asset.symbol}</h2>
           <button onClick={onClose} className="text-zinc-500 hover:text-white transition-colors">
@@ -450,7 +449,7 @@ const SimpleEarn: React.FC = () => {
             {carouselItems.map((item, idx) => (
               <div 
                 key={idx} 
-                className="flex-shrink-0 w-[calc(33.333%-16px)] min-w-[320px] bg-[#0d0d0d] border border-white/5 rounded-[24px] p-8 flex flex-col justify-between h-48 snap-start hover:border-white/20 transition-all hover:bg-zinc-900/40 cursor-pointer"
+                className="flex-shrink-0 w-[calc(33.333%-16px)] min-w-[320px] bg-[#0d0d0d] border border-white/5 rounded-2xl p-8 flex flex-col justify-between h-48 snap-start hover:border-white/20 transition-all hover:bg-zinc-900/40 cursor-pointer"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center overflow-hidden border border-white/5">
@@ -503,7 +502,7 @@ const SimpleEarn: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-zinc-950 border border-white/5 rounded-xl overflow-hidden shadow-2xl">
+        <div className="bg-zinc-950 border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
@@ -544,7 +543,6 @@ const SimpleEarn: React.FC = () => {
                     </td>
                     <td className="px-8 py-5 text-right">
                       <div className="flex items-center justify-end gap-3">
-                        {/* Synchronized Stake Button: 13px, rounded-full, increased padding */}
                         <button className="px-6 py-2 bg-white text-black text-[13px] font-bold rounded-full hover:bg-[#d7ff20] transition-all opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 tracking-tight shadow-xl">
                           Stake
                         </button>
@@ -600,7 +598,7 @@ const SimpleEarn: React.FC = () => {
         </div>
 
         <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-zinc-950/40 border border-white/5 p-8 rounded-xl flex flex-col justify-between group hover:border-zinc-800 transition-colors">
+          <div className="bg-zinc-950/40 border border-white/5 p-8 rounded-2xl flex flex-col justify-between group hover:border-zinc-800 transition-colors">
             <div>
               <h3 className="text-base font-medium mb-3 tracking-tight">{activeEarnTab} Overview</h3>
               <p className="text-zinc-500 text-[12px] leading-relaxed mb-6 font-normal opacity-80">
@@ -611,7 +609,7 @@ const SimpleEarn: React.FC = () => {
               Learn more about yield <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m9 18 6-6-6-6"/></svg>
             </button>
           </div>
-          <div className="bg-zinc-950/40 border border-white/5 p-8 rounded-xl flex flex-col justify-between group hover:border-zinc-800 transition-colors">
+          <div className="bg-zinc-950/40 border border-white/5 p-8 rounded-2xl flex flex-col justify-between group hover:border-zinc-800 transition-colors">
             <div>
               <h3 className="text-base font-medium mb-3 tracking-tight">Safety & Security</h3>
               <p className="text-zinc-500 text-[12px] leading-relaxed mb-6 font-normal opacity-80">
