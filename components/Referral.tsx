@@ -1,23 +1,30 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useExchangeStore, TIER_DATA, ReferralTier } from '../store';
 
-interface ReferralProps {
-  isAffiliate?: boolean;
-}
+const LevelMarker = ({ level, isCompleted }: { level: number; isCompleted: boolean; color: string }) => {
+  return (
+    <div 
+      className={`w-14 h-14 rounded-full flex items-center justify-center transition-all border-2 text-lg font-black tracking-tighter z-20 relative ${
+        isCompleted ? 'bg-white border-white text-black shadow-xl scale-110' : 'bg-zinc-950 border-zinc-800 text-zinc-600 grayscale'
+      }`}
+    >
+      {level.toString().padStart(2, '0')}
+    </div>
+  );
+};
 
-const Referral: React.FC<ReferralProps> = ({ isAffiliate }) => {
-  const { referralCode, referralCount, earnings, getTier } = useExchangeStore();
+const Referral: React.FC = () => {
+  const { referralCode, referralCount, referralVolume, earnings, getTier } = useExchangeStore();
   const currentTier = getTier();
-  const nextTier: ReferralTier | null = 
-    currentTier === 'Bronze' ? 'Silver' : 
-    currentTier === 'Silver' ? 'Gold' : 
-    currentTier === 'Gold' ? 'Platinum' : null;
+  
+  const tiers: ReferralTier[] = ['Bronze', 'Silver', 'Gold', 'Platinum'];
+  const nextTierIndex = Math.min(tiers.indexOf(currentTier) + 1, tiers.length - 1);
+  const nextTier = tiers[nextTierIndex] === currentTier ? null : tiers[nextTierIndex];
 
   const [calcRefs, setCalcRefs] = useState(10);
   const [calcVolume, setCalcVolume] = useState(5000);
   const [recentEvents, setRecentEvents] = useState<any[]>([]);
 
-  // Simulate live activity ticker
   useEffect(() => {
     const activities = [
       'just made a $12k trade',
@@ -29,8 +36,9 @@ const Referral: React.FC<ReferralProps> = ({ isAffiliate }) => {
     
     const interval = setInterval(() => {
       const id = Math.floor(Math.random() * 9000) + 1000;
+      const username = `Ref_${id}`;
       const act = activities[Math.floor(Math.random() * activities.length)];
-      setRecentEvents(prev => [{ user: `Ref_${id}`, action: act, time: 'Just now' }, ...prev].slice(0, 5));
+      setRecentEvents(prev => [{ user: username, action: act, time: 'Just now' }, ...prev].slice(0, 5));
     }, 4000);
     
     return () => clearInterval(interval);
@@ -38,7 +46,7 @@ const Referral: React.FC<ReferralProps> = ({ isAffiliate }) => {
 
   const estimatedProfit = useMemo(() => {
     const commission = TIER_DATA[currentTier].commission / 100;
-    const feeRate = 0.001; // 0.1%
+    const feeRate = 0.001; 
     return calcRefs * calcVolume * feeRate * commission;
   }, [calcRefs, calcVolume, currentTier]);
 
@@ -48,92 +56,125 @@ const Referral: React.FC<ReferralProps> = ({ isAffiliate }) => {
   };
 
   const tierProgress = useMemo(() => {
-    const tiers: ReferralTier[] = ['Bronze', 'Silver', 'Gold', 'Platinum'];
     const currentIndex = tiers.indexOf(currentTier);
-    const totalTiers = tiers.length;
-
     if (!nextTier) return 100;
 
-    // Base percentage for the current tier marker
+    const totalTiers = tiers.length;
     const baseProgress = (currentIndex / (totalTiers - 1)) * 100;
     
-    // Requirements for math
-    const currentReq = TIER_DATA[currentTier].requirement;
-    const nextReq = TIER_DATA[nextTier].requirement;
+    const currentCountReq = TIER_DATA[currentTier].requirement;
+    const nextCountReq = TIER_DATA[nextTier].requirement;
+    const currentVolReq = TIER_DATA[currentTier].volRequirement;
+    const nextVolReq = TIER_DATA[nextTier].volRequirement;
+
+    const countProgress = Math.min(1, (referralCount - currentCountReq) / (nextCountReq - currentCountReq || 1));
+    const volProgress = Math.min(1, (referralVolume - currentVolReq) / (nextVolReq - currentVolReq || 1));
     
-    // The width of one segment between markers
+    const progressInTier = (countProgress + volProgress) / 2;
     const tierStepWidth = 100 / (totalTiers - 1);
     
-    // Fractional progress within the current segment
-    const progressInTier = (referralCount - currentReq) / (nextReq - currentReq);
-    
     return baseProgress + (progressInTier * tierStepWidth);
-  }, [referralCount, currentTier, nextTier]);
+  }, [referralCount, referralVolume, currentTier, nextTier]);
 
   return (
-    <div className={`min-h-screen transition-colors duration-1000 ${currentTier === 'Platinum' ? 'bg-[#050505]' : 'bg-black'} text-white selection:bg-purple-500/30`}>
+    <div className="min-h-screen bg-black text-white selection:bg-white/10">
       <div className="max-w-7xl mx-auto px-8 py-16">
         
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-16 animate-in fade-in slide-in-from-top-4 duration-700">
-          <div className="max-w-3xl">
-            <div className="flex items-center gap-3 mb-4">
-              <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-lg`} style={{ backgroundColor: TIER_DATA[currentTier].color, color: '#000' }}>
-                {currentTier} STATUS UNLOCKED
-              </span>
-              <span className="text-zinc-600 text-[10px] font-bold uppercase tracking-widest">Growth Engine v2.4</span>
-            </div>
-            <h1 className="text-6xl md:text-7xl font-black tracking-tighter mb-6">
-              Build Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">Empire.</span>
-            </h1>
-            <p className="text-xl text-zinc-400 font-medium leading-relaxed">
-              Don't just trade. Host the market. Invite your network to Quilex and earn a lifetime of passive income while climbing the elite ranks.
-            </p>
+        {/* Centralized High-Impact Header Dashboard */}
+        <div className="flex flex-col items-center text-center mb-24 animate-in fade-in slide-in-from-top-4 duration-1000">
+          <div className="flex items-center gap-3 mb-6">
+            <span className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-lg" style={{ backgroundColor: TIER_DATA[currentTier].color, color: '#000' }}>
+              {currentTier} STATUS
+            </span>
+            <span className="text-zinc-600 text-[10px] font-bold uppercase tracking-widest">Growth Engine v3.2</span>
           </div>
+          <h1 className="text-7xl md:text-8xl font-black tracking-tighter mb-8 leading-none">
+            Build Your <span className="text-white">Empire.</span>
+          </h1>
           
-          <div className="bg-zinc-900/50 border border-white/5 p-8 rounded-2xl backdrop-blur-xl min-w-[320px] text-left">
-            <div className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4">Earnings Multiplier</div>
-            <div className="flex items-baseline gap-2 mb-2">
-              <span className="text-5xl font-black text-white">{TIER_DATA[currentTier].commission}%</span>
-              <span className="text-zinc-500 font-bold">Commission</span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-16 w-full max-w-5xl mt-8">
+            <div className="flex flex-col items-center group cursor-default">
+              <span className="text-zinc-500 text-[11px] font-bold uppercase tracking-widest mb-3 border-b border-zinc-800 pb-1">Network Scale</span>
+              <div className="text-5xl font-black tracking-tighter group-hover:text-blue-400 transition-colors">
+                {referralCount}<span className="text-sm font-bold text-zinc-600 ml-1">REFS</span>
+              </div>
             </div>
-            <div className="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden mb-4">
-              <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-1000" style={{ width: `${(TIER_DATA[currentTier].commission / 45) * 100}%` }}></div>
+            <div className="flex flex-col items-center group cursor-default">
+              <span className="text-zinc-500 text-[11px] font-bold uppercase tracking-widest mb-3 border-b border-zinc-800 pb-1">Trade Volume</span>
+              <div className="text-5xl font-black tracking-tighter group-hover:text-green-400 transition-colors">
+                ${(referralVolume / 1000).toFixed(0)}k
+              </div>
             </div>
-            <p className="text-[11px] text-zinc-500 font-bold">You are currently in the Top 5% of earners.</p>
+            <div className="flex flex-col items-center group cursor-default">
+              <span className="text-zinc-500 text-[11px] font-bold uppercase tracking-widest mb-3 border-b border-zinc-800 pb-1">Total Commission</span>
+              <div className="text-5xl font-black tracking-tighter group-hover:text-white transition-colors">
+                ${earnings.toLocaleString()}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Milestone Tracker */}
-        <div className="mb-20">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-black tracking-tight">Milestone Roadmap</h2>
-            {nextTier && (
-              <span className="text-sm font-bold text-zinc-500">
-                <span className="text-white">{TIER_DATA[nextTier].requirement - referralCount}</span> more invites to reach <span className="text-white">{nextTier}</span>
-              </span>
-            )}
-          </div>
-          <div className="relative pt-10 pb-4">
-            <div className="absolute top-1/2 left-0 w-full h-1 bg-zinc-900 -translate-y-1/2 rounded-full overflow-hidden">
-               <div className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-1000 ease-out" style={{ width: `${tierProgress}%` }}></div>
+        {/* Milestone Roadmap */}
+        <div className="mb-32 relative text-left">
+          <div className="flex justify-between items-center mb-16">
+            <div>
+               <h2 className="text-3xl font-black tracking-tighter mb-2">Milestone Roadmap</h2>
+               <p className="text-sm text-zinc-500 font-medium">Earn elite rewards by hitting network and volume benchmarks.</p>
             </div>
+            
+            {/* Multiplier with Tooltip */}
+            <div className="flex items-center gap-3 bg-zinc-900/40 border border-white/5 px-6 py-3 rounded-2xl relative group/multiplier">
+              <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Multiplier</span>
+              <span className="text-2xl font-black text-white">{TIER_DATA[currentTier].commission}%</span>
+              
+              <div className="relative cursor-help ml-2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-zinc-500 hover:text-white transition-colors"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                
+                {/* Custom Tooltip */}
+                <div className="absolute bottom-full right-0 mb-3 w-64 p-4 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl opacity-0 invisible group-hover/multiplier:opacity-100 group-hover/multiplier:visible transition-all z-50 pointer-events-none">
+                  <div className="text-[10px] font-black uppercase text-white mb-2 tracking-widest">Earnings Multiplier</div>
+                  <p className="text-[11px] text-zinc-400 font-medium leading-relaxed">
+                    This percentage represents your direct share of the trading fees generated by your referred users. As you climb the levels, this multiplier amplifies your passive revenue significantly.
+                  </p>
+                  <div className="absolute top-full right-4 w-2 h-2 bg-zinc-900 border-r border-b border-white/10 rotate-45 -mt-1"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative pt-10 pb-12">
+            {/* Progress Bar Background - Precision Aligned at 68px (pt-10: 40px + half-marker: 28px) */}
+            <div className="absolute top-[68px] left-0 w-full h-[4px] bg-zinc-900 rounded-full">
+               <div 
+                className="h-full apr-badge-glow transition-all duration-1000 ease-out shadow-[0_0_20px_rgba(168,85,247,0.4)] rounded-full" 
+                style={{ width: `${tierProgress}%` }}
+               ></div>
+            </div>
+
+            {/* Progress Nodes */}
             <div className="flex justify-between relative z-10">
-              {(Object.keys(TIER_DATA) as ReferralTier[]).map((t) => {
-                const isCompleted = referralCount >= TIER_DATA[t].requirement;
+              {tiers.map((t, index) => {
+                const isCompleted = referralCount >= TIER_DATA[t].requirement && referralVolume >= TIER_DATA[t].volRequirement;
                 const isCurrent = currentTier === t;
+                const data = TIER_DATA[t];
+
                 return (
-                  <div key={t} className="flex flex-col items-center group">
-                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all border-4 ${
-                      isCompleted ? 'bg-white text-black border-white shadow-[0_0_30px_rgba(255,255,255,0.2)] scale-110' : 'bg-zinc-900 text-zinc-600 border-zinc-800 grayscale'
-                    }`}>
-                      {isCompleted ? (
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><path d="m5 13 4 4L19 7"/></svg>
-                      ) : (
-                        <span className="font-black text-sm">{TIER_DATA[t].requirement}+</span>
-                      )}
+                  <div key={t} className="flex flex-col items-center w-48 text-center group cursor-default">
+                    <LevelMarker level={index + 1} isCompleted={isCompleted} color={data.color} />
+
+                    <div className={`mt-6 mb-4 transition-all ${isCurrent ? 'text-white' : 'text-zinc-600'}`}>
+                      <div className="text-[11px] font-black uppercase tracking-[0.2em] mb-1">{t}</div>
+                      <div className="text-xl font-black">{data.avgEarn} <span className="text-[10px] opacity-40">avg/mo</span></div>
                     </div>
-                    <span className={`mt-4 text-[11px] font-black uppercase tracking-widest ${isCurrent ? 'text-white' : 'text-zinc-500'}`}>{t}</span>
+
+                    <div className="flex flex-col gap-2 items-center">
+                       <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-tight border ${referralCount >= data.requirement ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-zinc-900 border-zinc-800 text-zinc-700'}`}>
+                         {data.requirement}+ Active Refs
+                       </div>
+                       <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-tight border ${referralVolume >= data.volRequirement ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-zinc-900 border-zinc-800 text-zinc-700'}`}>
+                         ${(data.volRequirement / 1000).toFixed(0)}k Network Vol
+                       </div>
+                    </div>
                   </div>
                 );
               })}
@@ -141,20 +182,19 @@ const Referral: React.FC<ReferralProps> = ({ isAffiliate }) => {
           </div>
         </div>
 
-        {/* Dynamic Matrix & Calculator */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
+        {/* Dynamic Matrix & Calculator (Row 1: 3:2 Split) */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mb-8">
           
-          {/* Benefit Matrix */}
-          <div className="lg:col-span-2 bg-[#0d0d0d] border border-white/5 rounded-2xl p-10 shadow-2xl relative overflow-hidden">
+          <div className="lg:col-span-3 bg-[#0d0d0d] border border-white/5 rounded-2xl p-10 shadow-2xl relative overflow-hidden text-left">
             <h3 className="text-2xl font-black mb-10 tracking-tight">Status Perks Matrix</h3>
             <div className="space-y-4">
-              {(Object.keys(TIER_DATA) as ReferralTier[]).map((t) => (
+              {tiers.map((t) => (
                 <div key={t} className={`flex items-center justify-between p-6 rounded-xl border transition-all ${currentTier === t ? 'bg-white/5 border-white/20' : 'border-transparent opacity-40 hover:opacity-100'}`}>
                   <div className="flex items-center gap-6">
                     <div className="w-1.5 h-10 rounded-full" style={{ backgroundColor: TIER_DATA[t].color }}></div>
                     <div>
                       <div className="text-lg font-black">{t} Rank</div>
-                      <div className="flex gap-2 mt-1">
+                      <div className="flex flex-wrap gap-2 mt-1">
                         {TIER_DATA[t].perks.map(p => (
                           <span key={p} className="text-[9px] font-bold bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded-md uppercase">{p}</span>
                         ))}
@@ -176,9 +216,8 @@ const Referral: React.FC<ReferralProps> = ({ isAffiliate }) => {
             </div>
           </div>
 
-          {/* Profit Calculator */}
-          <div className="bg-zinc-950 border border-white/5 rounded-2xl p-10 flex flex-col justify-between group overflow-hidden relative">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <div className="lg:col-span-2 bg-zinc-950 border border-white/5 rounded-2xl p-10 flex flex-col justify-between group overflow-hidden relative text-left">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             <div>
               <h3 className="text-2xl font-black mb-8 tracking-tight">Revenue Simulator</h3>
               <div className="space-y-8">
@@ -210,7 +249,7 @@ const Referral: React.FC<ReferralProps> = ({ isAffiliate }) => {
             <div className="mt-12 p-8 bg-zinc-900/40 rounded-xl border border-white/5 relative overflow-hidden">
                <div className="relative z-10">
                  <div className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-2">Estimated passive income</div>
-                 <div className="text-5xl font-black tracking-tighter text-green-400 animate-pulse">
+                 <div className="text-5xl font-black tracking-tighter text-green-400">
                    ${estimatedProfit.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                    <span className="text-xs text-zinc-600 font-bold ml-1 uppercase">/mo</span>
                  </div>
@@ -219,68 +258,70 @@ const Referral: React.FC<ReferralProps> = ({ isAffiliate }) => {
           </div>
         </div>
 
-        {/* Invitation Center */}
+        {/* Row 2: 3:2 Split */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
-          <div className="lg:col-span-3 bg-[#0d0d0d] border border-white/5 p-10 rounded-2xl shadow-2xl relative overflow-hidden">
+          <div className="lg:col-span-3 bg-[#0d0d0d] border border-white/5 p-8 rounded-2xl shadow-2xl relative overflow-hidden text-left">
              <div className="relative z-10">
-                <h2 className="text-3xl font-black mb-3 tracking-tighter">Ready to Expand?</h2>
-                <p className="text-zinc-500 font-medium mb-10 max-w-md text-sm">Your elite invitation link tracks everything from first click to thousandth trade.</p>
+                <h2 className="text-2xl font-black mb-2 tracking-tighter">Ready to Expand?</h2>
+                <p className="text-zinc-500 font-medium mb-8 max-w-sm text-[13px]">Your elite invitation link tracks everything from first click to thousandth trade.</p>
                 
-                <div className="flex flex-col sm:flex-row gap-4 mb-10">
-                   <div className="flex-1 bg-black border border-white/10 rounded-xl py-3 px-4 flex items-center justify-between group hover:border-white/40 transition-all">
+                <div className="flex flex-col sm:flex-row gap-3 mb-8">
+                   <div className="flex-1 bg-black border border-white/10 rounded-xl py-2 px-4 flex items-center justify-between group hover:border-white/20 transition-all">
                       <div className="flex flex-col">
-                        <span className="text-[9px] font-black text-zinc-600 uppercase mb-0.5">Lifetime Link</span>
-                        <span className="font-mono text-base text-zinc-300 group-hover:text-white">quilex.io/ref/{referralCode}</span>
+                        <span className="text-[8px] font-black text-zinc-600 uppercase mb-0.5">Lifetime Link</span>
+                        <span className="font-mono text-[13px] text-zinc-300 group-hover:text-white">quilex.io/ref/{referralCode}</span>
                       </div>
                       <button 
                         onClick={copyToClipboard} 
-                        className="p-2 bg-white text-black rounded-lg hover:bg-zinc-100 transition-all flex items-center justify-center active:scale-95"
+                        className="p-1.5 bg-white text-black rounded-lg hover:bg-zinc-100 transition-all flex items-center justify-center active:scale-95"
                         title="Copy Invitation Link"
                       >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                       </button>
                    </div>
-                   <button className="px-6 py-3.5 bg-gradient-to-tr from-blue-600 to-purple-600 text-white font-black rounded-xl hover:shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all uppercase tracking-widest text-[11px]">
+                   <button className="px-5 py-2.5 bg-zinc-100 text-black font-black rounded-xl hover:bg-white transition-all uppercase tracking-widest text-[10px] shrink-0">
                      Generate QR
                    </button>
                 </div>
 
-                <div className="flex flex-wrap gap-2.5">
+                <div className="flex flex-wrap gap-2">
                    {['Twitter', 'Telegram', 'WhatsApp'].map(plat => (
-                     <button key={plat} className="px-4 py-2.5 bg-zinc-900 border border-white/5 rounded-lg text-[10px] font-bold hover:bg-zinc-800 transition-all uppercase tracking-widest text-zinc-400 hover:text-white">
+                     <button key={plat} className="px-3 py-2 bg-zinc-900 border border-white/5 rounded-lg text-[9px] font-bold hover:bg-zinc-800 transition-all uppercase tracking-widest text-zinc-500 hover:text-white">
                        {plat}
                      </button>
                    ))}
                 </div>
              </div>
-             
-             {/* Abstract design elements */}
-             <div className="absolute top-[-20%] right-[-10%] w-[400px] h-[400px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none"></div>
-             <div className="absolute bottom-[-20%] left-[-10%] w-[300px] h-[300px] bg-purple-500/5 blur-[100px] rounded-full pointer-events-none"></div>
           </div>
 
-          <div className="lg:col-span-2 bg-[#0d0d0d] border border-white/5 rounded-2xl p-10">
-             <h3 className="text-xl font-black mb-8 flex items-center gap-2">
-               <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          <div className="lg:col-span-2 bg-[#0d0d0d] border border-white/5 rounded-2xl p-8 text-left">
+             <h3 className="text-lg font-black mb-6 flex items-center gap-2">
+               <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
                Recent Activity
              </h3>
-             <div className="space-y-3">
+             <div className="space-y-2">
                 {recentEvents.length > 0 ? recentEvents.map((ev, i) => (
-                  <div key={i} className="flex items-center justify-between p-5 bg-black/40 rounded-xl border border-white/5 animate-in slide-in-from-bottom-4 fade-in duration-500">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-zinc-900 rounded-lg flex items-center justify-center font-black text-[10px] text-zinc-500">REF</div>
+                  <div key={i} className="flex items-center justify-between p-4 bg-black/40 rounded-xl border border-white/5 animate-in slide-in-from-bottom-4 fade-in duration-500">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 bg-zinc-900 rounded-full flex items-center justify-center overflow-hidden border border-white/10">
+                        <img 
+                          src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${ev.user}`} 
+                          alt="avatar" 
+                          className="w-full h-full object-cover" 
+                        />
+                      </div>
                       <div>
-                        <div className="text-sm font-black">{ev.user}</div>
-                        <div className="text-[10px] text-zinc-600 font-bold uppercase tracking-tight">{ev.action}</div>
+                        <div className="text-[13px] font-black">{ev.user}</div>
+                        <div className="text-[9px] text-zinc-600 font-bold uppercase tracking-tight">{ev.action}</div>
                       </div>
                     </div>
-                    <span className="text-[9px] font-black text-zinc-700 uppercase">{ev.time}</span>
+                    <span className="text-[8px] font-black text-zinc-700 uppercase">{ev.time}</span>
                   </div>
                 )) : (
-                  <div className="py-20 text-center text-zinc-600 text-xs font-bold uppercase tracking-widest">Scanning network activity...</div>
+                  <div className="py-12 text-center text-zinc-700 text-[10px] font-bold uppercase tracking-widest">Scanning network activity...</div>
                 )}
              </div>
-             <button className="w-full mt-10 py-5 bg-zinc-900 hover:bg-zinc-800 text-zinc-500 hover:text-white transition-all rounded-xl text-[10px] font-black uppercase tracking-widest border border-white/5">
+             <button className="w-full mt-8 py-4 bg-zinc-900 hover:bg-zinc-800 text-zinc-600 hover:text-white transition-all rounded-xl text-[9px] font-black uppercase tracking-widest border border-white/5">
                View Full Dashboard
              </button>
           </div>

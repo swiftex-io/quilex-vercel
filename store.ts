@@ -12,13 +12,31 @@ interface TierBenefits {
   perks: string[];
   color: string;
   requirement: number;
+  volRequirement: number;
+  avgEarn: string;
 }
 
 export const TIER_DATA: Record<ReferralTier, TierBenefits> = {
-  Bronze: { commission: 15, feeDiscount: 0, aprBoost: 0, perks: ['Standard Support'], color: '#CD7F32', requirement: 0 },
-  Silver: { commission: 25, feeDiscount: 10, aprBoost: 0.5, perks: ['Priority Tickets'], color: '#C0C0C0', requirement: 6 },
-  Gold: { commission: 35, feeDiscount: 25, aprBoost: 1.5, perks: ['Signals Access', 'Exclusive Events'], color: '#FFD700', requirement: 26 },
-  Platinum: { commission: 45, feeDiscount: 50, aprBoost: 3.0, perks: ['Dedicated Manager', '0.01% Flat Maker'], color: '#E5E4E2', requirement: 101 },
+  Bronze: { 
+    commission: 15, feeDiscount: 0, aprBoost: 0, 
+    perks: ['Standard Support'], color: '#CD7F32', 
+    requirement: 0, volRequirement: 0, avgEarn: '$50' 
+  },
+  Silver: { 
+    commission: 25, feeDiscount: 10, aprBoost: 0.5, 
+    perks: ['Priority Tickets', 'API Rate Boost'], color: '#C0C0C0', 
+    requirement: 6, volRequirement: 50000, avgEarn: '$450' 
+  },
+  Gold: { 
+    commission: 35, feeDiscount: 25, aprBoost: 1.5, 
+    perks: ['Signals Access', 'Exclusive Events', 'Early Access'], color: '#FFD700', 
+    requirement: 26, volRequirement: 250000, avgEarn: '$2,400' 
+  },
+  Platinum: { 
+    commission: 45, feeDiscount: 50, aprBoost: 3.0, 
+    perks: ['Dedicated Manager', '0.01% Flat Maker', 'VIP Merch'], color: '#E5E4E2', 
+    requirement: 101, volRequirement: 1000000, avgEarn: '$12,000' 
+  },
 };
 
 interface ExchangeState {
@@ -26,6 +44,7 @@ interface ExchangeState {
   tradeHistory: Trade[];
   referralCode: string;
   referralCount: number;
+  referralVolume: number;
   earnings: number;
   referralXP: number;
   isSyncing: boolean;
@@ -52,9 +71,10 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
   balances: [...MOCK_ASSETS],
   tradeHistory: [],
   referralCode: 'QUILEX_PRO_88',
-  referralCount: 42, // Mocking some growth
+  referralCount: 42,
+  referralVolume: 125000, // New tracked metric
   earnings: 1245.50,
-  referralXP: 4200, // 100 XP per ref + activity
+  referralXP: 4200,
   isSyncing: false,
   user: null,
   profile: null,
@@ -64,9 +84,11 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
 
   getTier: () => {
     const count = get().referralCount;
-    if (count >= 101) return 'Platinum';
-    if (count >= 26) return 'Gold';
-    if (count >= 6) return 'Silver';
+    const volume = get().referralVolume;
+    // For the chase, we require both metrics to move up
+    if (count >= 101 && volume >= 1000000) return 'Platinum';
+    if (count >= 26 && volume >= 250000) return 'Gold';
+    if (count >= 6 && volume >= 50000) return 'Silver';
     return 'Bronze';
   },
 
@@ -120,7 +142,6 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
       if (session?.user) {
         const user = session.user;
         set({ user, isGuest: false });
-        // Database fetches omitted for brevity as they are handled in production
         set({ profile: { nickname: user.email?.split('@')[0] || 'Trader' } });
       }
     } catch (err) {
