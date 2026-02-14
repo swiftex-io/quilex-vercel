@@ -1,26 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useExchangeStore, TIER_DATA, ReferralTier } from '../store';
 
-const LevelMarker = ({ level, isCompleted }: { level: number; isCompleted: boolean; color: string }) => {
-  return (
-    <div 
-      className={`w-14 h-14 rounded-full flex items-center justify-center transition-all border-2 text-lg font-black tracking-tighter z-20 relative ${
-        isCompleted ? 'bg-white border-white text-black shadow-xl scale-110' : 'bg-zinc-950 border-zinc-800 text-zinc-600 grayscale'
-      }`}
-    >
-      {level.toString().padStart(2, '0')}
-    </div>
-  );
-};
-
 const Referral: React.FC = () => {
   const { referralCode, referralCount, referralVolume, earnings, getTier } = useExchangeStore();
   const currentTier = getTier();
   
   const tiers: ReferralTier[] = ['Bronze', 'Silver', 'Gold', 'Platinum'];
-  const nextTierIndex = Math.min(tiers.indexOf(currentTier) + 1, tiers.length - 1);
-  const nextTier = tiers[nextTierIndex] === currentTier ? null : tiers[nextTierIndex];
-
   const [calcRefs, setCalcRefs] = useState(10);
   const [calcVolume, setCalcVolume] = useState(5000);
   const [recentEvents, setRecentEvents] = useState<any[]>([]);
@@ -55,27 +40,6 @@ const Referral: React.FC = () => {
     alert('Elite Invitation Link copied!');
   };
 
-  const tierProgress = useMemo(() => {
-    const currentIndex = tiers.indexOf(currentTier);
-    if (!nextTier) return 100;
-
-    const totalTiers = tiers.length;
-    const baseProgress = (currentIndex / (totalTiers - 1)) * 100;
-    
-    const currentCountReq = TIER_DATA[currentTier].requirement;
-    const nextCountReq = TIER_DATA[nextTier].requirement;
-    const currentVolReq = TIER_DATA[currentTier].volRequirement;
-    const nextVolReq = TIER_DATA[nextTier].volRequirement;
-
-    const countProgress = Math.min(1, (referralCount - currentCountReq) / (nextCountReq - currentCountReq || 1));
-    const volProgress = Math.min(1, (referralVolume - currentVolReq) / (nextVolReq - currentVolReq || 1));
-    
-    const progressInTier = (countProgress + volProgress) / 2;
-    const tierStepWidth = 100 / (totalTiers - 1);
-    
-    return baseProgress + (progressInTier * tierStepWidth);
-  }, [referralCount, referralVolume, currentTier, nextTier]);
-
   return (
     <div className="min-h-screen bg-black text-white selection:bg-white/10">
       <div className="max-w-7xl mx-auto px-8 py-16">
@@ -86,7 +50,7 @@ const Referral: React.FC = () => {
             <span className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-lg" style={{ backgroundColor: TIER_DATA[currentTier].color, color: '#000' }}>
               {currentTier} STATUS
             </span>
-            <span className="text-zinc-600 text-[10px] font-bold uppercase tracking-widest">Growth Engine v3.2</span>
+            <span className="text-zinc-600 text-[10px] font-bold uppercase tracking-widest">Growth Engine v4.1</span>
           </div>
           <h1 className="text-7xl md:text-8xl font-black tracking-tighter mb-8 leading-none">
             Build Your <span className="text-white">Empire.</span>
@@ -94,19 +58,19 @@ const Referral: React.FC = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-16 w-full max-w-5xl mt-8">
             <div className="flex flex-col items-center group cursor-default">
-              <span className="text-zinc-500 text-[11px] font-bold uppercase tracking-widest mb-3 border-b border-zinc-800 pb-1">Network Scale</span>
+              <span className="text-zinc-500 text-[11px] font-bold uppercase tracking-widest mb-3 border-b border-zinc-800 pb-1 text-center w-32">Network Scale</span>
               <div className="text-5xl font-black tracking-tighter group-hover:text-blue-400 transition-colors">
                 {referralCount}<span className="text-sm font-bold text-zinc-600 ml-1">REFS</span>
               </div>
             </div>
             <div className="flex flex-col items-center group cursor-default">
-              <span className="text-zinc-500 text-[11px] font-bold uppercase tracking-widest mb-3 border-b border-zinc-800 pb-1">Trade Volume</span>
+              <span className="text-zinc-500 text-[11px] font-bold uppercase tracking-widest mb-3 border-b border-zinc-800 pb-1 text-center w-32">Trade Volume</span>
               <div className="text-5xl font-black tracking-tighter group-hover:text-green-400 transition-colors">
                 ${(referralVolume / 1000).toFixed(0)}k
               </div>
             </div>
             <div className="flex flex-col items-center group cursor-default">
-              <span className="text-zinc-500 text-[11px] font-bold uppercase tracking-widest mb-3 border-b border-zinc-800 pb-1">Total Commission</span>
+              <span className="text-zinc-500 text-[11px] font-bold uppercase tracking-widest mb-3 border-b border-zinc-800 pb-1 text-center w-32">Total Commission</span>
               <div className="text-5xl font-black tracking-tighter group-hover:text-white transition-colors">
                 ${earnings.toLocaleString()}
               </div>
@@ -114,9 +78,9 @@ const Referral: React.FC = () => {
           </div>
         </div>
 
-        {/* Milestone Roadmap */}
+        {/* Milestone Cards Grid */}
         <div className="mb-32 relative text-left">
-          <div className="flex justify-between items-center mb-16">
+          <div className="flex justify-between items-center mb-12">
             <div>
                <h2 className="text-3xl font-black tracking-tighter mb-2">Milestone Roadmap</h2>
                <p className="text-sm text-zinc-500 font-medium">Earn elite rewards by hitting network and volume benchmarks.</p>
@@ -132,8 +96,8 @@ const Referral: React.FC = () => {
                 
                 {/* Custom Tooltip */}
                 <div className="absolute bottom-full right-0 mb-3 w-64 p-4 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl opacity-0 invisible group-hover/multiplier:opacity-100 group-hover/multiplier:visible transition-all z-50 pointer-events-none">
-                  <div className="text-[10px] font-black uppercase text-white mb-2 tracking-widest">Earnings Multiplier</div>
-                  <p className="text-[11px] text-zinc-400 font-medium leading-relaxed">
+                  <div className="text-[10px] font-black uppercase text-white mb-2 tracking-widest text-left">Earnings Multiplier</div>
+                  <p className="text-[11px] text-zinc-400 font-medium leading-relaxed text-left">
                     This percentage represents your direct share of the trading fees generated by your referred users. As you climb the levels, this multiplier amplifies your passive revenue significantly.
                   </p>
                   <div className="absolute top-full right-4 w-2 h-2 bg-zinc-900 border-r border-b border-white/10 rotate-45 -mt-1"></div>
@@ -142,43 +106,89 @@ const Referral: React.FC = () => {
             </div>
           </div>
 
-          <div className="relative pt-10 pb-12">
-            {/* Progress Bar Background - Precision Aligned at 68px (pt-10: 40px + half-marker: 28px) */}
-            <div className="absolute top-[68px] left-0 w-full h-[4px] bg-zinc-900 rounded-full">
-               <div 
-                className="h-full apr-badge-glow transition-all duration-1000 ease-out shadow-[0_0_20px_rgba(168,85,247,0.4)] rounded-full" 
-                style={{ width: `${tierProgress}%` }}
-               ></div>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {tiers.map((t, index) => {
+              const data = TIER_DATA[t];
+              const isCompleted = referralCount >= data.requirement && referralVolume >= data.volRequirement;
+              const isCurrent = currentTier === t;
+              
+              return (
+                <div 
+                  key={t}
+                  className={`relative overflow-hidden rounded-3xl border transition-all duration-700 p-8 flex flex-col h-full group ${
+                    isCurrent ? 'border-white/40 ring-1 ring-white/10' : 'border-white/5 hover:border-white/10'
+                  } bg-[#080808]`}
+                  style={{
+                    background: `linear-gradient(90deg, ${data.color}25 0%, ${data.color}08 40%, transparent 100%)`
+                  }}
+                >
+                  {/* Smooth Side Glow Overlay */}
+                  <div 
+                    className="absolute left-0 top-0 bottom-0 w-[100px] pointer-events-none transition-opacity duration-700 opacity-30 group-hover:opacity-60"
+                    style={{
+                      background: `radial-gradient(circle at 0% 50%, ${data.color}40 0%, transparent 100%)`
+                    }}
+                  ></div>
 
-            {/* Progress Nodes */}
-            <div className="flex justify-between relative z-10">
-              {tiers.map((t, index) => {
-                const isCompleted = referralCount >= TIER_DATA[t].requirement && referralVolume >= TIER_DATA[t].volRequirement;
-                const isCurrent = currentTier === t;
-                const data = TIER_DATA[t];
+                  {/* Decorative High-Contrast Side Flash */}
+                  <div 
+                    className="absolute left-0 top-0 bottom-0 w-[3px] transition-all duration-500 opacity-40 group-hover:opacity-100"
+                    style={{ backgroundColor: data.color, boxShadow: `0 0 15px ${data.color}80` }}
+                  ></div>
 
-                return (
-                  <div key={t} className="flex flex-col items-center w-48 text-center group cursor-default">
-                    <LevelMarker level={index + 1} isCompleted={isCompleted} color={data.color} />
-
-                    <div className={`mt-6 mb-4 transition-all ${isCurrent ? 'text-white' : 'text-zinc-600'}`}>
-                      <div className="text-[11px] font-black uppercase tracking-[0.2em] mb-1">{t}</div>
-                      <div className="text-xl font-black">{data.avgEarn} <span className="text-[10px] opacity-40">avg/mo</span></div>
+                  <div className="flex justify-between items-start mb-8 relative z-10">
+                    <div 
+                      className={`text-5xl font-black tracking-tighter transition-all duration-500 ${isCurrent ? 'opacity-40 scale-110' : 'opacity-10 group-hover:opacity-20'}`}
+                      style={{ color: data.color }}
+                    >
+                      {(index + 1).toString().padStart(2, '0')}
                     </div>
+                    {isCurrent && (
+                      <span className="bg-white text-black px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-2xl animate-pulse">
+                        Active Rank
+                      </span>
+                    )}
+                  </div>
 
-                    <div className="flex flex-col gap-2 items-center">
-                       <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-tight border ${referralCount >= data.requirement ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-zinc-900 border-zinc-800 text-zinc-700'}`}>
-                         {data.requirement}+ Active Refs
-                       </div>
-                       <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-tight border ${referralVolume >= data.volRequirement ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-zinc-900 border-zinc-800 text-zinc-700'}`}>
-                         ${(data.volRequirement / 1000).toFixed(0)}k Network Vol
-                       </div>
+                  <div className="flex-1 relative z-10">
+                    <div className="text-[10px] font-black uppercase tracking-[0.2em] mb-1 opacity-40">Tier Rank</div>
+                    <div className="text-3xl font-black mb-6 tracking-tight text-white group-hover:translate-x-1 transition-transform duration-500">{t}</div>
+                    
+                    <div className="mb-8">
+                      <div className="text-[10px] font-black uppercase tracking-[0.2em] mb-1 opacity-40">Monthly Projection</div>
+                      <div className="text-4xl font-black tracking-tighter text-white">
+                        {data.avgEarn}
+                      </div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
+
+                  <div className="space-y-4 pt-6 border-t border-white/5 relative z-10">
+                    <div className={`flex items-center justify-between text-[11px] font-bold transition-colors ${referralCount >= data.requirement ? 'text-green-400' : 'text-zinc-600 group-hover:text-zinc-500'}`}>
+                      <span className="uppercase tracking-wider">Active Refs</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono">{data.requirement}+</span>
+                        {referralCount >= data.requirement && (
+                          <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center text-black">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><path d="M20 6L9 17l-5-5"/></svg>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className={`flex items-center justify-between text-[11px] font-bold transition-colors ${referralVolume >= data.volRequirement ? 'text-green-400' : 'text-zinc-600 group-hover:text-zinc-500'}`}>
+                      <span className="uppercase tracking-wider">Network Vol</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono">${(data.volRequirement / 1000).toFixed(0)}k+</span>
+                        {referralVolume >= data.volRequirement && (
+                          <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center text-black">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><path d="M20 6L9 17l-5-5"/></svg>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
