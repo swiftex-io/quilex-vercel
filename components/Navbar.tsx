@@ -24,12 +24,18 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
   const [badgeIndex, setBadgeIndex] = useState(0);
   const badgeItems = ['ETH 25.1%', 'UNI 59.0%', 'SOL 12.4%', 'PEPE 180%', 'BTC 0.05%'];
 
+  // Search placeholder cycle
+  const [searchPlaceholderIndex, setSearchPlaceholderIndex] = useState(0);
+  const hotSearchItems = ['BTC', 'ETH', 'SOL', 'PEPE', 'DOGE'];
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+
   useEffect(() => {
     const timer = setInterval(() => {
       setBadgeIndex((prev) => (prev + 1) % badgeItems.length);
+      setSearchPlaceholderIndex((prev) => (prev + 1) % hotSearchItems.length);
     }, 3000);
     return () => clearInterval(timer);
-  }, [badgeItems.length]);
+  }, [badgeItems.length, hotSearchItems.length]);
 
   // Search state
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -399,18 +405,36 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
             </button>
-            <input 
-              ref={inputRef}
-              type="text" 
-              placeholder="Search crypto" 
-              value={searchQuery}
-              onFocus={() => setIsSearchOpen(true)}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setIsSearchOpen(true);
-              }}
-              className="hidden xl:block bg-zinc-800/60 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-[11px] font-medium w-32 focus:w-48 focus:bg-zinc-800 focus:border-white/20 outline-none transition-all placeholder:text-gray-500 placeholder:tracking-tighter text-white shadow-inner relative z-[1]"
-            />
+            <div className="relative hidden xl:block">
+              <input 
+                ref={inputRef}
+                type="text" 
+                value={searchQuery}
+                onFocus={() => { setIsSearchOpen(true); setIsSearchFocused(true); }}
+                onBlur={() => setIsSearchFocused(false)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setIsSearchOpen(true);
+                }}
+                className="bg-zinc-800/60 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-[11px] font-medium w-32 focus:w-48 focus:bg-zinc-800 focus:border-white/20 outline-none transition-all placeholder:text-gray-500 placeholder:tracking-tighter text-white shadow-inner relative z-[1]"
+              />
+              
+              {!searchQuery && !isSearchFocused && (
+                <div className="absolute left-10 top-1/2 -translate-y-1/2 pointer-events-none flex items-center gap-1 overflow-hidden h-[16px] z-[2]">
+                  <span className="text-[10px] shrink-0 transform -translate-y-[0.5px]">🔥</span>
+                  <div 
+                    className="flex flex-col transition-transform duration-700 cubic-bezier(0.65, 0, 0.35, 1)" 
+                    style={{ transform: `translateY(-${searchPlaceholderIndex * 16}px)` }}
+                  >
+                    {hotSearchItems.map(item => (
+                      <span key={item} className="text-[11px] text-gray-500 font-medium h-[16px] leading-[16px] whitespace-nowrap">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
             <SearchDropdownContent />
           </div>
 
