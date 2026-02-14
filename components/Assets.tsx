@@ -135,8 +135,8 @@ const Assets: React.FC = () => {
             </div>
 
             <div className="flex gap-3 w-full md:w-auto">
-              <button onClick={() => setShowDepositFlow(true)} className="flex-1 md:flex-none px-8 py-3.5 bg-white text-black font-bold rounded-xl hover:bg-zinc-200 transition-all shadow-lg text-xs uppercase tracking-widest">Deposit</button>
-              <button className="flex-1 md:flex-none px-8 py-3.5 bg-zinc-900 text-white font-bold rounded-xl border border-white/10 hover:bg-zinc-800 transition-all text-xs uppercase tracking-widest">Withdraw</button>
+              <button onClick={() => setShowDepositFlow(true)} className="flex-1 md:flex-none px-8 py-3.5 apr-badge-glow text-white font-bold rounded-full hover:shadow-[0_0_20px_rgba(168,85,247,0.4)] transition-all shadow-lg text-xs uppercase tracking-widest">Deposit</button>
+              <button className="flex-1 md:flex-none px-8 py-3.5 bg-zinc-900 text-white font-bold rounded-full border border-white/10 hover:bg-zinc-800 transition-all text-xs uppercase tracking-widest">Withdraw</button>
             </div>
           </div>
         </div>
