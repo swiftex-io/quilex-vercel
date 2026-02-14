@@ -193,6 +193,7 @@ const SpotDCA: React.FC = () => {
   const [searchToken, setSearchToken] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedInitialTokens, setSelectedInitialTokens] = useState<string[]>(['BTC']);
+  const [hideBalances, setHideBalances] = useState(false);
   
   const [tokenRanges, setTokenRanges] = useState<Record<string, string>>({
     BTC: '5Y', ETH: '5Y', SOL: '5Y', BNB: '5Y', XRP: '5Y',
@@ -267,13 +268,28 @@ const SpotDCA: React.FC = () => {
             <div className="flex gap-12 mb-10">
               <div className="flex flex-col">
                 <div className="text-zinc-500 text-xs font-bold flex items-center gap-1.5 uppercase tracking-wider mb-2">
-                  My Holdings <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="opacity-40"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  My Holdings 
+                  <button 
+                    onClick={() => setHideBalances(!hideBalances)}
+                    className="text-zinc-500 hover:text-white transition-colors"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="opacity-60">
+                      {hideBalances ? (
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24M1 1l22 22"/>
+                      ) : (
+                        <>
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                          <circle cx="12" cy="12" r="3"/>
+                        </>
+                      )}
+                    </svg>
+                  </button>
                 </div>
-                <div className="text-3xl font-bold">0.00</div>
+                <div className="text-3xl font-bold">{hideBalances ? '******' : '0.00'}</div>
               </div>
               <div className="flex flex-col">
                 <div className="text-zinc-500 text-xs font-bold uppercase tracking-wider mb-2">Total PNL</div>
-                <div className="text-3xl font-bold">0.00</div>
+                <div className="text-3xl font-bold">{hideBalances ? '******' : '0.00'}</div>
               </div>
               <div className="flex flex-col">
                 <div className="text-zinc-500 text-xs font-bold uppercase tracking-wider mb-2">Active</div>
@@ -307,9 +323,9 @@ const SpotDCA: React.FC = () => {
                 </div>
                 <button 
                   onClick={() => openCreateModal(card.allocation)}
-                  className="px-5 py-2 bg-white text-black text-[13px] font-bold rounded-full hover:bg-gray-200 transition-all shadow-lg"
+                  className="px-5 py-2 bg-white text-black text-[13px] font-bold rounded-full hover:bg-gray-200 transition-all shadow-lg whitespace-nowrap"
                 >
-                  Create
+                  Create<span className="hidden xl:inline"> DCA Bot</span>
                 </button>
               </div>
 
@@ -326,14 +342,14 @@ const SpotDCA: React.FC = () => {
               <div className="space-y-4">
                 <div className="text-[11px] text-zinc-600 font-bold uppercase tracking-widest">Token Allocation</div>
                 <div className="flex items-center">
-                  <div className="flex -space-x-2">
+                  <div className="flex -space-x-1.5">
                     {card.allocation.slice(0, 3).map((sym) => (
                       <div key={sym} className="border-2 border-[#0d0d0d] rounded-full">
-                        {renderIcon(sym, "w-8 h-8")}
+                        {renderIcon(sym, "w-6 h-6")}
                       </div>
                     ))}
                     {card.allocation.length > 3 && (
-                      <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-[10px] font-bold border-2 border-[#0d0d0d] text-zinc-500">
+                      <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-[9px] font-bold border-2 border-[#0d0d0d] text-zinc-500">
                         +{card.allocation.length - 3}
                       </div>
                     )}
