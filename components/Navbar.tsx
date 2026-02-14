@@ -436,7 +436,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                 <div className={`absolute top-full right-0 dropdown-container ${isWalletOpen ? 'is-visible' : ''}`}>
                   <div className={`${dropdownBaseClass} w-80 p-6`}>
                     <div className="mb-6">
-                      <div className="text-[10px] font-bold text-gray-400 tracking-tight mb-1.5 opacity-80">Total balance</div>
+                      <div className="text-[10px] font-bold text-gray-400 tracking-tight mb-1.5 opacity-80 uppercase">Total balance</div>
                       <div className="flex flex-col gap-1">
                         <div className="flex items-baseline gap-2">
                           <span className="text-2xl font-bold text-black tracking-tight">${totalBalanceUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
@@ -509,7 +509,14 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
               </div>
 
               <div className="h-6 w-[1px] bg-zinc-600/60 mx-3 hidden sm:block"></div>
-              <button onClick={() => setShowAuth(true)} className="px-6 py-2.5 bg-white text-black text-[11px] font-semibold tracking-tight rounded-full hover:bg-gray-200 transition-all shadow-xl whitespace-nowrap shrink-0">Sign in</button>
+              <button onClick={() => setShowAuth(true)} className="group px-6 py-2.5 bg-white text-black text-[11px] font-semibold tracking-tight rounded-full hover:bg-gray-200 transition-all shadow-xl whitespace-nowrap shrink-0 overflow-hidden">
+                <span className="rolling-text-container">
+                  <span className="rolling-text-inner">
+                    <span className="block">Sign in</span>
+                    <span className="block">Sign in</span>
+                  </span>
+                </span>
+              </button>
             </>
           )}
         </div>
