@@ -540,13 +540,12 @@ const SpotTrading: React.FC = () => {
 
             {/* Amount Field - Only visible for Limit and TPSL execution */}
             {orderType !== 'market' && (
-              <div className={`flex items-center border rounded-lg px-3 h-10 group transition-all ${(orderType === 'market' && side === 'buy') ? 'bg-zinc-900 border-zinc-900 opacity-60' : 'bg-[#111] border-zinc-800 focus-within:border-zinc-400'}`}>
+              <div className="flex items-center border rounded-lg px-3 h-10 group transition-all bg-[#111] border-zinc-800 focus-within:border-zinc-400">
                 <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest min-w-[50px] shrink-0">Amount</span>
                 <input 
                   type="number" 
-                  value={orderType === 'market' && side === 'buy' ? '' : amount} 
-                  placeholder={orderType === 'market' && side === 'buy' ? 'Market' : '0.00'}
-                  disabled={orderType === 'market' && side === 'buy'}
+                  value={amount} 
+                  placeholder="0.00"
                   onChange={(e) => handleAmountChange(e.target.value)} 
                   className="flex-1 bg-transparent border-none outline-none text-right text-[12px] font-mono text-white pr-2 placeholder:text-zinc-700" 
                 />
