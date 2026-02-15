@@ -1,11 +1,11 @@
-
 import React from 'react';
+import Logo from './Logo';
 
 const Footer: React.FC = () => {
   const footerSections = [
     {
-      title: "More about QUILEX",
-      links: ["About us", "Careers", "Contact us", "Terms of Service", "Privacy Notice", "Disclosures", "Whistleblower notice", "Law enforcement", "QUILEX app", "Cookie preferences"]
+      title: "More about Lintex",
+      links: ["About us", "Careers", "Contact us", "Terms of Service", "Privacy Notice", "Disclosures", "Whistleblower notice", "Law enforcement", "Lintex app", "Cookie preferences"]
     },
     {
       title: "Products",
@@ -42,11 +42,10 @@ const Footer: React.FC = () => {
           <div className="lg:col-span-3 space-y-8">
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-white rounded flex items-center justify-center font-black text-black">Q</div>
-                <span className="text-2xl font-black tracking-tighter">QUILEX</span>
+                <Logo className="h-6 text-white" />
               </div>
               <div className="text-[12px] text-zinc-500 leading-relaxed max-w-[280px]">
-                ©2026 QUILEX.COM. One Sansome Street, Suite 1400 PMB 6005, San Francisco, CA 94104.
+                ©2026 LINTEX.EXCHANGE. One Sansome Street, Suite 1400 PMB 6005, San Francisco, CA 94104.
                 <br />
                 NMLS #1767779
               </div>

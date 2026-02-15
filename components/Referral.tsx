@@ -40,7 +40,7 @@ export default function Referral({ isAffiliate = false }: ReferralProps) {
   }, [calcRefs, calcVolume, currentTier]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(`https://quilex.io/ref/${referralCode}`);
+    navigator.clipboard.writeText(`https://lintex.exchange/ref/${referralCode}`);
     alert(`${isAffiliate ? 'Affiliate' : 'Elite'} Invitation Link copied!`);
   };
 
@@ -57,7 +57,7 @@ export default function Referral({ isAffiliate = false }: ReferralProps) {
             <span className="text-zinc-600 text-[10px] font-bold uppercase tracking-widest">{isAffiliate ? 'Affiliate Program v4.2' : 'Growth Engine v4.2'}</span>
           </div>
           <h1 className="text-7xl md:text-8xl font-black tracking-tighter mb-8 leading-none">
-            {isAffiliate ? 'Partner with' : 'Build Your'} <span className="text-white">Quilex.</span>
+            {isAffiliate ? 'Partner with' : 'Build Your'} <span className="text-white">Lintex.</span>
           </h1>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-16 w-full max-w-5xl mt-8">
@@ -283,7 +283,7 @@ export default function Referral({ isAffiliate = false }: ReferralProps) {
                    <div className="flex-1 bg-black border border-white/10 rounded-xl py-2 px-4 flex items-center justify-between group hover:border-white/20 transition-all">
                       <div className="flex flex-col">
                         <span className="text-[8px] font-black text-zinc-600 uppercase mb-0.5">Lifetime Link</span>
-                        <span className="font-mono text-[13px] text-zinc-300 group-hover:text-white">quilex.io/ref/{referralCode}</span>
+                        <span className="font-mono text-[13px] text-zinc-300 group-hover:text-white">lintex.exchange/ref/{referralCode}</span>
                       </div>
                       <button 
                         onClick={copyToClipboard} 

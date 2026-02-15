@@ -530,7 +530,7 @@ const SpotTrading: React.FC = () => {
 
               <input 
                 type="text" 
-                value={(orderType === 'market' || (orderType === 'tpsl' && tpslExecutionType === 'market')) ? 'Market price' : priceInput} 
+                value={(orderType === 'market' || (orderType === 'tpsl' && tpslExecutionType === 'market')) ? 'Market' : priceInput} 
                 onChange={(e) => handlePriceChange(e.target.value)} 
                 disabled={orderType === 'market' || (orderType === 'tpsl' && tpslExecutionType === 'market')} 
                 className="flex-1 bg-transparent border-none outline-none text-right text-[12px] font-mono text-white pr-2 placeholder:text-zinc-700 disabled:text-zinc-500" 

@@ -120,10 +120,10 @@ const Settings: React.FC = () => {
             </div>
             <div className="space-y-6">
                {[
-                 { date: '01/30/2026', title: 'OKX to list ZAMA (Zama) for spot trading and convert pre-market futures to standard perpetual futures' },
-                 { date: '01/30/2026', title: 'OKX to support Sei network mainnet upgrade' },
-                 { date: '01/29/2026', title: 'OKX to support Story Network Mainnet Upgrade' },
-                 { date: '01/27/2026', title: 'OKX will launch USAT/USD for spot trading' }
+                 { date: '01/30/2026', title: 'Lintex to list ZAMA (Zama) for spot trading and convert pre-market futures to standard perpetual futures' },
+                 { date: '01/30/2026', title: 'Lintex to support Sei network mainnet upgrade' },
+                 { date: '01/29/2026', title: 'Lintex to support Story Network Mainnet Upgrade' },
+                 { date: '01/27/2026', title: 'Lintex will launch USAT/USD for spot trading' }
                ].map((ann, i) => (
                  <div key={i} className="cursor-pointer group">
                     <div className="text-[10px] text-zinc-600 font-bold mb-1">{ann.date}</div>
@@ -137,7 +137,7 @@ const Settings: React.FC = () => {
             <button className="absolute top-4 right-4 text-zinc-500 hover:text-white"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M18 6 6 18M6 6l12 12"/></svg></button>
             <div className="flex gap-4">
               <div className="bg-white p-2 rounded-lg w-20 h-20 shrink-0">
-                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=QUILEX-APP" alt="QR" className="w-full h-full" />
+                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=LINTEX-APP" alt="QR" className="w-full h-full" />
               </div>
               <div className="flex flex-col justify-center">
                 <div className="font-bold text-sm mb-1">Download app and trade on the go</div>
@@ -420,7 +420,7 @@ const Settings: React.FC = () => {
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 19l7-7-7-7M5 12h14"/></svg>
              </div>
              <h3 className="text-2xl font-bold mb-2">{activeTab}</h3>
-             <p className="text-zinc-500 text-sm max-w-xs">This section is currently under development as part of the QUILEX Pro upgrade.</p>
+             <p className="text-zinc-500 text-sm max-w-xs">This section is currently under development as part of the Lintex Pro upgrade.</p>
           </div>
         )}
       </div>

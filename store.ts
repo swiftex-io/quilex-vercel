@@ -94,7 +94,7 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
   openOrders: [],
   filledOrders: [],
   notifications: [],
-  referralCode: 'QUILEX_PRO_88',
+  referralCode: 'LINTEX_PRO_88',
   referralCount: 42,
   referralVolume: 125000,
   earnings: 1245.50,
@@ -138,7 +138,7 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
   enterAsGuest: async () => {
     const guestUser = {
       id: 'guest-' + Math.random().toString(36).substr(2, 9),
-      email: 'guest@quilex.io',
+      email: 'guest@lintex.exchange',
       user_metadata: { nickname: 'Guest_Trader' }
     };
     
@@ -151,19 +151,19 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
       openOrders: [],
       filledOrders: []
     });
-    localStorage.setItem('quilex_guest_session', JSON.stringify(guestUser));
+    localStorage.setItem('lintex_guest_session', JSON.stringify(guestUser));
   },
 
   signOut: async () => {
     await supabase.auth.signOut();
-    localStorage.removeItem('quilex_guest_session');
+    localStorage.removeItem('lintex_guest_session');
     set({ user: null, profile: null, isGuest: false, tradeHistory: [], openOrders: [], filledOrders: [], balances: [...MOCK_ASSETS] });
   },
 
   initialize: async () => {
     set({ isSyncing: true });
     try {
-      const savedGuest = localStorage.getItem('quilex_guest_session');
+      const savedGuest = localStorage.getItem('lintex_guest_session');
       if (savedGuest) {
         const guestUser = JSON.parse(savedGuest);
         set({ 

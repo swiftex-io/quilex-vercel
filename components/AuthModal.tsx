@@ -1,7 +1,7 @@
-
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useExchangeStore } from '../store';
+import Logo from './Logo';
 
 interface AuthModalProps {
   onClose: () => void;
@@ -83,8 +83,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
         </button>
 
         <div className="text-center mb-10">
-          <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-black font-black text-2xl mx-auto mb-6">Q</div>
-          <h2 className="text-3xl font-black mb-2 tracking-tighter">{isLogin ? 'Quilex Login' : 'Create Account'}</h2>
+          <Logo className="h-10 mx-auto mb-6 text-white" />
+          <h2 className="text-3xl font-black mb-2 tracking-tighter">{isLogin ? 'Lintex Login' : 'Create Account'}</h2>
         </div>
 
         <form onSubmit={handleAuth} className="space-y-4">

@@ -75,7 +75,7 @@ const Home: React.FC<HomeProps> = ({ onTrade }) => {
           The Next Gen Exchange.
         </h1>
         <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto font-medium">
-          Trade Bitcoin, Ethereum, and over 100+ cryptocurrencies with the lowest fees and the most advanced tools.
+          Trade Bitcoin, Ethereum, and over 100+ cryptocurrencies on Lintex with the lowest fees and the most advanced tools.
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-24">

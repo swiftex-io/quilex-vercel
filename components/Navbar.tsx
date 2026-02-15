@@ -2,6 +2,7 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Page } from '../types';
 import { useExchangeStore } from '../store';
 import AuthModal from './AuthModal';
+import Logo from './Logo';
 
 interface NavbarProps {
   currentPage: Page;
@@ -55,7 +56,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
   const btcPrice = balances.find(b => b.symbol === 'BTC')?.price || 65000;
   const totalInBTC = totalBalanceUSD / btcPrice;
 
-  const maskedEmail = user?.email ? `${user.email.split('@')[0].slice(0, 3)}***@${user.email.split('@')[1]}` : 'guest@quilex.io';
+  const maskedEmail = user?.email ? `${user.email.split('@')[0].slice(0, 3)}***@${user.email.split('@')[1]}` : 'guest@lintex.exchange';
   const displayUid = user?.id?.slice(0, 16) || '805418618808070350';
 
   // Close search on click outside
@@ -90,8 +91,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
     <>
       <nav className="h-16 flex items-center px-6 bg-black z-[60] sticky top-0 shadow-2xl">
         <div className="flex items-center gap-2 mr-10 cursor-pointer group shrink-0" onClick={() => onNavigate(Page.HOME)}>
-          <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center font-black text-black transition-all group-hover:bg-blue-500 shadow-sm">Q</div>
-          <span className="text-xl font-bold tracking-tighter text-white">QUILEX</span>
+          <Logo className="h-6 md:h-7 transition-all hover:scale-[1.02] text-white" />
         </div>
 
         <div className="hidden md:flex items-center gap-8 text-[14px] font-medium tracking-tight h-full">
@@ -347,7 +347,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                   <div className={`${dropdownBaseClass} w-[300px] py-4`}>
                     <div className="px-5 pb-5 flex items-center gap-4">
                       <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-100 shadow-sm">
-                        <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.id || 'quilex'}`} alt="avatar" className="w-full h-full object-cover" />
+                        <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.id || 'lintex'}`} alt="avatar" className="w-full h-full object-cover" />
                       </div>
                       <div className="flex flex-col min-w-0">
                         <span className="text-sm font-semibold truncate tracking-tight">{maskedEmail}</span>
