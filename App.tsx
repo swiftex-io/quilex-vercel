@@ -59,6 +59,10 @@ const NotificationToast: React.FC<{ notification: Notification; onDismiss: (id: 
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>(Page.HOME);
+  const [isFooterSettingsOpen, setIsFooterSettingsOpen] = useState(false);
+  const [tickerPosition, setTickerPosition] = useState<'top' | 'bottom'>('bottom');
+  const footerSettingsRef = useRef<HTMLDivElement>(null);
+  
   const { updatePrices, balances, initialize, isSyncing, notifications, removeNotification } = useExchangeStore();
   const balancesRef = useRef(balances);
 
@@ -69,6 +73,17 @@ const App: React.FC = () => {
   useEffect(() => {
     balancesRef.current = balances;
   }, [balances]);
+
+  // Handle click outside for footer settings
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (footerSettingsRef.current && !footerSettingsRef.current.contains(event.target as Node)) {
+        setIsFooterSettingsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const simulatePrices = () => {
@@ -93,7 +108,9 @@ const App: React.FC = () => {
   };
 
   const layout = getLayoutType(currentPage);
-  const btcPrice = balances.find(b => b.symbol === 'BTC')?.price || 65432.50;
+  
+  // Get top 10 assets excluding USDT for the ticker
+  const tickerAssets = balances.filter(b => b.symbol !== 'USDT').slice(0, 10);
 
   const renderContent = () => {
     switch (currentPage) {
@@ -110,34 +127,78 @@ const App: React.FC = () => {
     }
   };
 
+  const TickerStrip = (
+    <div className={`h-8 border-zinc-900 flex items-center px-4 text-[10px] text-zinc-500 justify-between bg-black shrink-0 z-[70] ${tickerPosition === 'top' ? 'border-b' : 'border-t'}`}>
+      <div className="flex gap-4 items-center min-w-0">
+        <div className="flex items-center gap-1.5 shrink-0">
+          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          <span className="font-bold uppercase tracking-wider text-green-500/80">Systems Operational</span>
+        </div>
+        <div className="h-3 w-[1px] bg-zinc-800 shrink-0"></div>
+        
+        {/* Top 10 Coins Ticker */}
+        <div className="flex items-center gap-6 overflow-hidden select-none">
+           {tickerAssets.map((asset) => (
+             <div key={asset.symbol} className="flex items-center gap-1.5 whitespace-nowrap">
+               <span className="text-zinc-400 font-bold uppercase">{asset.symbol}</span>
+               <span className={`font-bold ${asset.change24h >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>
+                 {asset.change24h >= 0 ? '+' : ''}{asset.change24h.toFixed(2)}%
+               </span>
+               <span className="text-white font-medium">
+                 ${asset.price.toLocaleString(undefined, { minimumFractionDigits: asset.price < 1 ? 4 : 2, maximumFractionDigits: asset.price < 1 ? 4 : 2 })}
+               </span>
+             </div>
+           ))}
+        </div>
+      </div>
+      
+      {/* Configuration Right */}
+      <div className="relative h-full flex items-center" ref={footerSettingsRef}>
+        <button 
+          onClick={() => setIsFooterSettingsOpen(!isFooterSettingsOpen)}
+          className={`p-1.5 rounded transition-all hover:bg-zinc-800 flex items-center justify-center ${isFooterSettingsOpen ? 'text-white bg-zinc-800' : 'text-zinc-500 hover:text-white'}`}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+          </svg>
+        </button>
+        
+        <div className={`absolute ${tickerPosition === 'top' ? 'top-full mt-2' : 'bottom-full mb-2'} right-0 dropdown-container ${isFooterSettingsOpen ? 'is-visible' : ''}`}>
+          <div className="bg-white text-black rounded-xl shadow-[0_24px_48px_rgba(0,0,0,0.3)] overflow-hidden border border-gray-100 py-1.5 w-36">
+            <button 
+              onClick={() => { setTickerPosition('top'); setIsFooterSettingsOpen(false); }}
+              className={`w-full px-4 py-2.5 text-left text-[11px] font-bold hover:bg-gray-50 transition-colors flex items-center justify-between group ${tickerPosition === 'top' ? 'bg-gray-50' : ''}`}
+            >
+              Pin to top
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-gray-300 group-hover:text-black"><path d="m18 15-6-6-6 6"/></svg>
+            </button>
+            <div className="mx-2 h-[1px] bg-gray-50"></div>
+            <button 
+              onClick={() => { setTickerPosition('bottom'); setIsFooterSettingsOpen(false); }}
+              className={`w-full px-4 py-2.5 text-left text-[11px] font-bold hover:bg-gray-50 transition-colors flex items-center justify-between group ${tickerPosition === 'bottom' ? 'bg-gray-50' : ''}`}
+            >
+              Pin to bottom
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-gray-300 group-hover:text-black"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-black text-white flex flex-col selection:bg-blue-500/30">
       <Navbar currentPage={currentPage} onNavigate={setCurrentPage} />
       
+      {tickerPosition === 'top' && TickerStrip}
+
       <main className={`flex-1 ${layout === 'trading' ? 'overflow-hidden' : 'overflow-auto'}`}>
         {renderContent()}
       </main>
 
       {layout === 'default' && <Footer />}
 
-      {/* Persistent Status Bar */}
-      <div className="h-8 border-t border-zinc-900 flex items-center px-4 text-[10px] text-zinc-500 justify-between bg-black shrink-0 z-[70]">
-        <div className="flex gap-4 items-center">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-            <span className="font-bold uppercase tracking-wider text-green-500/80">Systems Operational</span>
-          </div>
-          <div className="h-3 w-[1px] bg-zinc-800"></div>
-          <div className="flex items-center gap-2">
-            <span className="opacity-60 uppercase font-bold tracking-tight">BTC/USDT:</span>
-            <span className="text-white font-mono">${btcPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-          </div>
-        </div>
-        <div className="flex gap-4 items-center font-mono opacity-50 uppercase tracking-tighter">
-          <span>{isSyncing ? 'SYNC_ACTIVE' : 'STABLE_CORE_V2'}</span>
-          <span>{new Date().toLocaleTimeString([], { hour12: false })}</span>
-        </div>
-      </div>
+      {tickerPosition === 'bottom' && TickerStrip}
 
       {/* Notifications Overlay */}
       <div className="fixed top-20 right-6 z-[1000] flex flex-col gap-4 pointer-events-none">
