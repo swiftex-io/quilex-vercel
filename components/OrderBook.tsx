@@ -21,7 +21,7 @@ interface MarketTrade {
 }
 
 const OrderBook: React.FC<OrderBookProps> = ({ currentPrice = 65432.50 }) => {
-  const [activeTab, setActiveTab] = useState<'book' | 'market'>('book');
+  const [activeTab, setActiveTab] = useState<'book' | 'trades'>('book');
   const [asks, setAsks] = useState<LiveOrderEntry[]>([]);
   const [bids, setBids] = useState<LiveOrderEntry[]>([]);
   const [marketTrades, setMarketTrades] = useState<MarketTrade[]>([]);
@@ -127,10 +127,10 @@ const OrderBook: React.FC<OrderBookProps> = ({ currentPrice = 65432.50 }) => {
           Order book
         </button>
         <button 
-          onClick={() => setActiveTab('market')}
-          className={`px-4 text-[12px] font-normal transition-all ${activeTab === 'market' ? 'text-white border-b-2 border-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+          onClick={() => setActiveTab('trades')}
+          className={`px-4 text-[12px] font-normal transition-all ${activeTab === 'trades' ? 'text-white border-b-2 border-white' : 'text-zinc-500 hover:text-zinc-300'}`}
         >
-          Market
+          Last trades
         </button>
       </div>
       
@@ -211,7 +211,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ currentPrice = 65432.50 }) => {
             </div>
           </>
         ) : (
-          /* Market Trades Tab Content */
+          /* Last Trades Tab Content */
           <div className="flex flex-col overflow-hidden">
             {marketTrades.map((trade) => (
               <div key={trade.id} className="grid grid-cols-3 px-3 py-[3px] hover:bg-zinc-900/30 transition-colors animate-in fade-in slide-in-from-top-1 duration-500">

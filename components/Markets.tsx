@@ -195,14 +195,14 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
       <div className="bg-zinc-950 border border-white/5 rounded-2xl shadow-2xl overflow-hidden">
         <table className="w-full text-left">
           <thead>
-            <tr className="text-[12px] text-zinc-600 font-normal border-b border-zinc-900 tracking-tight">
-              <th className="px-8 py-3 font-normal">Name</th>
-              <th className="px-8 py-3 font-normal">Price</th>
-              <th className="px-8 py-3 font-normal">24h change</th>
-              <th className="px-8 py-3 font-normal">Last 24h</th>
-              <th className="px-8 py-3 font-normal">24h range</th>
-              <th className="px-8 py-3 font-normal">Market cap</th>
-              <th className="px-8 py-3 text-right font-normal">Action</th>
+            <tr className="text-[12px] text-zinc-600 border-b border-zinc-900 tracking-tight">
+              <th className="px-8 py-3 font-medium">Name</th>
+              <th className="px-8 py-3 font-medium">Price</th>
+              <th className="px-8 py-3 font-medium">24h change</th>
+              <th className="px-8 py-3 font-medium">Last 24h</th>
+              <th className="px-8 py-3 font-medium">24h range</th>
+              <th className="px-8 py-3 font-medium">Market cap</th>
+              <th className="px-8 py-3 text-right font-medium">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-900/50">
@@ -317,7 +317,7 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
               </h3>
               <button className="text-[11px] font-bold text-zinc-600 hover:text-white transition-colors">More &gt;</button>
             </div>
-            <div className="grid grid-cols-12 text-[12px] text-zinc-600 font-normal uppercase tracking-tight mb-4 px-1">
+            <div className="grid grid-cols-12 text-[12px] text-zinc-600 font-medium tracking-tight mb-4 px-1">
               <div className="col-span-8">Name | Turnover</div>
               <div className="col-span-2 text-right">Price</div>
               <div className="col-span-2 text-right">24h</div>

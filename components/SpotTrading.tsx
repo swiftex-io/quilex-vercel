@@ -12,8 +12,8 @@ const SpotTrading: React.FC = () => {
   const [isSliderHovered, setIsSliderHovered] = useState(false);
   const [isPairSelectorOpen, setIsPairSelectorOpen] = useState(false);
   const [pairSearchQuery, setPairSearchQuery] = useState('');
-  const [historyTab, setHistoryTab] = useState<'trades' | 'open' | 'history'>('open');
-  const [openOrdersSubTab, setOpenOrdersSubTab] = useState<'limit' | 'market' | 'tpsl'>('limit');
+  const [historyTab, setHistoryTab] = useState<'open' | 'history'>('open');
+  const [openOrdersSubTab, setOpenOrdersSubTab] = useState<'limit_market' | 'tpsl'>('limit_market');
   
   // TP/SL States
   const [showTPSL, setShowTPSL] = useState(false);
@@ -42,8 +42,6 @@ const SpotTrading: React.FC = () => {
   const quoteBalance = quoteAsset?.available || 0;
   const baseBalance = baseAsset?.available || 0;
 
-  // Only sync price input when pair changes or user switches to Limit/TPSL tab
-  // Removed livePrice from dependencies to prevent input "jumping" during manual edits
   useEffect(() => {
     if (orderType === 'limit' || (orderType === 'tpsl' && tpslExecutionType === 'limit')) {
       setPriceInput(livePrice.toFixed(2));
@@ -57,7 +55,6 @@ const SpotTrading: React.FC = () => {
     setTpInput('');
     setSlInput('');
     setTriggerPrice('');
-    // Only show the inner TP/SL checkbox for non-TPSL tabs
     if (orderType === 'tpsl') {
       setShowTPSL(false);
     }
@@ -134,7 +131,6 @@ const SpotTrading: React.FC = () => {
     const numAmount = parseFloat(amount);
     if (isNaN(numPrice) || isNaN(numAmount) || numAmount <= 0) return;
 
-    // For dedicated TP/SL tab, the "triggerPrice" is key. 
     const tpValue = showTPSL && tpInput ? parseFloat(tpInput) : undefined;
     const slValue = (orderType === 'tpsl' && triggerPrice) ? parseFloat(triggerPrice) : (showTPSL && slInput ? parseFloat(slInput) : undefined);
 
@@ -173,19 +169,16 @@ const SpotTrading: React.FC = () => {
     setIsPairSelectorOpen(false);
   };
 
-  // Logic for counting orders for badges
-  const getOrdersBySubTab = (subtab: 'limit' | 'market' | 'tpsl') => {
-    return openOrders.filter(o => o.symbol === activePair && o.type === subtab);
-  };
-
   const filteredOpenOrders = useMemo(() => {
-    return getOrdersBySubTab(openOrdersSubTab);
+    if (openOrdersSubTab === 'limit_market') {
+      return openOrders.filter(o => o.symbol === activePair && (o.type === 'limit' || o.type === 'market'));
+    }
+    return openOrders.filter(o => o.symbol === activePair && o.type === 'tpsl');
   }, [openOrders, openOrdersSubTab, activePair]);
 
   const subTabCounts = {
-    limit: getOrdersBySubTab('limit').length,
-    market: getOrdersBySubTab('market').length,
-    tpsl: getOrdersBySubTab('tpsl').length
+    limit_market: openOrders.filter(o => o.symbol === activePair && (o.type === 'limit' || o.type === 'market')).length,
+    tpsl: openOrders.filter(o => o.symbol === activePair && o.type === 'tpsl').length
   };
 
   return (
@@ -249,7 +242,7 @@ const SpotTrading: React.FC = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden border-r border-zinc-900">
+      <div className="flex-1 flex flex-col min-0 h-full overflow-hidden border-r border-zinc-900">
         
         {/* Ticker Header */}
         <div className="h-[60px] border-b border-zinc-900 flex items-center px-4 gap-8 bg-black shrink-0 relative z-50">
@@ -350,8 +343,7 @@ const SpotTrading: React.FC = () => {
           <div className="flex border-b border-zinc-900 shrink-0">
             {[
               { id: 'open', label: `Open orders (${openOrders.filter(o => o.symbol === activePair).length})` },
-              { id: 'trades', label: 'Position' },
-              { id: 'history', label: 'History' }
+              { id: 'history', label: 'Order history' }
             ].map((tab) => (
               <button 
                 key={tab.id} 
@@ -367,20 +359,28 @@ const SpotTrading: React.FC = () => {
               <div className="flex flex-col h-full">
                 {/* Submenu for Open Orders */}
                 <div className="flex gap-1 p-2 border-b border-zinc-900/50 bg-zinc-950/20 shrink-0">
-                  {(['limit', 'market', 'tpsl'] as const).map((sub) => (
-                    <button 
-                      key={sub}
-                      onClick={() => setOpenOrdersSubTab(sub)}
-                      className={`flex items-center gap-2 px-3 py-1 rounded-md text-[11px] font-medium transition-all ${openOrdersSubTab === sub ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-400'}`}
-                    >
-                      <span className="capitalize">{sub === 'tpsl' ? 'TP/SL' : sub}</span>
-                      {subTabCounts[sub] > 0 && (
-                        <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black ${openOrdersSubTab === sub ? 'bg-white text-black' : 'bg-zinc-900 text-zinc-600'}`}>
-                          {subTabCounts[sub]}
-                        </span>
-                      )}
-                    </button>
-                  ))}
+                  <button 
+                    onClick={() => setOpenOrdersSubTab('limit_market')}
+                    className={`flex items-center gap-2 px-3 py-1 rounded-md text-[11px] font-medium transition-all ${openOrdersSubTab === 'limit_market' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-400'}`}
+                  >
+                    <span>Limit | Market</span>
+                    {subTabCounts.limit_market > 0 && (
+                      <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black ${openOrdersSubTab === 'limit_market' ? 'bg-white text-black' : 'bg-zinc-900 text-zinc-600'}`}>
+                        {subTabCounts.limit_market}
+                      </span>
+                    )}
+                  </button>
+                  <button 
+                    onClick={() => setOpenOrdersSubTab('tpsl')}
+                    className={`flex items-center gap-2 px-3 py-1 rounded-md text-[11px] font-medium transition-all ${openOrdersSubTab === 'tpsl' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-400'}`}
+                  >
+                    <span>TP/SL</span>
+                    {subTabCounts.tpsl > 0 && (
+                      <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black ${openOrdersSubTab === 'tpsl' ? 'bg-white text-black' : 'bg-zinc-900 text-zinc-600'}`}>
+                        {subTabCounts.tpsl}
+                      </span>
+                    )}
+                  </button>
                 </div>
 
                 <table className="w-full text-[11px] text-left border-separate border-spacing-0">
@@ -422,13 +422,13 @@ const SpotTrading: React.FC = () => {
                       </tr>
                     )) : (
                       <tr>
-                        <td colSpan={6} className="px-4 py-10 text-center text-zinc-600 text-[10px] uppercase font-bold tracking-widest">No active {openOrdersSubTab} orders for {activePair}</td>
+                        <td colSpan={6} className="px-4 py-10 text-center text-zinc-600 text-[10px] uppercase font-bold tracking-widest">No active {openOrdersSubTab === 'limit_market' ? 'Limit | Market' : 'TP/SL'} orders for {activePair}</td>
                       </tr>
                     )}
                   </tbody>
                 </table>
               </div>
-            ) : historyTab === 'history' ? (
+            ) : (
               <table className="w-full text-[11px] text-left border-separate border-spacing-0">
                 <thead className="sticky top-0 bg-zinc-950 text-zinc-500 font-normal border-b border-zinc-900 z-10">
                   <tr>
@@ -449,16 +449,11 @@ const SpotTrading: React.FC = () => {
                   ))}
                   {tradeHistory.filter(t => t.pair === activePair).length === 0 && (
                      <tr>
-                       <td colSpan={4} className="px-4 py-10 text-center text-zinc-600 text-[10px] uppercase font-bold tracking-widest">No trade history for {activePair}</td>
+                       <td colSpan={4} className="px-4 py-10 text-center text-zinc-600 text-[10px] uppercase font-bold tracking-widest">No order history for {activePair}</td>
                      </tr>
                   )}
                 </tbody>
               </table>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-10 opacity-40">
-                <svg className="w-8 h-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                <span className="text-[10px] uppercase font-bold tracking-widest">No Positions</span>
-              </div>
             )}
           </div>
         </div>

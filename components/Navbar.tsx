@@ -103,7 +103,6 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
             </button>
             <div className={`top-full left-0 dropdown-container ${isTradeOpen ? 'is-visible' : ''}`}>
               <div className={`${dropdownBaseClass} w-[380px] py-4`}>
-                <div className="px-5 pb-3 text-[10px] font-bold text-gray-400 tracking-tight border-b border-gray-50 mb-3">Trading instruments</div>
                 <div className="space-y-1 px-2">
                   {[
                     { title: 'Convert', desc: 'Quick conversion, zero fees', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8l4 4-4 4M8 12h7"/></svg> },
@@ -177,7 +176,6 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
             </button>
             <div className={`top-full left-0 dropdown-container ${isEarnNavOpen ? 'is-visible' : ''}`}>
               <div className={`${dropdownBaseClass} w-[380px] py-4`}>
-                <div className="px-5 pb-3 text-[10px] font-bold text-gray-400 tracking-tight border-b border-gray-50 mb-3">Passive income</div>
                 <div className="space-y-1 px-2">
                   {[
                     { title: 'Simple Earn', page: Page.SIMPLE_EARN, desc: 'Flexible savings with daily rewards', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> },
