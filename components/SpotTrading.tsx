@@ -129,7 +129,7 @@ const SpotTrading: React.FC = () => {
     const isMarketExecution = orderType === 'market' || (orderType === 'tpsl' && tpslExecutionType === 'market');
     const numPrice = isMarketExecution ? livePrice : parseFloat(priceInput);
     const numAmount = parseFloat(amount);
-    if (isNaN(numPrice) || isNaN(numAmount) || numAmount <= 0) return;
+    if (isNaN(numPrice) || numAmount <= 0) return;
 
     const tpValue = showTPSL && tpInput ? parseFloat(tpInput) : undefined;
     const slValue = (orderType === 'tpsl' && triggerPrice) ? parseFloat(triggerPrice) : (showTPSL && slInput ? parseFloat(slInput) : undefined);
@@ -459,15 +459,18 @@ const SpotTrading: React.FC = () => {
         </div>
       </div>
 
-      {/* Right Column (Orderbook & Trade) */}
-      <div className="w-[300px] xl:w-[320px] flex flex-col bg-[#0a0a0a] shrink-0 h-full overflow-hidden">
-        {/* Order Book: Fixed height to prevent vertical shifts */}
-        <div className="h-[480px] shrink-0 overflow-hidden border-b border-zinc-900">
-           <OrderBook currentPrice={livePrice} />
+      {/* Right Column Group (Orderbook & Trade) - Responsive 2-column on XL+ */}
+      <div className="flex shrink-0 h-full overflow-hidden bg-[#0a0a0a] border-l border-zinc-900 w-[300px] xl:w-[640px] flex-col xl:flex-row transition-all duration-300">
+        
+        {/* Sub-Column 1: Order Book */}
+        <div className="w-full xl:w-1/2 flex flex-col h-full border-r border-zinc-900/50 shrink-0">
+          <div className="flex-1 xl:h-full h-[480px] overflow-hidden">
+             <OrderBook currentPrice={livePrice} />
+          </div>
         </div>
 
-        {/* Order Entry Section: Fixed action buttons with scrollable inputs */}
-        <div className="flex-1 min-h-0 flex flex-col bg-black">
+        {/* Sub-Column 2: Order Entry Section */}
+        <div className="w-full xl:w-1/2 flex flex-col h-full bg-black min-h-0">
           {/* Static Header Part of Order Entry */}
           <div className="p-3 pb-0 shrink-0">
             <div className="flex gap-1 p-0.5 bg-zinc-900/50 rounded-lg mb-2">

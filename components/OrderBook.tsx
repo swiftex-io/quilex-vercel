@@ -28,24 +28,37 @@ const OrderBook: React.FC<OrderBookProps> = ({ currentPrice = 65432.50 }) => {
   const [asks, setAsks] = useState<LiveOrderEntry[]>([]);
   const [bids, setBids] = useState<LiveOrderEntry[]>([]);
   const [marketTrades, setMarketTrades] = useState<MarketTrade[]>([]);
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
   
   const { openOrders } = useExchangeStore();
   
   const spread = 2.5;
   const spreadPercent = ((spread / currentPrice) * 100).toFixed(4);
   
-  // Dynamic visible rows based on view mode
-  const visibleRows = viewMode === 'mixed' ? 11 : 22;
+  // Dynamic visible rows based on view mode and screen size
+  useEffect(() => {
+    const handleResize = () => {
+      setIsLargeScreen(window.innerWidth >= 1280);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const visibleRows = useMemo(() => {
+    if (viewMode === 'mixed') return isLargeScreen ? 20 : 11;
+    return isLargeScreen ? 40 : 22;
+  }, [viewMode, isLargeScreen]);
 
   // Initialize data
   useEffect(() => {
     // We generate enough mock data to fill the expanded view
-    const baseAsks = Array.from({ length: 30 }, (_, i) => ({
+    const baseAsks = Array.from({ length: 60 }, (_, i) => ({
       priceOffset: i * 0.5 + spread / 2,
       amount: Math.random() * 0.8,
       flash: null as 'up' | 'down' | null
     }));
-    const baseBids = Array.from({ length: 30 }, (_, i) => ({
+    const baseBids = Array.from({ length: 60 }, (_, i) => ({
       priceOffset: i * 0.5 + spread / 2,
       amount: Math.random() * 0.8,
       flash: null as 'up' | 'down' | null
@@ -54,7 +67,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ currentPrice = 65432.50 }) => {
     setAsks(baseAsks.slice(0, visibleRows));
     setBids(baseBids.slice(0, visibleRows));
 
-    const initialTrades: MarketTrade[] = Array.from({ length: 25 }, (_, i) => ({
+    const initialTrades: MarketTrade[] = Array.from({ length: 50 }, (_, i) => ({
       id: Math.random().toString(36).substr(2, 9),
       price: currentPrice + (Math.random() - 0.5) * 10,
       amount: Math.random() * 0.5,
@@ -62,7 +75,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ currentPrice = 65432.50 }) => {
       side: Math.random() > 0.5 ? 'buy' : 'sell'
     }));
     setMarketTrades(initialTrades);
-  }, [currentPrice, viewMode]);
+  }, [currentPrice, visibleRows]);
 
   // Simulate live updates for Order Book volume
   useEffect(() => {
