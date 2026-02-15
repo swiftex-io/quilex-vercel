@@ -1,4 +1,3 @@
-
 export enum Page {
   TRADE = 'trade',
   ASSETS = 'assets',
@@ -31,8 +30,30 @@ export interface Trade {
   time: string;
 }
 
+export interface Order {
+  id: string;
+  symbol: string;
+  side: 'buy' | 'sell';
+  type: 'limit' | 'market' | 'tpsl';
+  price: number;
+  amount: number;
+  filled: number;
+  status: 'open' | 'filled' | 'canceled';
+  time: string;
+  tpPrice?: number;
+  slPrice?: number;
+}
+
 export interface OrderBookEntry {
   price: number;
   amount: number;
   total: number;
+}
+
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'success' | 'info' | 'error' | 'warning';
+  timestamp: number;
 }
