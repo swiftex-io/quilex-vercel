@@ -63,7 +63,7 @@ const App: React.FC = () => {
   const [tickerPosition, setTickerPosition] = useState<'top' | 'bottom'>('bottom');
   const footerSettingsRef = useRef<HTMLDivElement>(null);
   
-  const { updatePrices, balances, initialize, isSyncing, notifications, removeNotification } = useExchangeStore();
+  const { updatePrices, balances, initialize, isSyncing, notifications, removeNotification, setActivePair } = useExchangeStore();
   const balancesRef = useRef(balances);
 
   useEffect(() => {
@@ -114,22 +114,32 @@ const App: React.FC = () => {
 
   const renderContent = () => {
     switch (currentPage) {
-      case Page.HOME: return <Home onTrade={() => setCurrentPage(Page.TRADE)} />;
-      case Page.MARKETS: return <Markets onTrade={() => setCurrentPage(Page.TRADE)} />;
-      case Page.TRADE: return <SpotTrading />;
-      case Page.ASSETS: return <Assets />;
-      case Page.REFERRAL: return <Referral />;
-      case Page.AFFILIATE: return <Referral isAffiliate />;
-      case Page.SETTINGS: return <Settings />;
-      case Page.SIMPLE_EARN: return <SimpleEarn />;
-      case Page.SPOT_DCA: return <SpotDCA />;
-      default: return <Home onTrade={() => setCurrentPage(Page.TRADE)} />;
+      case Page.HOME:
+        return <Home onTrade={() => setCurrentPage(Page.TRADE)} />;
+      case Page.TRADE:
+        return <SpotTrading />;
+      case Page.ASSETS:
+        return <Assets />;
+      case Page.REFERRAL:
+        return <Referral />;
+      case Page.AFFILIATE:
+        return <Referral isAffiliate={true} />;
+      case Page.SETTINGS:
+        return <Settings />;
+      case Page.MARKETS:
+        return <Markets onTrade={() => setCurrentPage(Page.TRADE)} />;
+      case Page.SIMPLE_EARN:
+        return <SimpleEarn />;
+      case Page.SPOT_DCA:
+        return <SpotDCA />;
+      default:
+        return <Home onTrade={() => setCurrentPage(Page.TRADE)} />;
     }
   };
 
   const TickerStrip = (
     <div className={`h-8 border-zinc-900 flex items-center px-4 text-[10px] text-zinc-500 justify-between bg-black shrink-0 z-[70] ${tickerPosition === 'top' ? 'border-b' : 'border-t'}`}>
-      <div className="flex gap-4 items-center min-w-0">
+      <div className="flex gap-4 items-center min-w-0 h-full">
         <div className="flex items-center gap-1.5 shrink-0">
           <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
           <span className="font-bold uppercase tracking-wider text-green-500/80">Systems Operational</span>
@@ -137,17 +147,21 @@ const App: React.FC = () => {
         <div className="h-3 w-[1px] bg-zinc-800 shrink-0"></div>
         
         {/* Top 10 Coins Ticker */}
-        <div className="flex items-center gap-6 overflow-hidden select-none">
+        <div className="flex items-center gap-1 overflow-hidden select-none h-full">
            {tickerAssets.map((asset) => (
-             <div key={asset.symbol} className="flex items-center gap-1.5 whitespace-nowrap">
-               <span className="text-zinc-400 font-bold uppercase">{asset.symbol}</span>
-               <span className={`font-bold ${asset.change24h >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>
+             <button 
+                key={asset.symbol} 
+                onClick={() => { setActivePair(`${asset.symbol}/USDT`); setCurrentPage(Page.TRADE); }}
+                className="flex items-center gap-2 whitespace-nowrap px-2.5 h-full hover:bg-zinc-800 transition-all group"
+             >
+               <span className="text-zinc-400 font-bold uppercase group-hover:text-white transition-colors">{asset.symbol}</span>
+               <span className={`font-bold tabular-nums ${asset.change24h >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>
                  {asset.change24h >= 0 ? '+' : ''}{asset.change24h.toFixed(2)}%
                </span>
-               <span className="text-white font-medium">
+               <span className="text-white font-medium tabular-nums">
                  ${asset.price.toLocaleString(undefined, { minimumFractionDigits: asset.price < 1 ? 4 : 2, maximumFractionDigits: asset.price < 1 ? 4 : 2 })}
                </span>
-             </div>
+             </button>
            ))}
         </div>
       </div>
@@ -157,6 +171,7 @@ const App: React.FC = () => {
         <button 
           onClick={() => setIsFooterSettingsOpen(!isFooterSettingsOpen)}
           className={`p-1.5 rounded transition-all hover:bg-zinc-800 flex items-center justify-center ${isFooterSettingsOpen ? 'text-white bg-zinc-800' : 'text-zinc-500 hover:text-white'}`}
+          title="Ticker Options"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>

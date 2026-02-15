@@ -461,14 +461,16 @@ const SpotTrading: React.FC = () => {
 
       {/* Right Column (Orderbook & Trade) */}
       <div className="w-[300px] xl:w-[320px] flex flex-col bg-[#0a0a0a] shrink-0 h-full overflow-hidden">
-        <div className="flex-1 min-h-0 overflow-hidden border-b border-zinc-900">
+        {/* Order Book: Fixed height to prevent vertical shifts */}
+        <div className="h-[480px] shrink-0 overflow-hidden border-b border-zinc-900">
            <OrderBook currentPrice={livePrice} />
         </div>
 
-        <div className="p-3 bg-black shrink-0 shadow-[0_-10px_20px_rgba(0,0,0,0.5)] overflow-y-auto custom-scrollbar">
+        {/* Order Entry: Now flexible and scrollable to accommodate different screen heights and expanded options */}
+        <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3 bg-black">
           <div className="flex gap-1 p-0.5 bg-zinc-900/50 rounded-lg mb-2">
-            <button onClick={() => setSide('buy')} className={`flex-1 py-1 rounded-md text-[12px] font-normal transition-all ${side === 'buy' ? 'bg-[#00d18e] text-black shadow-lg' : 'text-zinc-500 hover:bg-white/5'}`}>Buy</button>
-            <button onClick={() => setSide('sell')} className={`flex-1 py-1 rounded-md text-[12px] font-normal transition-all ${side === 'sell' ? 'bg-[#ff4d4f] text-white shadow-lg' : 'text-zinc-500 hover:bg-white/5'}`}>Sell</button>
+            <button onClick={() => setSide('buy')} className={`flex-1 py-1 rounded-md text-[12px] font-bold transition-all ${side === 'buy' ? 'bg-[#00d18e] text-black shadow-lg' : 'text-zinc-500 hover:bg-white/5'}`}>Buy</button>
+            <button onClick={() => setSide('sell')} className={`flex-1 py-1 rounded-md text-[12px] font-bold transition-all ${side === 'sell' ? 'bg-[#ff4d4f] text-white shadow-lg' : 'text-zinc-500 hover:bg-white/5'}`}>Sell</button>
           </div>
 
           <div className="flex gap-4 mb-2 border-b border-zinc-900">
@@ -477,205 +479,211 @@ const SpotTrading: React.FC = () => {
             ))}
           </div>
 
-          <div className="space-y-1.5 pt-1.5">
-            {/* Conditional Trigger Price Field for TP/SL tab */}
-            {orderType === 'tpsl' && (
-              <div className="flex items-center border border-zinc-800 bg-[#111] rounded-lg px-3 h-10 focus-within:border-zinc-500 transition-all">
-                <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest min-w-[50px] shrink-0">Trigger</span>
+          {/* Stabilized container with min-height to avoid UI jumping during tab switching */}
+          <div className="flex flex-col min-h-[420px] pt-1.5">
+            <div className="space-y-1.5">
+              {/* Conditional Trigger Price Field for TP/SL tab */}
+              {orderType === 'tpsl' && (
+                <div className="flex items-center border border-zinc-800 bg-[#111] rounded-lg px-3 h-10 focus-within:border-zinc-500 transition-all">
+                  <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest min-w-[50px] shrink-0">Trigger</span>
+                  <input 
+                    type="number" 
+                    value={triggerPrice}
+                    onChange={(e) => setTriggerPrice(e.target.value)}
+                    placeholder="Price"
+                    className="flex-1 bg-transparent border-none outline-none text-right text-[12px] font-medium text-white pr-2 placeholder:text-zinc-700" 
+                  />
+                  <span className="text-[10px] font-bold text-zinc-600 shrink-0 uppercase">{activeQuote}</span>
+                </div>
+              )}
+
+              {/* Price/Order Field */}
+              <div className="flex items-center border rounded-lg px-3 h-10 group transition-all relative bg-[#111] border-zinc-800 focus-within:border-zinc-400">
+                
+                {orderType === 'tpsl' ? (
+                  <div className="relative shrink-0 flex items-center" ref={tpslTypeRef}>
+                    <button 
+                      onClick={() => setIsTpslTypeDropdownOpen(!isTpslTypeDropdownOpen)}
+                      className="text-[9px] font-black text-zinc-500 uppercase tracking-widest min-w-[50px] flex items-center gap-1.5 hover:text-zinc-300 transition-colors"
+                    >
+                      {tpslExecutionType} 
+                      <svg className={`w-2.5 h-2.5 text-zinc-600 transition-transform ${isTpslTypeDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    {isTpslTypeDropdownOpen && (
+                      <div className="absolute top-full left-0 mt-2 w-28 bg-[#1a1a1a] border border-zinc-800 rounded-lg shadow-2xl z-[110] py-1">
+                        {(['market', 'limit'] as const).map(type => (
+                          <button 
+                            key={type}
+                            onClick={() => { setTpslExecutionType(type); setIsTpslTypeDropdownOpen(false); }}
+                            className={`w-full text-left px-3 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-colors ${tpslExecutionType === type ? 'text-white bg-zinc-800' : 'text-zinc-500'}`}
+                          >
+                            {type}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest min-w-[50px] shrink-0">Price</span>
+                )}
+
+                <input 
+                  type="text" 
+                  value={(orderType === 'market' || (orderType === 'tpsl' && tpslExecutionType === 'market')) ? 'Market' : priceInput} 
+                  onChange={(e) => handlePriceChange(e.target.value)} 
+                  disabled={orderType === 'market' || (orderType === 'tpsl' && tpslExecutionType === 'market')} 
+                  className="flex-1 bg-transparent border-none outline-none text-right text-[12px] font-medium text-white pr-2 placeholder:text-zinc-700 disabled:text-zinc-500" 
+                />
+                <span className="text-[10px] font-bold text-zinc-600 shrink-0 uppercase">{activeQuote}</span>
+              </div>
+
+              {/* Amount Field - Only visible for Limit and TP/SL execution */}
+              {orderType !== 'market' && (
+                <div className="flex items-center border rounded-lg px-3 h-10 group transition-all bg-[#111] border-zinc-800 focus-within:border-zinc-400">
+                  <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest min-w-[50px] shrink-0">Amount</span>
+                  <input 
+                    type="number" 
+                    value={amount} 
+                    placeholder="0.00"
+                    onChange={(e) => handleAmountChange(e.target.value)} 
+                    className="flex-1 bg-transparent border-none outline-none text-right text-[12px] font-medium text-white pr-2 placeholder:text-zinc-700" 
+                  />
+                  <span className="text-[10px] font-bold text-zinc-600 shrink-0 uppercase">{activeBase}</span>
+                </div>
+              )}
+
+              {/* Investment Slider */}
+              <div 
+                className="px-1 py-1 relative group/slider"
+                onMouseEnter={() => setIsSliderHovered(true)}
+                onMouseLeave={() => setIsSliderHovered(false)}
+              >
+                <div className="relative h-6 flex items-center">
+                  <div className="absolute top-1/2 left-0 right-0 h-1 bg-zinc-800 -translate-y-1/2 rounded-full overflow-hidden">
+                     <div 
+                      className={`h-full transition-all ${side === 'buy' ? 'bg-[#00d18e]' : 'bg-[#ff4d4f]'}`} 
+                      style={{ width: `${percent}%` }}
+                     />
+                  </div>
+                  <div className="absolute top-1/2 left-0 right-0 flex justify-between -translate-y-1/2 pointer-events-none px-[1px]">
+                    {[0, 25, 50, 75, 100].map(p => (
+                      <div key={p} className={`w-1.5 h-1.5 rounded-full border border-zinc-900 transition-colors ${percent >= p ? (side === 'buy' ? 'bg-[#00d18e]' : 'bg-[#ff4d4f]') : 'bg-zinc-700'}`} />
+                    ))}
+                  </div>
+                  <input 
+                    type="range" 
+                    min="0" 
+                    max="100" 
+                    step="1"
+                    value={percent}
+                    onChange={(e) => handlePercentChange(parseInt(e.target.value))}
+                    className="absolute inset-0 w-full h-full bg-transparent appearance-none cursor-pointer z-10 opacity-0"
+                  />
+                  <div 
+                    className={`absolute -top-6 -translate-x-1/2 pointer-events-none transition-all duration-150 flex flex-col items-center ${isSliderHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
+                    style={{ left: `${percent}%` }}
+                  >
+                    <div className="bg-white text-black text-[10px] font-black px-1.5 py-0.5 rounded shadow-xl leading-none">
+                      {percent}%
+                    </div>
+                    <div className="w-1.5 h-1.5 bg-white rotate-45 -mt-1 shadow-xl"></div>
+                  </div>
+                  <div 
+                    className={`absolute top-1/2 w-3.5 h-3.5 rounded-full shadow-lg border-2 border-zinc-900 pointer-events-none -translate-x-1/2 -translate-y-1/2 transition-all bg-white`}
+                    style={{ left: `${percent}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-[8px] font-bold text-zinc-600 px-0.5 uppercase tracking-tighter -mt-1 select-none">
+                  <span className="w-4 text-left">0%</span>
+                  <span className="w-6 text-center text-zinc-700">25%</span>
+                  <span className="w-6 text-center text-zinc-700">50%</span>
+                  <span className="w-6 text-center text-zinc-700">75%</span>
+                  <span className="w-6 text-right">100%</span>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-4 gap-1">
+                 {[25, 50, 75, 100].map(pct => (
+                   <button 
+                    key={pct} 
+                    onClick={() => handlePercentChange(pct)} 
+                    className={`py-0.5 bg-zinc-800/80 rounded text-[10px] font-bold transition-all ${percent === pct ? 'bg-zinc-600 text-white' : 'text-zinc-500 hover:text-white hover:bg-zinc-700/50'}`}
+                   >
+                    {pct}%
+                   </button>
+                 ))}
+              </div>
+
+              {/* Total Field */}
+              <div className={`flex items-center border rounded-lg px-3 h-10 group transition-all bg-[#111] border-zinc-800 focus-within:border-zinc-400`}>
+                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest min-w-[50px] shrink-0">Total</span>
                 <input 
                   type="number" 
-                  value={triggerPrice}
-                  onChange={(e) => setTriggerPrice(e.target.value)}
-                  placeholder="Price"
+                  value={total} 
+                  placeholder="0.00"
+                  onChange={(e) => handleTotalChange(e.target.value)} 
                   className="flex-1 bg-transparent border-none outline-none text-right text-[12px] font-medium text-white pr-2 placeholder:text-zinc-700" 
                 />
                 <span className="text-[10px] font-bold text-zinc-600 shrink-0 uppercase">{activeQuote}</span>
               </div>
-            )}
 
-            {/* Price/Order Field */}
-            <div className="flex items-center border rounded-lg px-3 h-10 group transition-all relative bg-[#111] border-zinc-800 focus-within:border-zinc-400">
-              
-              {orderType === 'tpsl' ? (
-                <div className="relative shrink-0 flex items-center" ref={tpslTypeRef}>
-                  <button 
-                    onClick={() => setIsTpslTypeDropdownOpen(!isTpslTypeDropdownOpen)}
-                    className="text-[9px] font-black text-zinc-500 uppercase tracking-widest min-w-[50px] flex items-center gap-1.5 hover:text-zinc-300 transition-colors"
-                  >
-                    {tpslExecutionType} 
-                    <svg className={`w-2.5 h-2.5 text-zinc-600 transition-transform ${isTpslTypeDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="m6 9 6 6 6-6"/></svg>
-                  </button>
-                  {isTpslTypeDropdownOpen && (
-                    <div className="absolute top-full left-0 mt-2 w-28 bg-[#1a1a1a] border border-zinc-800 rounded-lg shadow-2xl z-[110] py-1">
-                      {(['market', 'limit'] as const).map(type => (
-                        <button 
-                          key={type}
-                          onClick={() => { setTpslExecutionType(type); setIsTpslTypeDropdownOpen(false); }}
-                          className={`w-full text-left px-3 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-colors ${tpslExecutionType === type ? 'text-white bg-zinc-800' : 'text-zinc-500'}`}
-                        >
-                          {type}
-                        </button>
-                      ))}
+              {/* TP/SL Inner Toggle Section (Only for Limit/Market) */}
+              {orderType !== 'tpsl' && (
+                <div className="pt-1">
+                  <label className="flex items-center gap-2 cursor-pointer group w-fit select-none">
+                    <div className={`w-4 h-4 rounded border transition-all flex items-center justify-center ${showTPSL ? 'bg-white border-white' : 'border-zinc-700 group-hover:border-zinc-500'}`}>
+                      {showTPSL && <svg className="w-3 h-3 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="m5 13 4 4L19 7"/></svg>}
+                      <input type="checkbox" className="hidden" checked={showTPSL} onChange={() => setShowTPSL(!showTPSL)} />
                     </div>
-                  )}
+                    <span className="text-[11px] font-bold text-zinc-400 group-hover:text-zinc-200 transition-colors uppercase tracking-tight">TP/SL</span>
+                  </label>
+
+                  <div className={`overflow-hidden transition-all duration-300 ease-in-out ${showTPSL ? 'max-h-32 opacity-100 mt-2 space-y-1.5' : 'max-h-0 opacity-0'}`}>
+                    {/* Take Profit Input */}
+                    <div className="flex items-center border border-zinc-800 bg-[#111] rounded-lg px-3 h-9 focus-within:border-zinc-500 transition-all">
+                      <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest min-w-[50px] shrink-0">TP Price</span>
+                      <input 
+                        type="number" 
+                        value={tpInput}
+                        onChange={(e) => setTpInput(e.target.value)}
+                        placeholder="Take Profit"
+                        className="flex-1 bg-transparent border-none outline-none text-right text-[11px] font-medium text-white pr-2 placeholder:text-zinc-700" 
+                      />
+                      <span className="text-[9px] font-bold text-zinc-600 shrink-0 uppercase">{activeQuote}</span>
+                    </div>
+                    {/* Stop Loss Input */}
+                    <div className="flex items-center border border-zinc-800 bg-[#111] rounded-lg px-3 h-9 focus-within:border-zinc-500 transition-all">
+                      <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest min-w-[50px] shrink-0">SL Price</span>
+                      <input 
+                        type="number" 
+                        value={slInput}
+                        onChange={(e) => setSlInput(e.target.value)}
+                        placeholder="Stop Loss"
+                        className="flex-1 bg-transparent border-none outline-none text-right text-[11px] font-medium text-white pr-2 placeholder:text-zinc-700" 
+                      />
+                      <span className="text-[9px] font-bold text-zinc-600 shrink-0 uppercase">{activeQuote}</span>
+                    </div>
+                  </div>
                 </div>
-              ) : (
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest min-w-[50px] shrink-0">Price</span>
               )}
-
-              <input 
-                type="text" 
-                value={(orderType === 'market' || (orderType === 'tpsl' && tpslExecutionType === 'market')) ? 'Market' : priceInput} 
-                onChange={(e) => handlePriceChange(e.target.value)} 
-                disabled={orderType === 'market' || (orderType === 'tpsl' && tpslExecutionType === 'market')} 
-                className="flex-1 bg-transparent border-none outline-none text-right text-[12px] font-medium text-white pr-2 placeholder:text-zinc-700 disabled:text-zinc-500" 
-              />
-              <span className="text-[10px] font-bold text-zinc-600 shrink-0 uppercase">{activeQuote}</span>
             </div>
 
-            {/* Amount Field - Only visible for Limit and TP/SL execution */}
-            {orderType !== 'market' && (
-              <div className="flex items-center border rounded-lg px-3 h-10 group transition-all bg-[#111] border-zinc-800 focus-within:border-zinc-400">
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest min-w-[50px] shrink-0">Amount</span>
-                <input 
-                  type="number" 
-                  value={amount} 
-                  placeholder="0.00"
-                  onChange={(e) => handleAmountChange(e.target.value)} 
-                  className="flex-1 bg-transparent border-none outline-none text-right text-[12px] font-medium text-white pr-2 placeholder:text-zinc-700" 
-                />
-                <span className="text-[10px] font-bold text-zinc-600 shrink-0 uppercase">{activeBase}</span>
+            {/* Bottom Actions Area fixed at bottom of stabilized container */}
+            <div className="mt-auto pt-4">
+              <div className="flex justify-between items-center text-[10px] font-normal text-zinc-500 px-0.5 mb-2">
+                <span>Available</span>
+                <span className="text-zinc-400 font-medium tabular-nums tracking-tighter">{side === 'buy' ? `${quoteBalance.toLocaleString()} ${activeQuote}` : `${baseBalance.toFixed(4)} ${activeBase}`}</span>
               </div>
-            )}
 
-            {/* Investment Slider */}
-            <div 
-              className="px-1 py-1 relative group/slider"
-              onMouseEnter={() => setIsSliderHovered(true)}
-              onMouseLeave={() => setIsSliderHovered(false)}
-            >
-              <div className="relative h-6 flex items-center">
-                <div className="absolute top-1/2 left-0 right-0 h-1 bg-zinc-800 -translate-y-1/2 rounded-full overflow-hidden">
-                   <div 
-                    className={`h-full transition-all ${side === 'buy' ? 'bg-[#00d18e]' : 'bg-[#ff4d4f]'}`} 
-                    style={{ width: `${percent}%` }}
-                   />
-                </div>
-                <div className="absolute top-1/2 left-0 right-0 flex justify-between -translate-y-1/2 pointer-events-none px-[1px]">
-                  {[0, 25, 50, 75, 100].map(p => (
-                    <div key={p} className={`w-1.5 h-1.5 rounded-full border border-zinc-900 transition-colors ${percent >= p ? (side === 'buy' ? 'bg-[#00d18e]' : 'bg-[#ff4d4f]') : 'bg-zinc-700'}`} />
-                  ))}
-                </div>
-                <input 
-                  type="range" 
-                  min="0" 
-                  max="100" 
-                  step="1"
-                  value={percent}
-                  onChange={(e) => handlePercentChange(parseInt(e.target.value))}
-                  className="absolute inset-0 w-full h-full bg-transparent appearance-none cursor-pointer z-10 opacity-0"
-                />
-                <div 
-                  className={`absolute -top-6 -translate-x-1/2 pointer-events-none transition-all duration-150 flex flex-col items-center ${isSliderHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
-                  style={{ left: `${percent}%` }}
-                >
-                  <div className="bg-white text-black text-[10px] font-black px-1.5 py-0.5 rounded shadow-xl leading-none">
-                    {percent}%
-                  </div>
-                  <div className="w-1.5 h-1.5 bg-white rotate-45 -mt-1 shadow-xl"></div>
-                </div>
-                <div 
-                  className={`absolute top-1/2 w-3.5 h-3.5 rounded-full shadow-lg border-2 border-zinc-900 pointer-events-none -translate-x-1/2 -translate-y-1/2 transition-all bg-white`}
-                  style={{ left: `${percent}%` }}
-                />
-              </div>
-              <div className="flex justify-between text-[8px] font-bold text-zinc-600 px-0.5 uppercase tracking-tighter -mt-1 select-none">
-                <span className="w-4 text-left">0%</span>
-                <span className="w-6 text-center text-zinc-700">25%</span>
-                <span className="w-6 text-center text-zinc-700">50%</span>
-                <span className="w-6 text-center text-zinc-700">75%</span>
-                <span className="w-6 text-right">100%</span>
-              </div>
+              <button 
+                onClick={handleTrade}
+                className={`w-full py-2.5 rounded-xl font-bold text-[13px] transition-all active:scale-[0.98] shadow-2xl ${
+                  side === 'buy' ? 'bg-[#00d18e] hover:bg-[#00e099] text-black' : 'bg-[#ff4d4f] hover:bg-[#ff5c5e] text-white'
+                }`}
+              >
+                {side === 'buy' ? 'Buy' : 'Sell'} {activeBase}
+              </button>
             </div>
-            
-            <div className="grid grid-cols-4 gap-1">
-               {[25, 50, 75, 100].map(pct => (
-                 <button 
-                  key={pct} 
-                  onClick={() => handlePercentChange(pct)} 
-                  className={`py-0.5 bg-zinc-800/80 rounded text-[10px] font-bold transition-all ${percent === pct ? 'bg-zinc-600 text-white' : 'text-zinc-500 hover:text-white hover:bg-zinc-700/50'}`}
-                 >
-                  {pct}%
-                 </button>
-               ))}
-            </div>
-
-            {/* Total Field */}
-            <div className={`flex items-center border rounded-lg px-3 h-10 group transition-all bg-[#111] border-zinc-800 focus-within:border-zinc-400`}>
-              <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest min-w-[50px] shrink-0">Total</span>
-              <input 
-                type="number" 
-                value={total} 
-                placeholder="0.00"
-                onChange={(e) => handleTotalChange(e.target.value)} 
-                className="flex-1 bg-transparent border-none outline-none text-right text-[12px] font-medium text-white pr-2 placeholder:text-zinc-700" 
-              />
-              <span className="text-[10px] font-bold text-zinc-600 shrink-0 uppercase">{activeQuote}</span>
-            </div>
-
-            {/* TP/SL Inner Toggle Section (Only for Limit/Market) */}
-            {orderType !== 'tpsl' && (
-              <div className="pt-1">
-                <label className="flex items-center gap-2 cursor-pointer group w-fit select-none">
-                  <div className={`w-4 h-4 rounded border transition-all flex items-center justify-center ${showTPSL ? 'bg-white border-white' : 'border-zinc-700 group-hover:border-zinc-500'}`}>
-                    {showTPSL && <svg className="w-3 h-3 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="m5 13 4 4L19 7"/></svg>}
-                    <input type="checkbox" className="hidden" checked={showTPSL} onChange={() => setShowTPSL(!showTPSL)} />
-                  </div>
-                  <span className="text-[11px] font-bold text-zinc-400 group-hover:text-zinc-200 transition-colors uppercase tracking-tight">TP/SL</span>
-                </label>
-
-                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${showTPSL ? 'max-h-32 opacity-100 mt-2 space-y-1.5' : 'max-h-0 opacity-0'}`}>
-                  {/* Take Profit Input */}
-                  <div className="flex items-center border border-zinc-800 bg-[#111] rounded-lg px-3 h-9 focus-within:border-zinc-500 transition-all">
-                    <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest min-w-[50px] shrink-0">TP Price</span>
-                    <input 
-                      type="number" 
-                      value={tpInput}
-                      onChange={(e) => setTpInput(e.target.value)}
-                      placeholder="Take Profit"
-                      className="flex-1 bg-transparent border-none outline-none text-right text-[11px] font-medium text-white pr-2 placeholder:text-zinc-700" 
-                    />
-                    <span className="text-[9px] font-bold text-zinc-600 shrink-0 uppercase">{activeQuote}</span>
-                  </div>
-                  {/* Stop Loss Input */}
-                  <div className="flex items-center border border-zinc-800 bg-[#111] rounded-lg px-3 h-9 focus-within:border-zinc-500 transition-all">
-                    <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest min-w-[50px] shrink-0">SL Price</span>
-                    <input 
-                      type="number" 
-                      value={slInput}
-                      onChange={(e) => setSlInput(e.target.value)}
-                      placeholder="Stop Loss"
-                      className="flex-1 bg-transparent border-none outline-none text-right text-[11px] font-medium text-white pr-2 placeholder:text-zinc-700" 
-                    />
-                    <span className="text-[9px] font-bold text-zinc-600 shrink-0 uppercase">{activeQuote}</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="flex justify-between items-center text-[10px] font-normal text-zinc-500 px-0.5">
-              <span>Available</span>
-              <span className="text-zinc-400 font-medium tabular-nums tracking-tighter">{side === 'buy' ? `${quoteBalance.toLocaleString()} ${activeQuote}` : `${baseBalance.toFixed(4)} ${activeBase}`}</span>
-            </div>
-
-            <button 
-              onClick={handleTrade}
-              className={`w-full py-2.5 rounded-xl font-bold text-[13px] transition-all active:scale-[0.98] shadow-2xl mt-0.5 ${
-                side === 'buy' ? 'bg-[#00d18e] hover:bg-[#00e099] text-black' : 'bg-[#ff4d4f] hover:bg-[#ff5c5e] text-white'
-              }`}
-            >
-              {side === 'buy' ? 'Buy' : 'Sell'} {activeBase}
-            </button>
           </div>
         </div>
       </div>

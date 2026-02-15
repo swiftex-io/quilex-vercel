@@ -91,7 +91,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
     <>
       <nav className="h-16 flex items-center px-6 bg-black z-[60] sticky top-0 shadow-2xl">
         <div className="flex items-center gap-2 mr-10 cursor-pointer group shrink-0" onClick={() => onNavigate(Page.HOME)}>
-          <Logo className="h-6 md:h-7 transition-all hover:scale-[1.02] text-white" />
+          <Logo className="h-6 md:h-7 transition-all text-white" />
         </div>
 
         <div className="hidden md:flex items-center gap-8 text-[14px] font-medium tracking-tight h-full">

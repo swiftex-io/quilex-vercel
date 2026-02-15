@@ -144,6 +144,16 @@
             92% { opacity: 1; transform: translateY(0); }
             100% { opacity: 0; transform: translateY(-3px); }
         }
+
+        /* Logo Symbol Animated Gradient Hover */
+        .logo-symbol path {
+            fill: #605cf4;
+            transition: fill 0.3s ease;
+        }
+
+        .group:hover .logo-symbol path {
+            fill: url(#logo-symbol-gradient);
+        }
     </style>
 <script type="importmap">
 {
