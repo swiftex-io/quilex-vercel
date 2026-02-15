@@ -154,6 +154,18 @@
         .group:hover .logo-symbol path {
             fill: url(#logo-symbol-gradient);
         }
+
+        /* Easter Egg: Logo Symbol Rotation */
+        .logo-symbol-mark {
+            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: center;
+            transform-box: fill-box;
+            will-change: transform;
+        }
+
+        .group:hover .logo-symbol-mark {
+            transform: rotate(360deg);
+        }
     </style>
 <script type="importmap">
 {
