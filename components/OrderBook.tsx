@@ -38,7 +38,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ currentPrice = 65432.50 }) => {
   // Dynamic visible rows based on view mode and screen size
   useEffect(() => {
     const handleResize = () => {
-      setIsLargeScreen(window.innerWidth >= 1280);
+      setIsLargeScreen(window.innerWidth >= 1440);
     };
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -53,12 +53,12 @@ const OrderBook: React.FC<OrderBookProps> = ({ currentPrice = 65432.50 }) => {
   // Initialize data
   useEffect(() => {
     // We generate enough mock data to fill the expanded view
-    const baseAsks = Array.from({ length: 60 }, (_, i) => ({
+    const baseAsks = Array.from({ length: 80 }, (_, i) => ({
       priceOffset: i * 0.5 + spread / 2,
       amount: Math.random() * 0.8,
       flash: null as 'up' | 'down' | null
     }));
-    const baseBids = Array.from({ length: 60 }, (_, i) => ({
+    const baseBids = Array.from({ length: 80 }, (_, i) => ({
       priceOffset: i * 0.5 + spread / 2,
       amount: Math.random() * 0.8,
       flash: null as 'up' | 'down' | null
