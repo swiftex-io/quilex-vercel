@@ -460,17 +460,17 @@ const SpotTrading: React.FC = () => {
       </div>
 
       {/* Right Column Group (Orderbook & Trade) - Responsive 2-column on XL+ */}
-      <div className="flex shrink-0 h-full overflow-hidden bg-[#0a0a0a] border-l border-zinc-900 w-[300px] xl:w-[640px] flex-col xl:flex-row transition-all duration-300">
+      <div className="flex shrink-0 h-full overflow-y-auto xl:overflow-hidden bg-[#0a0a0a] border-l border-zinc-900 w-[300px] xl:w-[640px] flex-col xl:flex-row transition-all duration-300">
         
         {/* Sub-Column 1: Order Book */}
-        <div className="w-full xl:w-1/2 flex flex-col h-full border-r border-zinc-900/50 shrink-0">
+        <div className="w-full xl:w-1/2 flex flex-col h-auto xl:h-full border-r border-zinc-900/50 shrink-0">
           <div className="flex-1 xl:h-full h-[480px] overflow-hidden">
              <OrderBook currentPrice={livePrice} />
           </div>
         </div>
 
         {/* Sub-Column 2: Order Entry Section */}
-        <div className="w-full xl:w-1/2 flex flex-col h-full bg-black min-h-0">
+        <div className="w-full xl:w-1/2 flex flex-col h-fit xl:h-full bg-black min-h-0">
           {/* Static Header Part of Order Entry */}
           <div className="p-3 pb-0 shrink-0">
             <div className="flex gap-1 p-0.5 bg-zinc-900/50 rounded-lg mb-2">
@@ -485,8 +485,8 @@ const SpotTrading: React.FC = () => {
             </div>
           </div>
 
-          {/* Scrollable Middle Part: Fields and Slider - Added pb-12 for empty spacing at the end */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar px-3 space-y-1.5 pt-1.5 pb-12">
+          {/* Middle Part: Fields and Slider - Scrollable on desktop, auto height on mobile */}
+          <div className="h-auto xl:flex-1 xl:overflow-y-auto custom-scrollbar px-3 space-y-1.5 pt-1.5 pb-12">
             {/* Conditional Trigger Price Field for TP/SL tab */}
             {orderType === 'tpsl' && (
               <div className="flex items-center border border-zinc-800 bg-[#111] rounded-lg px-3 h-10 focus-within:border-zinc-500 transition-all">
