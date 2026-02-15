@@ -494,7 +494,7 @@ const SpotTrading: React.FC = () => {
             )}
 
             {/* Price/Order Field */}
-            <div className={`flex items-center border rounded-lg px-3 h-10 group transition-all relative ${(orderType === 'market' || (orderType === 'tpsl' && tpslExecutionType === 'market')) ? 'bg-zinc-900 border-zinc-900 opacity-60' : 'bg-[#111] border-zinc-800 focus-within:border-zinc-400'}`}>
+            <div className="flex items-center border rounded-lg px-3 h-10 group transition-all relative bg-[#111] border-zinc-800 focus-within:border-zinc-400">
               
               {orderType === 'tpsl' ? (
                 <div className="relative shrink-0 flex items-center" ref={tpslTypeRef}>
