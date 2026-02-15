@@ -151,28 +151,28 @@ const OrderBook: React.FC<OrderBookProps> = ({ currentPrice = 65432.50 }) => {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                 <rect x="3" y="4" width="6" height="7" rx="1" className="text-[#ff4d4f]" />
                 <rect x="3" y="13" width="6" height="7" rx="1" className="text-[#00d18e]" />
-                <rect x="11" y="5" width="10" height="2" rx="0.5" className="opacity-20" />
-                <rect x="11" y="9" width="10" height="2" rx="0.5" className="opacity-20" />
-                <rect x="11" y="13" width="10" height="2" rx="0.5" className="opacity-20" />
-                <rect x="11" y="17" width="10" height="2" rx="0.5" className="opacity-20" />
+                <rect x="11" y="5" width="10" height="2" rx="0.5" className="opacity-80" />
+                <rect x="11" y="9" width="10" height="2" rx="0.5" className="opacity-80" />
+                <rect x="11" y="13" width="10" height="2" rx="0.5" className="opacity-80" />
+                <rect x="11" y="17" width="10" height="2" rx="0.5" className="opacity-80" />
               </svg>
             </button>
             <button onClick={() => setViewMode('buy')} title="Buy Only" className={`p-1 rounded transition-colors ${viewMode === 'buy' ? 'bg-zinc-800 text-white' : 'text-zinc-600 hover:text-zinc-400'}`}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                 <rect x="3" y="4" width="6" height="16" rx="1" className="text-[#00d18e]" />
-                <rect x="11" y="5" width="10" height="2" rx="0.5" className="opacity-20" />
-                <rect x="11" y="9" width="10" height="2" rx="0.5" className="opacity-20" />
-                <rect x="11" y="13" width="10" height="2" rx="0.5" className="opacity-20" />
-                <rect x="11" y="17" width="10" height="2" rx="0.5" className="opacity-20" />
+                <rect x="11" y="5" width="10" height="2" rx="0.5" className="opacity-80" />
+                <rect x="11" y="9" width="10" height="2" rx="0.5" className="opacity-80" />
+                <rect x="11" y="13" width="10" height="2" rx="0.5" className="opacity-80" />
+                <rect x="11" y="17" width="10" height="2" rx="0.5" className="opacity-80" />
               </svg>
             </button>
             <button onClick={() => setViewMode('sell')} title="Sell Only" className={`p-1 rounded transition-colors ${viewMode === 'sell' ? 'bg-zinc-800 text-white' : 'text-zinc-600 hover:text-zinc-400'}`}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                 <rect x="3" y="4" width="6" height="16" rx="1" className="text-[#ff4d4f]" />
-                <rect x="11" y="5" width="10" height="2" rx="0.5" className="opacity-20" />
-                <rect x="11" y="9" width="10" height="2" rx="0.5" className="opacity-20" />
-                <rect x="11" y="13" width="10" height="2" rx="0.5" className="opacity-20" />
-                <rect x="11" y="17" width="10" height="2" rx="0.5" className="opacity-20" />
+                <rect x="11" y="5" width="10" height="2" rx="0.5" className="opacity-80" />
+                <rect x="11" y="9" width="10" height="2" rx="0.5" className="opacity-80" />
+                <rect x="11" y="13" width="10" height="2" rx="0.5" className="opacity-80" />
+                <rect x="11" y="17" width="10" height="2" rx="0.5" className="opacity-80" />
               </svg>
             </button>
           </div>
@@ -206,12 +206,12 @@ const OrderBook: React.FC<OrderBookProps> = ({ currentPrice = 65432.50 }) => {
                       ></div>
                       <div className="flex items-center gap-1.5 z-10">
                         {isMine && <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></div>}
-                        <span className="text-[#ff4d4f] font-mono font-normal tabular-nums text-[11px]">{displayPrice.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
+                        <span className="text-[#ff4d4f] font-medium tabular-nums text-[11px]">{displayPrice.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
                       </div>
-                      <span className="text-right z-10 font-mono text-zinc-400 tabular-nums text-[11px] transition-all duration-300">
+                      <span className="text-right z-10 font-medium text-zinc-400 tabular-nums text-[11px] transition-all duration-300">
                         {ask.amount.toFixed(4)}
                       </span>
-                      <span className="text-right z-10 font-mono text-zinc-600 tabular-nums text-[11px]">{displayPrice.toFixed(0).slice(-3)}</span>
+                      <span className="text-right z-10 font-medium text-zinc-600 tabular-nums text-[11px]">{displayPrice.toFixed(0).slice(-3)}</span>
                     </div>
                   );
                 })}
@@ -221,7 +221,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ currentPrice = 65432.50 }) => {
             {/* Mid Price & Spread Indicator */}
             <div className="py-2 px-3 bg-zinc-900/20 border-y border-zinc-900/30 my-1 flex flex-col shrink-0">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-normal text-[#00d18e] tabular-nums tracking-tighter animate-pulse">
+                <span className="text-sm font-medium text-[#00d18e] tabular-nums tracking-tighter animate-pulse">
                   {currentPrice.toLocaleString(undefined, { minimumFractionDigits: 1 })}
                 </span>
                 <span className="text-[10px] font-normal text-zinc-500">
@@ -247,12 +247,12 @@ const OrderBook: React.FC<OrderBookProps> = ({ currentPrice = 65432.50 }) => {
                       ></div>
                       <div className="flex items-center gap-1.5 z-10">
                         {isMine && <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></div>}
-                        <span className="text-[#00d18e] font-mono font-normal tabular-nums text-[11px]">{displayPrice.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
+                        <span className="text-[#00d18e] font-medium tabular-nums text-[11px]">{displayPrice.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
                       </div>
-                      <span className="text-right z-10 font-mono text-zinc-400 tabular-nums text-[11px] transition-all duration-300">
+                      <span className="text-right z-10 font-medium text-zinc-400 tabular-nums text-[11px] transition-all duration-300">
                         {bid.amount.toFixed(4)}
                       </span>
-                      <span className="text-right z-10 font-mono text-zinc-600 tabular-nums text-[11px]">{displayPrice.toFixed(0).slice(-3)}</span>
+                      <span className="text-right z-10 font-medium text-zinc-600 tabular-nums text-[11px]">{displayPrice.toFixed(0).slice(-3)}</span>
                     </div>
                   );
                 })}
@@ -264,13 +264,13 @@ const OrderBook: React.FC<OrderBookProps> = ({ currentPrice = 65432.50 }) => {
           <div className="flex flex-col overflow-hidden">
             {marketTrades.map((trade) => (
               <div key={trade.id} className="grid grid-cols-3 px-3 py-[3px] hover:bg-zinc-900/30 transition-colors animate-in fade-in slide-in-from-top-1 duration-500">
-                <span className={`font-mono font-normal tabular-nums text-[11px] ${trade.side === 'buy' ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>
+                <span className={`font-medium tabular-nums text-[11px] ${trade.side === 'buy' ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>
                   {trade.price.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
                 </span>
-                <span className="text-right font-mono text-zinc-400 tabular-nums text-[11px]">
+                <span className="text-right font-medium text-zinc-400 tabular-nums text-[11px]">
                   {trade.amount.toFixed(4)}
                 </span>
-                <span className="text-right font-mono text-zinc-500 tabular-nums text-[11px]">
+                <span className="text-right font-medium text-zinc-500 tabular-nums text-[11px]">
                   {trade.time}
                 </span>
               </div>

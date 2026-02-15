@@ -232,7 +232,7 @@ const SpotTrading: React.FC = () => {
                 </div>
               </div>
               <div className="col-span-5 text-right">
-                <span className="text-[11px] font-mono font-normal text-zinc-300 block truncate">
+                <span className="text-[11px] font-medium text-zinc-300 block truncate">
                   {asset.price.toLocaleString(undefined, { minimumFractionDigits: asset.price < 1 ? 4 : 2 })}
                 </span>
               </div>
@@ -304,7 +304,7 @@ const SpotTrading: React.FC = () => {
                       </div>
                     </div>
                     <div className="col-span-5 text-right">
-                      <span className="text-[12px] font-mono font-bold text-zinc-300 block truncate">
+                      <span className="text-[12px] font-bold text-zinc-300 block truncate">
                         {asset.price.toLocaleString(undefined, { minimumFractionDigits: asset.price < 1 ? 4 : 2 })}
                       </span>
                     </div>
@@ -315,7 +315,7 @@ const SpotTrading: React.FC = () => {
           </div>
 
           <div className="flex flex-col justify-center">
-            <span className={`text-lg font-mono font-normal tabular-nums leading-none ${priceChange >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>{livePrice.toLocaleString(undefined, { minimumFractionDigits: livePrice < 1 ? 4 : 1 })}</span>
+            <span className={`text-lg font-medium tabular-nums leading-none ${priceChange >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>{livePrice.toLocaleString(undefined, { minimumFractionDigits: livePrice < 1 ? 4 : 1 })}</span>
             <span className={`text-[11px] font-normal tabular-nums leading-none mt-0.5 ${priceChange >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>{priceChange >= 0 ? '+' : ''}{absChange.toLocaleString(undefined, { minimumFractionDigits: livePrice < 1 ? 4 : 1 })} ({priceChange.toFixed(2)}%)</span>
           </div>
           
@@ -327,7 +327,7 @@ const SpotTrading: React.FC = () => {
             ].map((item, i) => (
               <div key={i} className="flex flex-col">
                 <span className="text-[10px] text-zinc-500 font-normal">{item.label}</span>
-                <span className="text-[12px] font-normal text-zinc-300 font-mono tracking-tight">{item.val}</span>
+                <span className="text-[12px] font-medium text-zinc-300 tracking-tight">{item.val}</span>
               </div>
             ))}
           </div>
@@ -404,8 +404,8 @@ const SpotTrading: React.FC = () => {
                           </div>
                         </td>
                         <td className={`px-4 py-3 font-bold ${o.side === 'buy' ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>{o.side === 'buy' ? 'Buy' : 'Sell'}</td>
-                        <td className="px-4 py-3 font-mono text-zinc-300">{o.price.toLocaleString()}</td>
-                        <td className="px-4 py-3 font-mono text-zinc-300">{o.amount}</td>
+                        <td className="px-4 py-3 text-zinc-300 font-medium">{o.price.toLocaleString()}</td>
+                        <td className="px-4 py-3 text-zinc-300 font-medium">{o.amount}</td>
                         <td className="px-4 py-3">
                            <div className="w-16 h-1 bg-zinc-800 rounded-full overflow-hidden">
                              <div className="h-full bg-[#00d18e]" style={{ width: `${(o.filled / o.amount) * 100}%` }}></div>
@@ -441,10 +441,10 @@ const SpotTrading: React.FC = () => {
                 <tbody>
                   {tradeHistory.filter(t => t.pair === activePair).map((t) => (
                     <tr key={t.id} className="border-b border-zinc-900/30">
-                      <td className="px-4 py-1.5 text-zinc-500 font-mono">{t.time}</td>
+                      <td className="px-4 py-1.5 text-zinc-500 font-medium">{t.time}</td>
                       <td className={`px-4 py-1.5 font-normal ${t.type === 'buy' ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>{t.type === 'buy' ? 'Buy' : 'Sell'}</td>
-                      <td className="px-4 py-1.5 font-mono text-zinc-300">{t.price.toLocaleString()}</td>
-                      <td className="px-4 py-1.5 text-right font-mono text-zinc-500">{t.amount}</td>
+                      <td className="px-4 py-1.5 text-zinc-300 font-medium">{t.price.toLocaleString()}</td>
+                      <td className="px-4 py-1.5 text-right text-zinc-500 font-medium">{t.amount}</td>
                     </tr>
                   ))}
                   {tradeHistory.filter(t => t.pair === activePair).length === 0 && (
@@ -487,7 +487,7 @@ const SpotTrading: React.FC = () => {
                   value={triggerPrice}
                   onChange={(e) => setTriggerPrice(e.target.value)}
                   placeholder="Price"
-                  className="flex-1 bg-transparent border-none outline-none text-right text-[12px] font-mono text-white pr-2 placeholder:text-zinc-700" 
+                  className="flex-1 bg-transparent border-none outline-none text-right text-[12px] font-medium text-white pr-2 placeholder:text-zinc-700" 
                 />
                 <span className="text-[10px] font-bold text-zinc-600 shrink-0 uppercase">{activeQuote}</span>
               </div>
@@ -528,12 +528,12 @@ const SpotTrading: React.FC = () => {
                 value={(orderType === 'market' || (orderType === 'tpsl' && tpslExecutionType === 'market')) ? 'Market' : priceInput} 
                 onChange={(e) => handlePriceChange(e.target.value)} 
                 disabled={orderType === 'market' || (orderType === 'tpsl' && tpslExecutionType === 'market')} 
-                className="flex-1 bg-transparent border-none outline-none text-right text-[12px] font-mono text-white pr-2 placeholder:text-zinc-700 disabled:text-zinc-500" 
+                className="flex-1 bg-transparent border-none outline-none text-right text-[12px] font-medium text-white pr-2 placeholder:text-zinc-700 disabled:text-zinc-500" 
               />
               <span className="text-[10px] font-bold text-zinc-600 shrink-0 uppercase">{activeQuote}</span>
             </div>
 
-            {/* Amount Field - Only visible for Limit and TPSL execution */}
+            {/* Amount Field - Only visible for Limit and TP/SL execution */}
             {orderType !== 'market' && (
               <div className="flex items-center border rounded-lg px-3 h-10 group transition-all bg-[#111] border-zinc-800 focus-within:border-zinc-400">
                 <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest min-w-[50px] shrink-0">Amount</span>
@@ -542,7 +542,7 @@ const SpotTrading: React.FC = () => {
                   value={amount} 
                   placeholder="0.00"
                   onChange={(e) => handleAmountChange(e.target.value)} 
-                  className="flex-1 bg-transparent border-none outline-none text-right text-[12px] font-mono text-white pr-2 placeholder:text-zinc-700" 
+                  className="flex-1 bg-transparent border-none outline-none text-right text-[12px] font-medium text-white pr-2 placeholder:text-zinc-700" 
                 />
                 <span className="text-[10px] font-bold text-zinc-600 shrink-0 uppercase">{activeBase}</span>
               </div>
@@ -618,7 +618,7 @@ const SpotTrading: React.FC = () => {
                 value={total} 
                 placeholder="0.00"
                 onChange={(e) => handleTotalChange(e.target.value)} 
-                className="flex-1 bg-transparent border-none outline-none text-right text-[12px] font-mono text-white pr-2 placeholder:text-zinc-700" 
+                className="flex-1 bg-transparent border-none outline-none text-right text-[12px] font-medium text-white pr-2 placeholder:text-zinc-700" 
               />
               <span className="text-[10px] font-bold text-zinc-600 shrink-0 uppercase">{activeQuote}</span>
             </div>
@@ -643,7 +643,7 @@ const SpotTrading: React.FC = () => {
                       value={tpInput}
                       onChange={(e) => setTpInput(e.target.value)}
                       placeholder="Take Profit"
-                      className="flex-1 bg-transparent border-none outline-none text-right text-[11px] font-mono text-white pr-2 placeholder:text-zinc-700" 
+                      className="flex-1 bg-transparent border-none outline-none text-right text-[11px] font-medium text-white pr-2 placeholder:text-zinc-700" 
                     />
                     <span className="text-[9px] font-bold text-zinc-600 shrink-0 uppercase">{activeQuote}</span>
                   </div>
@@ -655,7 +655,7 @@ const SpotTrading: React.FC = () => {
                       value={slInput}
                       onChange={(e) => setSlInput(e.target.value)}
                       placeholder="Stop Loss"
-                      className="flex-1 bg-transparent border-none outline-none text-right text-[11px] font-mono text-white pr-2 placeholder:text-zinc-700" 
+                      className="flex-1 bg-transparent border-none outline-none text-right text-[11px] font-medium text-white pr-2 placeholder:text-zinc-700" 
                     />
                     <span className="text-[9px] font-bold text-zinc-600 shrink-0 uppercase">{activeQuote}</span>
                   </div>
@@ -665,7 +665,7 @@ const SpotTrading: React.FC = () => {
 
             <div className="flex justify-between items-center text-[10px] font-normal text-zinc-500 px-0.5">
               <span>Available</span>
-              <span className="text-zinc-400 font-mono tracking-tighter">{side === 'buy' ? `${quoteBalance.toLocaleString()} ${activeQuote}` : `${baseBalance.toFixed(4)} ${activeBase}`}</span>
+              <span className="text-zinc-400 font-medium tabular-nums tracking-tighter">{side === 'buy' ? `${quoteBalance.toLocaleString()} ${activeQuote}` : `${baseBalance.toFixed(4)} ${activeBase}`}</span>
             </div>
 
             <button 
