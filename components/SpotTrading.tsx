@@ -459,18 +459,18 @@ const SpotTrading: React.FC = () => {
         </div>
       </div>
 
-      {/* Right Column Group (Orderbook & Trade) - Responsive 2-column on 1440px+ */}
-      <div className="flex shrink-0 h-full overflow-y-auto min-[1440px]:overflow-hidden bg-[#0a0a0a] border-l border-zinc-900 w-[300px] min-[1440px]:w-[640px] flex-col min-[1440px]:flex-row transition-all duration-300">
+      {/* Right Column Group (Orderbook & Trade) - Responsive 2-column on 1441px+ */}
+      <div className="flex shrink-0 h-full overflow-y-auto min-[1441px]:overflow-hidden bg-[#0a0a0a] border-l border-zinc-900 w-[300px] min-[1441px]:w-[640px] flex-col min-[1441px]:flex-row transition-all duration-300">
         
         {/* Sub-Column 1: Order Book */}
-        <div className="w-full min-[1440px]:w-1/2 flex flex-col h-auto min-[1440px]:h-full border-r border-zinc-900/50 shrink-0">
-          <div className="flex-1 min-[1440px]:h-full h-[480px] overflow-hidden">
+        <div className="w-full min-[1441px]:w-1/2 flex flex-col h-auto min-[1441px]:h-full border-r border-zinc-900/50 shrink-0">
+          <div className="flex-1 min-[1441px]:h-full h-[480px] overflow-hidden">
              <OrderBook currentPrice={livePrice} />
           </div>
         </div>
 
         {/* Sub-Column 2: Order Entry Section */}
-        <div className="w-full min-[1440px]:w-1/2 flex flex-col h-fit min-[1440px]:h-full bg-black min-w-0">
+        <div className="w-full min-[1441px]:w-1/2 flex flex-col h-fit min-[1441px]:h-full bg-black min-w-0">
           {/* Static Header Part of Order Entry */}
           <div className="p-4 pb-0 shrink-0">
             <div className="flex gap-1 p-0.5 bg-zinc-900/50 rounded-lg mb-4">
@@ -486,11 +486,11 @@ const SpotTrading: React.FC = () => {
           </div>
 
           {/* Middle Part: Fields and Slider - Constrained horizontal labels for narrow screens */}
-          <div className="h-auto min-[1440px]:flex-1 min-[1440px]:overflow-y-auto custom-scrollbar px-4 space-y-4 pt-4 pb-4">
+          <div className="h-auto min-[1441px]:flex-1 min-[1441px]:overflow-y-auto custom-scrollbar px-4 space-y-4 pt-4 pb-4">
             {/* Conditional Trigger Price Field for TP/SL tab */}
             {orderType === 'tpsl' && (
               <div className="flex items-center border border-zinc-800 bg-[#111] rounded-xl px-3 h-12 focus-within:border-zinc-500 transition-all min-w-0">
-                <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest min-[1440px]:min-w-[60px] min-w-[50px] shrink-0">Trigger</span>
+                <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest min-[1441px]:min-w-[60px] min-w-[50px] shrink-0">Trigger</span>
                 <input 
                   type="number" 
                   value={triggerPrice}
@@ -508,7 +508,7 @@ const SpotTrading: React.FC = () => {
                 <div className="relative shrink-0 flex items-center" ref={tpslTypeRef}>
                   <button 
                     onClick={() => setIsTpslTypeDropdownOpen(!isTpslTypeDropdownOpen)}
-                    className="text-[10px] font-black text-zinc-500 uppercase tracking-widest min-[1440px]:min-w-[60px] min-w-[50px] flex items-center gap-1.5 hover:text-zinc-300 transition-colors"
+                    className="text-[10px] font-black text-zinc-500 uppercase tracking-widest min-[1441px]:min-w-[60px] min-w-[50px] flex items-center gap-1.5 hover:text-zinc-300 transition-colors"
                   >
                     {tpslExecutionType} 
                     <svg className={`w-3 h-3 text-zinc-600 transition-transform ${isTpslTypeDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="m6 9 6 6 6-6"/></svg>
@@ -528,7 +528,7 @@ const SpotTrading: React.FC = () => {
                   )}
                 </div>
               ) : (
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest min-[1440px]:min-w-[60px] min-w-[50px] shrink-0">Price</span>
+                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest min-[1441px]:min-w-[60px] min-w-[50px] shrink-0">Price</span>
               )}
 
               <input 
@@ -544,7 +544,7 @@ const SpotTrading: React.FC = () => {
             {/* Amount Field */}
             {orderType !== 'market' && (
               <div className="flex items-center border rounded-xl px-3 h-12 group transition-all bg-[#111] border-zinc-800 focus-within:border-zinc-400 min-w-0">
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest min-[1440px]:min-w-[60px] min-w-[50px] shrink-0">Amount</span>
+                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest min-[1441px]:min-w-[60px] min-w-[50px] shrink-0">Amount</span>
                 <input 
                   type="number" 
                   value={amount} 
@@ -620,7 +620,7 @@ const SpotTrading: React.FC = () => {
 
             {/* Total Field */}
             <div className={`flex items-center border rounded-xl px-3 h-12 group transition-all bg-[#111] border-zinc-800 focus-within:border-zinc-400 min-w-0`}>
-              <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest min-[1440px]:min-w-[60px] min-w-[50px] shrink-0">Total</span>
+              <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest min-[1441px]:min-w-[60px] min-w-[50px] shrink-0">Total</span>
               <input 
                 type="number" 
                 value={total} 
@@ -645,7 +645,7 @@ const SpotTrading: React.FC = () => {
                 <div className={`overflow-hidden transition-all duration-300 ease-in-out ${showTPSL ? 'max-h-40 opacity-100 mt-4 space-y-3' : 'max-h-0 opacity-0'}`}>
                   {/* Take Profit Input */}
                   <div className="flex items-center border border-zinc-800 bg-[#111] rounded-xl px-3 h-11 focus-within:border-zinc-500 transition-all min-w-0">
-                    <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest min-[1440px]:min-w-[60px] min-w-[50px] shrink-0">TP Price</span>
+                    <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest min-[1441px]:min-w-[60px] min-w-[50px] shrink-0">TP Price</span>
                     <input 
                       type="number" 
                       value={tpInput}
@@ -657,7 +657,7 @@ const SpotTrading: React.FC = () => {
                   </div>
                   {/* Stop Loss Input */}
                   <div className="flex items-center border border-zinc-800 bg-[#111] rounded-xl px-3 h-11 focus-within:border-zinc-500 transition-all min-w-0">
-                    <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest min-[1440px]:min-w-[60px] min-w-[50px] shrink-0">SL Price</span>
+                    <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest min-[1441px]:min-w-[60px] min-w-[50px] shrink-0">SL Price</span>
                     <input 
                       type="number" 
                       value={slInput}
