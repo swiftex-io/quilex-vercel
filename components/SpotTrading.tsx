@@ -496,6 +496,7 @@ const SpotTrading: React.FC = () => {
                         <tr>
                           <th className="px-4 py-2">Pair / Type</th>
                           <th className="px-4 py-2">Side</th>
+                          {openOrdersSubTab === 'tpsl' && <th className="px-4 py-2">Trigger condition</th>}
                           <th className="px-4 py-2">Price</th>
                           <th className="px-4 py-2">Amount</th>
                           <th className="px-4 py-2">Filled</th>
@@ -507,6 +508,11 @@ const SpotTrading: React.FC = () => {
                           <tr key={o.id} className="border-b border-zinc-900/30 hover:bg-zinc-900/20 transition-all">
                             <td className="px-4 py-3"><span className="font-bold text-white">{o.symbol}</span> <span className="text-zinc-600 text-[9px] uppercase">{o.type}</span></td>
                             <td className={`px-4 py-3 font-bold ${o.side === 'buy' ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>{o.side.toUpperCase()}</td>
+                            {openOrdersSubTab === 'tpsl' && (
+                              <td className="px-4 py-3 text-zinc-400 font-medium whitespace-nowrap">
+                                Last price {o.side === 'buy' ? '>=' : '<='} {o.slPrice?.toLocaleString()}
+                              </td>
+                            )}
                             <td className="px-4 py-3 text-zinc-300 font-medium">{o.price.toLocaleString()}</td>
                             <td className="px-4 py-3 text-zinc-300 font-medium">{o.amount}</td>
                             <td className="px-4 py-3">
@@ -519,7 +525,7 @@ const SpotTrading: React.FC = () => {
                         ))}
                         {filteredOpenOrders.length === 0 && (
                           <tr>
-                            <td colSpan={6} className="py-20 text-center text-zinc-600 uppercase font-black text-[10px] tracking-widest opacity-20">No active orders</td>
+                            <td colSpan={openOrdersSubTab === 'tpsl' ? 7 : 6} className="py-20 text-center text-zinc-600 uppercase font-black text-[10px] tracking-widest opacity-20">No active orders</td>
                           </tr>
                         )}
                       </tbody>
