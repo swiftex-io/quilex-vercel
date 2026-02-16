@@ -57,6 +57,7 @@ interface ExchangeState {
   openOrders: Order[];
   filledOrders: Order[]; // Track filled orders to monitor TP/SL
   notifications: Notification[];
+  favorites: string[];
   referralCode: string;
   referralCount: number;
   referralVolume: number;
@@ -86,6 +87,7 @@ interface ExchangeState {
   addNotification: (notification: Omit<Notification, 'id' | 'timestamp'>) => void;
   removeNotification: (id: string) => void;
   setActivePair: (pair: string) => void;
+  toggleFavorite: (symbol: string) => void;
 }
 
 export const useExchangeStore = create<ExchangeState>((set, get) => ({
@@ -94,6 +96,7 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
   openOrders: [],
   filledOrders: [],
   notifications: [],
+  favorites: [],
   referralCode: 'LINTEX_PRO_88',
   referralCount: 42,
   referralVolume: 125000,
@@ -117,6 +120,15 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
   },
 
   setActivePair: (pair) => set({ activePair: pair }),
+
+  toggleFavorite: (symbol) => {
+    const { favorites } = get();
+    if (favorites.includes(symbol)) {
+      set({ favorites: favorites.filter(s => s !== symbol) });
+    } else {
+      set({ favorites: [...favorites, symbol] });
+    }
+  },
 
   addNotification: (n) => {
     const id = Math.random().toString(36).substring(2, 9);

@@ -14,6 +14,7 @@ const SpotTrading: React.FC = () => {
   const [pairSearchQuery, setPairSearchQuery] = useState('');
   const [historyTab, setHistoryTab] = useState<'open' | 'history'>('open');
   const [openOrdersSubTab, setOpenOrdersSubTab] = useState<'limit_market' | 'tpsl'>('limit_market');
+  const [sidebarTab, setSidebarTab] = useState<'All' | 'Favorites' | 'Meme' | 'L1' | 'AI'>('All');
   
   // TP/SL States
   const [showTPSL, setShowTPSL] = useState(false);
@@ -26,7 +27,7 @@ const SpotTrading: React.FC = () => {
   const pairSelectorRef = useRef<HTMLDivElement>(null);
   const tpslTypeRef = useRef<HTMLDivElement>(null);
 
-  const { balances, placeOrder, tradeHistory, openOrders, cancelOrder, activePair, setActivePair } = useExchangeStore();
+  const { balances, placeOrder, tradeHistory, openOrders, cancelOrder, activePair, setActivePair, favorites, toggleFavorite } = useExchangeStore();
   
   const [activeBase, activeQuote] = activePair.split('/');
   
@@ -156,13 +157,25 @@ const SpotTrading: React.FC = () => {
   };
 
   const availablePairs = useMemo(() => {
-    return balances
+    let list = balances
       .filter(b => b.symbol !== 'USDT')
       .filter(b => 
         b.symbol.toLowerCase().includes(pairSearchQuery.toLowerCase()) || 
         b.name.toLowerCase().includes(pairSearchQuery.toLowerCase())
       );
-  }, [balances, pairSearchQuery]);
+    
+    if (sidebarTab === 'Favorites') {
+      list = list.filter(b => favorites.includes(b.symbol));
+    } else if (sidebarTab === 'Meme') {
+      list = list.filter(b => ['DOGE', 'SHIB', 'PEPE'].includes(b.symbol));
+    } else if (sidebarTab === 'L1') {
+      list = list.filter(b => ['BTC', 'ETH', 'SOL', 'BNB', 'ADA', 'AVAX', 'DOT'].includes(b.symbol));
+    } else if (sidebarTab === 'AI') {
+      list = list.filter(b => ['NEAR', 'ICP', 'RNDR'].includes(b.symbol));
+    }
+
+    return list;
+  }, [balances, pairSearchQuery, sidebarTab, favorites]);
 
   const selectPair = (symbol: string) => {
     setActivePair(`${symbol}/USDT`);
@@ -180,6 +193,17 @@ const SpotTrading: React.FC = () => {
     limit_market: openOrders.filter(o => o.symbol === activePair && (o.type === 'limit' || o.type === 'market')).length,
     tpsl: openOrders.filter(o => o.symbol === activePair && o.type === 'tpsl').length
   };
+
+  const StarIcon = ({ symbol, filled, className }: { symbol: string, filled: boolean, className?: string }) => (
+    <button 
+      onClick={(e) => { e.stopPropagation(); toggleFavorite(symbol); }} 
+      className={`transition-all duration-300 transform active:scale-125 ${className || ''} ${filled ? 'text-amber-400' : 'text-zinc-700 hover:text-zinc-400'}`}
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+      </svg>
+    </button>
+  );
 
   return (
     <div className="flex h-[calc(100vh-64px-32px)] bg-black overflow-hidden border-t border-zinc-900">
@@ -201,18 +225,28 @@ const SpotTrading: React.FC = () => {
           </div>
         </div>
         
-        <div className="flex px-2 pt-1 gap-1 border-b border-zinc-900 bg-black/20">
-          {['All', 'Meme', 'L1', 'AI'].map((cat, i) => (
-            <button key={cat} className={`px-3 py-1.5 text-[11px] font-normal rounded-t-lg transition-all ${i === 0 ? 'bg-zinc-900 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>
-              {cat}
+        <div className="flex px-2 pt-1 gap-0.5 border-b border-zinc-900 bg-black/20 overflow-x-auto no-scrollbar">
+          {['All', 'Favorites', 'Meme', 'L1', 'AI'].map((cat) => (
+            <button 
+              key={cat} 
+              onClick={() => setSidebarTab(cat as any)}
+              className={`px-3 py-1.5 text-[11px] font-normal rounded-t-lg transition-all whitespace-nowrap ${sidebarTab === cat ? 'bg-zinc-900 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+            >
+              {cat === 'Favorites' ? (
+                <div className="flex items-center gap-1">
+                   <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                   Favorites
+                </div>
+              ) : cat}
             </button>
           ))}
         </div>
 
         <div className="flex-1 overflow-y-auto custom-scrollbar bg-black/10">
           <div className="grid grid-cols-12 px-3 py-2 text-[10px] text-zinc-500 font-normal border-b border-zinc-900/30 sticky top-0 bg-[#0a0a0a] z-10">
-            <div className="col-span-7">Pair</div>
-            <div className="col-span-5 text-right">Price</div>
+            <div className="col-span-6">Pair</div>
+            <div className="col-span-4 text-right">Price</div>
+            <div className="col-span-2 text-right"></div>
           </div>
           {availablePairs.map((asset) => (
             <div 
@@ -220,9 +254,9 @@ const SpotTrading: React.FC = () => {
               onClick={() => selectPair(asset.symbol)}
               className={`grid grid-cols-12 items-center px-3 py-2.5 hover:bg-zinc-900/50 transition-all cursor-pointer group ${asset.symbol === activeBase ? 'bg-zinc-900/60 border-l-2 border-white' : ''}`}
             >
-              <div className="col-span-7 flex items-center gap-2">
+              <div className="col-span-6 flex items-center gap-2 overflow-hidden">
                 <img src={`https://assets.coincap.io/assets/icons/${asset.symbol.toLowerCase()}@2x.png`} alt={asset.symbol} className="w-4 h-4 rounded-full object-cover shrink-0" />
-                <div className="flex flex-col min-0">
+                <div className="flex flex-col min-w-0">
                   <span className="text-[12px] font-normal text-zinc-200 group-hover:text-white truncate">
                     {asset.symbol}<span className="text-zinc-500">/USDT</span>
                   </span>
@@ -231,13 +265,21 @@ const SpotTrading: React.FC = () => {
                   </span>
                 </div>
               </div>
-              <div className="col-span-5 text-right">
+              <div className="col-span-4 text-right overflow-hidden">
                 <span className="text-[11px] font-medium text-zinc-300 block truncate">
                   {asset.price.toLocaleString(undefined, { minimumFractionDigits: asset.price < 1 ? 4 : 2 })}
                 </span>
               </div>
+              <div className="col-span-2 text-right">
+                <StarIcon symbol={asset.symbol} filled={favorites.includes(asset.symbol)} />
+              </div>
             </div>
           ))}
+          {availablePairs.length === 0 && (
+            <div className="py-20 text-center px-6">
+              <p className="text-[10px] font-bold text-zinc-700 uppercase tracking-widest leading-loose">No pairs found</p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -246,7 +288,7 @@ const SpotTrading: React.FC = () => {
         
         {/* Ticker Header */}
         <div className="h-[60px] border-b border-zinc-900 flex items-center px-4 gap-8 bg-black shrink-0 relative z-50">
-          <div className="flex items-center gap-3 relative" ref={pairSelectorRef}>
+          <div className="flex items-center gap-4 relative" ref={pairSelectorRef}>
             <div 
               className="flex items-center gap-2 cursor-pointer group select-none" 
               onClick={() => setIsPairSelectorOpen(!isPairSelectorOpen)}
@@ -264,6 +306,20 @@ const SpotTrading: React.FC = () => {
                 </svg>
               </div>
             </div>
+            
+            <button 
+              onClick={(e) => { e.stopPropagation(); toggleFavorite(activeBase); }}
+              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-90 ${
+                favorites.includes(activeBase) 
+                  ? 'bg-amber-400/20 text-amber-400' 
+                  : 'bg-zinc-800 text-zinc-500 hover:bg-zinc-700 hover:text-zinc-300'
+              }`}
+              title={favorites.includes(activeBase) ? "Remove from favorites" : "Add to favorites"}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill={favorites.includes(activeBase) ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+            </button>
 
             <div className={`absolute top-full left-0 mt-2 w-80 bg-[#0d0d0d] border border-zinc-800 rounded-xl shadow-[0_24px_48px_rgba(0,0,0,0.5)] z-[100] overflow-hidden dropdown-container ${isPairSelectorOpen ? 'is-visible' : ''}`}>
               <div className="p-3 border-b border-zinc-800 bg-black/40">
@@ -283,8 +339,9 @@ const SpotTrading: React.FC = () => {
               </div>
               <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
                 <div className="grid grid-cols-12 px-4 py-2 text-[10px] text-zinc-500 font-normal border-b border-zinc-900/30 sticky top-0 bg-[#0d0d0d] z-10">
-                  <div className="col-span-7">Pair</div>
-                  <div className="col-span-5 text-right">Price</div>
+                  <div className="col-span-6">Pair</div>
+                  <div className="col-span-4 text-right">Price</div>
+                  <div className="col-span-2 text-right"></div>
                 </div>
                 {availablePairs.map((asset) => (
                   <div 
@@ -292,7 +349,7 @@ const SpotTrading: React.FC = () => {
                     onClick={() => selectPair(asset.symbol)}
                     className={`grid grid-cols-12 items-center px-4 py-3 hover:bg-zinc-800 transition-all cursor-pointer group ${asset.symbol === activeBase ? 'bg-zinc-900/30 border-l-2 border-white' : ''}`}
                   >
-                    <div className="col-span-7 flex items-center gap-3">
+                    <div className="col-span-6 flex items-center gap-3 overflow-hidden">
                       <img src={`https://assets.coincap.io/assets/icons/${asset.symbol.toLowerCase()}@2x.png`} alt={asset.symbol} className="w-5 h-5 rounded-full object-cover shrink-0" />
                       <div className="flex flex-col min-w-0">
                         <span className="text-[12px] font-bold text-zinc-200 group-hover:text-white truncate">
@@ -303,10 +360,13 @@ const SpotTrading: React.FC = () => {
                         </span>
                       </div>
                     </div>
-                    <div className="col-span-5 text-right">
+                    <div className="col-span-4 text-right overflow-hidden">
                       <span className="text-[12px] font-bold text-zinc-300 block truncate">
                         {asset.price.toLocaleString(undefined, { minimumFractionDigits: asset.price < 1 ? 4 : 2 })}
                       </span>
+                    </div>
+                    <div className="col-span-2 text-right">
+                      <StarIcon symbol={asset.symbol} filled={favorites.includes(asset.symbol)} />
                     </div>
                   </div>
                 ))}
