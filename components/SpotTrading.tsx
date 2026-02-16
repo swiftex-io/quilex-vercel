@@ -184,8 +184,8 @@ const SpotTrading: React.FC = () => {
   return (
     <div className="flex h-[calc(100vh-64px-32px)] bg-black overflow-hidden border-t border-zinc-900">
       
-      {/* Left Sidebar - Trading Pairs */}
-      <div className="hidden lg:flex w-[260px] flex-col border-r border-zinc-900 bg-[#0a0a0a] shrink-0 h-full overflow-hidden">
+      {/* Left Sidebar - Trading Pairs (Hides below 1280px / xl) */}
+      <div className="hidden xl:flex w-[260px] flex-col border-r border-zinc-900 bg-[#0a0a0a] shrink-0 h-full overflow-hidden">
         <div className="p-3 border-b border-zinc-900 bg-black/40">
           <div className="relative">
             <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600">
@@ -319,10 +319,10 @@ const SpotTrading: React.FC = () => {
             <span className={`text-[11px] font-normal tabular-nums leading-none mt-0.5 ${priceChange >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>{priceChange >= 0 ? '+' : ''}{absChange.toLocaleString(undefined, { minimumFractionDigits: livePrice < 1 ? 4 : 1 })} ({priceChange.toFixed(2)}%)</span>
           </div>
           
-          <div className="hidden xl:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-8">
             {[
-              { label: '24h low', val: (livePrice * 0.95).toLocaleString(undefined, { maximumFractionDigits: 1 }) },
-              { label: '24h high', val: (livePrice * 1.05).toLocaleString(undefined, { maximumFractionDigits: 1 }) },
+              { label: '24h low', val: '62,015.4' },
+              { label: '24h high', val: '68,543.3' },
               { label: '24h volume', val: '1.94K' }
             ].map((item, i) => (
               <div key={i} className="flex flex-col">
@@ -333,8 +333,8 @@ const SpotTrading: React.FC = () => {
           </div>
         </div>
 
-        {/* Chart Area */}
-        <div className="h-[60%] bg-black overflow-hidden relative border-b border-zinc-900 shrink-0">
+        {/* Chart Area - Reduced height slightly to 52% */}
+        <div className="h-[52%] bg-black overflow-hidden relative border-b border-zinc-900 shrink-0">
           <TradeChart />
         </div>
         
@@ -671,8 +671,8 @@ const SpotTrading: React.FC = () => {
               </div>
             )}
 
-            {/* Static Actions Area (follows flow in compact mode, bottom of column in fullscreen) */}
-            <div className="min-[1440px]:mt-auto pt-6 border-t border-zinc-900/50 bg-black shrink-0">
+            {/* Static Actions Area (follows flow in all modes) */}
+            <div className="mt-6 pt-6 border-t border-zinc-900/50 bg-black shrink-0">
               <div className="flex justify-between items-center text-[12px] font-normal text-zinc-500 px-1 mb-3">
                 <span>Available</span>
                 <span className="text-zinc-300 font-bold tabular-nums tracking-tight">{side === 'buy' ? `${quoteBalance.toLocaleString()} ${activeQuote}` : `${baseBalance.toFixed(4)} ${activeBase}`}</span>
