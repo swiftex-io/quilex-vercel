@@ -222,14 +222,15 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
   },
 
   updatePrices: (priceData) => {
-    const { openOrders, filledOrders, balances, tradeHistory, addNotification } = get();
+    const { openOrders, balances, tradeHistory, addNotification } = get();
     const updatedHistory: Trade[] = [...tradeHistory];
     const nextOpenOrders: Order[] = [];
-    const nextFilledOrders: Order[] = [];
+    const nextFilledOrders: Order[] = [...get().filledOrders];
     let balancesChanged = false;
     let updatedBalances = [...balances];
     let playSuccess = false;
 
+    // We use a manual loop to handle dynamic addition of TP/SL orders when a limit order is filled
     openOrders.forEach(order => {
       const baseSymbol = order.symbol.split('/')[0];
       const pairKey = `${baseSymbol}USDT`;
@@ -241,6 +242,65 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
         return;
       }
 
+      // 1. Handle TP/SL Triggers (Conditional Orders)
+      if (order.type === 'tpsl') {
+        let triggered = false;
+        let triggerType: 'tp' | 'sl' | null = null;
+
+        // If side is 'sell', it means it was an exit for a 'buy' entry
+        if (order.side === 'sell') {
+          if (order.tpPrice && currentPrice >= order.tpPrice) { triggered = true; triggerType = 'tp'; }
+          else if (order.slPrice && currentPrice <= order.slPrice) { triggered = true; triggerType = 'sl'; }
+        } else {
+          // Exit for 'sell' entry (order.side is 'buy')
+          if (order.tpPrice && currentPrice <= order.tpPrice) { triggered = true; triggerType = 'tp'; }
+          else if (order.slPrice && currentPrice >= order.slPrice) { triggered = true; triggerType = 'sl'; }
+        }
+
+        if (triggered) {
+          balancesChanged = true;
+          playSuccess = true;
+          
+          const sideLabel = triggerType === 'tp' ? 'Take Profit' : 'Stop Loss';
+          addNotification({
+            title: `${sideLabel} Triggered`,
+            message: `Closed ${order.amount} ${baseSymbol} @ ${currentPrice.toLocaleString()}`,
+            type: triggerType === 'tp' ? 'success' : 'warning'
+          });
+
+          const quoteSymbol = order.symbol.split('/')[1];
+          updatedBalances = updatedBalances.map(b => {
+            if (order.side === 'sell') { 
+              // Closing a BUY entry (Selling BTC for USDT)
+              if (b.symbol === baseSymbol) return { ...b, balance: b.balance - order.amount, available: b.available - order.amount };
+              if (b.symbol === quoteSymbol) return { ...b, balance: b.balance + (currentPrice * order.amount), available: b.available + (currentPrice * order.amount) };
+            } else { 
+              // Closing a SELL entry (Buying BTC back with USDT)
+              if (b.symbol === quoteSymbol) return { ...b, balance: b.balance - (currentPrice * order.amount), available: b.available - (currentPrice * order.amount) };
+              if (b.symbol === baseSymbol) return { ...b, balance: b.balance + order.amount, available: b.available + order.amount };
+            }
+            return b;
+          });
+
+          updatedHistory.unshift({
+            id: `exit-${order.id}`,
+            pair: order.symbol,
+            type: order.side,
+            price: currentPrice,
+            amount: order.amount,
+            time: new Date().toLocaleTimeString([], { hour12: false })
+          });
+          
+          // Move to filled orders as history
+          nextFilledOrders.unshift({ ...order, status: 'filled', filled: order.amount, time: new Date().toLocaleTimeString([], { hour12: false }) });
+          return; // Don't add to nextOpenOrders
+        } else {
+          nextOpenOrders.push(order);
+          return;
+        }
+      }
+
+      // 2. Handle Limit/Market Fills (Entry Orders)
       let isFilled = false;
       if (order.side === 'buy') {
         if (currentPrice <= order.price) isFilled = true;
@@ -251,8 +311,9 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
       if (isFilled) {
         balancesChanged = true;
         playSuccess = true;
+        
         const filledOrder: Order = { ...order, status: 'filled', filled: order.amount };
-        nextFilledOrders.push(filledOrder);
+        nextFilledOrders.unshift(filledOrder);
 
         updatedHistory.unshift({
           id: order.id,
@@ -280,66 +341,32 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
           }
           return b;
         });
+
+        // SPECIAL LOGIC: If this order had TP/SL parameters, convert them to a new ACTIVE TP/SL order
+        if (order.tpPrice || order.slPrice) {
+          const tpslExitOrder: Order = {
+            id: `tpsl-exit-${order.id}`,
+            symbol: order.symbol,
+            side: order.side === 'buy' ? 'sell' : 'buy', // Exit side is opposite of entry
+            type: 'tpsl',
+            price: order.price, // Reference entry price
+            amount: order.amount,
+            filled: 0,
+            status: 'open',
+            time: new Date().toLocaleTimeString([], { hour12: false }),
+            tpPrice: order.tpPrice,
+            slPrice: order.slPrice
+          };
+          nextOpenOrders.push(tpslExitOrder);
+          
+          addNotification({
+            title: 'TP/SL Protection Active',
+            message: `Conditional exit order created for ${baseSymbol}`,
+            type: 'info'
+          });
+        }
       } else {
         nextOpenOrders.push(order);
-      }
-    });
-
-    filledOrders.forEach(order => {
-      const baseSymbol = order.symbol.split('/')[0];
-      const pairKey = `${baseSymbol}USDT`;
-      const priceEntry = priceData[pairKey];
-      const currentPrice = typeof priceEntry === 'object' ? priceEntry.price : priceEntry;
-      
-      if (!currentPrice || (!order.tpPrice && !order.slPrice)) {
-        nextFilledOrders.push(order);
-        return;
-      }
-
-      let triggered = false;
-      let triggerType: 'tp' | 'sl' | null = null;
-
-      if (order.side === 'buy') {
-        if (order.tpPrice && currentPrice >= order.tpPrice) { triggered = true; triggerType = 'tp'; }
-        else if (order.slPrice && currentPrice <= order.slPrice) { triggered = true; triggerType = 'sl'; }
-      } else {
-        if (order.tpPrice && currentPrice <= order.tpPrice) { triggered = true; triggerType = 'tp'; }
-        else if (order.slPrice && currentPrice >= order.slPrice) { triggered = true; triggerType = 'sl'; }
-      }
-
-      if (triggered) {
-        balancesChanged = true;
-        playSuccess = true;
-        
-        const sideLabel = triggerType === 'tp' ? 'Take Profit' : 'Stop Loss';
-        addNotification({
-          title: `${sideLabel} Triggered`,
-          message: `Closed ${order.amount} ${baseSymbol} @ ${currentPrice.toLocaleString()}`,
-          type: triggerType === 'tp' ? 'success' : 'warning'
-        });
-
-        const quoteSymbol = order.symbol.split('/')[1];
-        updatedBalances = updatedBalances.map(b => {
-          if (order.side === 'buy') { 
-            if (b.symbol === baseSymbol) return { ...b, balance: b.balance - order.amount, available: b.available - order.amount };
-            if (b.symbol === quoteSymbol) return { ...b, balance: b.balance + (currentPrice * order.amount), available: b.available + (currentPrice * order.amount) };
-          } else { 
-            if (b.symbol === quoteSymbol) return { ...b, balance: b.balance - (currentPrice * order.amount), available: b.available - (currentPrice * order.amount) };
-            if (b.symbol === baseSymbol) return { ...b, balance: b.balance + order.amount, available: b.available + order.amount };
-          }
-          return b;
-        });
-
-        updatedHistory.unshift({
-          id: `exit-${order.id}`,
-          pair: order.symbol,
-          type: order.side === 'buy' ? 'sell' : 'buy',
-          price: currentPrice,
-          amount: order.amount,
-          time: new Date().toLocaleTimeString([], { hour12: false })
-        });
-      } else {
-        nextFilledOrders.push(order);
       }
     });
 
@@ -439,6 +466,24 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
         type: 'success'
       });
 
+      // Handle TP/SL for Market Orders
+      if (orderData.tpPrice || orderData.slPrice) {
+        const tpslExitOrder: Order = {
+          id: `tpsl-exit-mkt-${Math.random().toString(36).substr(2, 9)}`,
+          symbol: orderData.symbol,
+          side: orderData.side === 'buy' ? 'sell' : 'buy',
+          type: 'tpsl',
+          price: orderData.price,
+          amount: orderData.amount,
+          filled: 0,
+          status: 'open',
+          time: new Date().toLocaleTimeString([], { hour12: false }),
+          tpPrice: orderData.tpPrice,
+          slPrice: orderData.slPrice
+        };
+        set(s => ({ openOrders: [...s.openOrders, tpslExitOrder] }));
+      }
+
       return true;
     } else {
       if (orderData.side === 'buy') {
@@ -454,7 +499,6 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
         if (!baseAsset || baseAsset.available < orderData.amount) return false;
         
         set(s => ({
-          // Fix: Changing order.amount to orderData.amount to fix "Cannot find name 'order'" error.
           balances: s.balances.map(b => b.symbol === base ? { ...b, available: b.available - orderData.amount } : b)
         }));
       }
@@ -487,21 +531,26 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
     const quote = order.symbol.split('/')[1];
     const base = order.symbol.split('/')[0];
 
-    if (order.side === 'buy') {
-      const cost = order.price * order.amount;
-      set(s => ({
-        balances: s.balances.map(b => b.symbol === quote ? { ...b, available: b.available + cost } : b)
-      }));
-    } else {
-      set(s => ({
-        balances: s.balances.map(b => b.symbol === base ? { ...b, available: b.available + order.amount } : b)
-      }));
+    // If it's a regular limit order, return reserved funds
+    if (order.type === 'limit') {
+      if (order.side === 'buy') {
+        const cost = order.price * order.amount;
+        set(s => ({
+          balances: s.balances.map(b => b.symbol === quote ? { ...b, available: b.available + cost } : b)
+        }));
+      } else {
+        set(s => ({
+          balances: s.balances.map(b => b.symbol === base ? { ...b, available: b.available + order.amount } : b)
+        }));
+      }
     }
+    // If it's a TP/SL order, it doesn't "reserve" additional funds in this prototype (it protects existing position),
+    // so we just remove it from the list.
 
     set(s => ({ openOrders: s.openOrders.filter(o => o.id !== id) }));
     addNotification({
       title: 'Order Canceled',
-      message: `${order.side.toUpperCase()} ${order.amount} ${base} canceled.`,
+      message: `${order.type === 'tpsl' ? 'TP/SL Protection' : order.side.toUpperCase() + ' ' + order.amount + ' ' + base} canceled.`,
       type: 'warning'
     });
   },
