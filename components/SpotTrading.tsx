@@ -604,8 +604,8 @@ const SpotTrading: React.FC = () => {
                     <table className="w-full text-[11px] text-left border-separate border-spacing-0">
                       <thead className="sticky top-0 bg-zinc-950 text-zinc-500 font-normal border-b border-zinc-900 z-10">
                         <tr>
-                          <th className="px-4 py-2">Pair / Type</th>
-                          <th className="px-4 py-2">Side</th>
+                          <th className="px-4 py-2 font-normal">Pair / Type</th>
+                          <th className="px-4 py-2 font-normal">Side</th>
                           {openOrdersSubTab === 'tpsl' && <th className="px-4 py-2 font-normal">Trigger condition</th>}
                           <th className="px-4 py-2 font-normal">Price</th>
                           <th className="px-4 py-2 font-normal">Amount</th>
@@ -615,42 +615,97 @@ const SpotTrading: React.FC = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredOpenOrders.map((o) => (
-                          <tr key={o.id} className="border-b border-zinc-900/30 hover:bg-zinc-900/20 transition-all">
-                            <td className="px-4 py-3 font-medium"><span className="font-bold text-white">{o.symbol}</span> <span className="text-zinc-600 text-[9px] uppercase">{o.type}</span></td>
-                            <td className={`px-4 py-3 font-bold ${o.side === 'buy' ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>{o.side.toUpperCase()}</td>
-                            {openOrdersSubTab === 'tpsl' && (
-                              <td className="px-4 py-3 text-zinc-400 font-medium whitespace-nowrap">
-                                Last price {o.side === 'buy' ? '>=' : '<='} {o.slPrice?.toLocaleString()}
-                              </td>
-                            )}
-                            <td className="px-4 py-3 text-zinc-300 font-medium tabular-nums">{o.price.toLocaleString()}</td>
-                            <td className="px-4 py-3 text-zinc-300 font-medium tabular-nums">{o.amount}</td>
-                            <td className="px-4 py-3">
-                               <div className="w-16 h-1 bg-zinc-800 rounded-full overflow-hidden">
-                                 <div className="h-full bg-[#00d18e]" style={{ width: `${(o.filled / o.amount) * 100}%` }}></div>
-                               </div>
-                            </td>
-                            <td className="px-4 py-3">
-                              {(o.tpPrice || o.slPrice) ? (
-                                <button 
-                                  onClick={() => setViewingTPSLOrder(o)}
-                                  className="text-blue-400 hover:text-blue-300 font-black uppercase text-[10px] tracking-tight"
-                                >
-                                  View
-                                </button>
-                              ) : (
-                                <span className="text-zinc-700 font-black">--</span>
-                              )}
-                            </td>
-                            <td className="px-4 py-3 text-right"><button onClick={() => cancelOrder(o.id)} className="text-[10px] font-bold text-red-400 hover:text-red-300 uppercase">Cancel</button></td>
-                          </tr>
-                        ))}
-                        {filteredOpenOrders.length === 0 && (
+                        {filteredOpenOrders.length === 0 ? (
                           <tr>
                             <td colSpan={openOrdersSubTab === 'tpsl' ? 8 : 7} className="py-20 text-center text-zinc-600 uppercase font-black text-[10px] tracking-widest opacity-20">No active orders</td>
                           </tr>
-                        )}
+                        ) : filteredOpenOrders.map((o) => {
+                          const isBracket = o.type === 'tpsl' && o.tpPrice && o.slPrice;
+                          
+                          if (isBracket && openOrdersSubTab === 'tpsl') {
+                            // Split row rendering for OCO TP/SL brackets
+                            return (
+                              <React.Fragment key={o.id}>
+                                {/* First Row: Take Profit specific + Common Fields */}
+                                <tr className="border-b border-zinc-900/10 hover:bg-zinc-900/20 transition-all">
+                                  <td rowSpan={2} className="px-4 py-3 font-medium border-r border-zinc-900/20 bg-zinc-900/5">
+                                    <div className="flex flex-col">
+                                      <span className="font-bold text-white uppercase">{o.symbol}</span>
+                                      <span className="text-zinc-600 text-[9px] uppercase font-black">Bracket Order</span>
+                                    </div>
+                                  </td>
+                                  <td rowSpan={2} className={`px-4 py-3 font-black border-r border-zinc-900/20 ${o.side === 'buy' ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>
+                                    {o.side.toUpperCase()}
+                                  </td>
+                                  <td className="px-4 py-3 text-zinc-300 font-medium flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-[#00d18e]"></span>
+                                    Take Profit: Last price {o.side === 'sell' ? '>=' : '<='} {o.tpPrice?.toLocaleString()}
+                                  </td>
+                                  <td className="px-4 py-3 text-zinc-300 font-medium tabular-nums">{o.tpPrice?.toLocaleString()}</td>
+                                  <td className="px-4 py-3 text-zinc-300 font-medium tabular-nums">{o.amount}</td>
+                                  <td rowSpan={2} className="px-4 py-3 border-l border-r border-zinc-900/20">
+                                     <div className="w-16 h-1 bg-zinc-800 rounded-full overflow-hidden">
+                                       <div className="h-full bg-[#00d18e]" style={{ width: `${(o.filled / o.amount) * 100}%` }}></div>
+                                     </div>
+                                  </td>
+                                  <td rowSpan={2} className="px-4 py-3 border-r border-zinc-900/20">
+                                    <button 
+                                      onClick={() => setViewingTPSLOrder(o)}
+                                      className="text-blue-400 hover:text-blue-300 font-black uppercase text-[10px] tracking-tight"
+                                    >
+                                      View
+                                    </button>
+                                  </td>
+                                  <td rowSpan={2} className="px-4 py-3 text-right">
+                                    <button onClick={() => cancelOrder(o.id)} className="text-[10px] font-black text-red-500 hover:text-red-400 uppercase tracking-widest bg-red-500/5 px-3 py-1 rounded border border-red-500/20 hover:border-red-500/50 transition-all">Cancel</button>
+                                  </td>
+                                </tr>
+                                {/* Second Row: Stop Loss specific */}
+                                <tr className="border-b border-zinc-900/30 hover:bg-zinc-900/20 transition-all">
+                                  <td className="px-4 py-3 text-zinc-300 font-medium flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-[#ff4d4f]"></span>
+                                    Stop Loss: Last price {o.side === 'sell' ? '<=' : '>='} {o.slPrice?.toLocaleString()}
+                                  </td>
+                                  <td className="px-4 py-3 text-zinc-300 font-medium tabular-nums">{o.slPrice?.toLocaleString()}</td>
+                                  <td className="px-4 py-3 text-zinc-300 font-medium tabular-nums">{o.amount}</td>
+                                </tr>
+                              </React.Fragment>
+                            );
+                          }
+
+                          // Standard Row Rendering
+                          return (
+                            <tr key={o.id} className="border-b border-zinc-900/30 hover:bg-zinc-900/20 transition-all">
+                              <td className="px-4 py-3 font-medium"><span className="font-bold text-white">{o.symbol}</span> <span className="text-zinc-600 text-[9px] uppercase">{o.type}</span></td>
+                              <td className={`px-4 py-3 font-bold ${o.side === 'buy' ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>{o.side.toUpperCase()}</td>
+                              {openOrdersSubTab === 'tpsl' && (
+                                <td className="px-4 py-3 text-zinc-400 font-medium whitespace-nowrap">
+                                  Last price {o.side === 'buy' ? '>=' : '<='} {o.slPrice?.toLocaleString()}
+                                </td>
+                              )}
+                              <td className="px-4 py-3 text-zinc-300 font-medium tabular-nums">{o.price.toLocaleString()}</td>
+                              <td className="px-4 py-3 text-zinc-300 font-medium tabular-nums">{o.amount}</td>
+                              <td className="px-4 py-3">
+                                 <div className="w-16 h-1 bg-zinc-800 rounded-full overflow-hidden">
+                                   <div className="h-full bg-[#00d18e]" style={{ width: `${(o.filled / o.amount) * 100}%` }}></div>
+                                 </div>
+                              </td>
+                              <td className="px-4 py-3">
+                                {(o.tpPrice || o.slPrice) ? (
+                                  <button 
+                                    onClick={() => setViewingTPSLOrder(o)}
+                                    className="text-blue-400 hover:text-blue-300 font-black uppercase text-[10px] tracking-tight"
+                                  >
+                                    View
+                                  </button>
+                                ) : (
+                                  <span className="text-zinc-700 font-black">--</span>
+                                )}
+                              </td>
+                              <td className="px-4 py-3 text-right"><button onClick={() => cancelOrder(o.id)} className="text-[10px] font-bold text-red-400 hover:text-red-300 uppercase">Cancel</button></td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </>
