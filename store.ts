@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 import { Asset, Trade, Order, Notification } from './types';
 import { MOCK_ASSETS } from './constants';
@@ -42,7 +43,7 @@ export const TIER_DATA: Record<ReferralTier, TierBenefits> = {
 // Audio Utilities
 const SOUNDS = {
   PLACED: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3',
-  FILLED: 'https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3' // Updated to a satisfying coins dropping sound
+  FILLED: 'https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3' 
 };
 
 const playAudio = (url: string) => {
@@ -55,7 +56,7 @@ interface ExchangeState {
   balances: Asset[];
   tradeHistory: Trade[];
   openOrders: Order[];
-  filledOrders: Order[]; // Track filled orders to monitor TP/SL
+  filledOrders: Order[]; 
   notifications: Notification[];
   favorites: string[];
   referralCode: string;
@@ -80,7 +81,7 @@ interface ExchangeState {
   executeTrade: (pair: string, type: 'buy' | 'sell', price: number, amount: number) => Promise<boolean>;
   placeOrder: (order: Omit<Order, 'id' | 'filled' | 'status' | 'time'>) => Promise<boolean>;
   cancelOrder: (id: string) => void;
-  updatePrices: (priceData: Record<string, number>) => void;
+  updatePrices: (priceData: Record<string, number | { price: number; change24h: number }>) => void;
   setDepositModalOpen: (open: boolean) => void;
   setMarketsActiveTab: (tab: 'Markets Overview' | 'Rankings') => void;
   getTier: () => ReferralTier;
@@ -135,7 +136,6 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
     set(s => ({ 
       notifications: [{ ...n, id, timestamp: Date.now() }, ...s.notifications].slice(0, 5) 
     }));
-    // Auto remove after 5s
     setTimeout(() => get().removeNotification(id), 5000);
   },
 
@@ -222,7 +222,6 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
   },
 
   updatePrices: (priceData) => {
-    const currentPrices = priceData;
     const { openOrders, filledOrders, balances, tradeHistory, addNotification } = get();
     const updatedHistory: Trade[] = [...tradeHistory];
     const nextOpenOrders: Order[] = [];
@@ -231,11 +230,11 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
     let updatedBalances = [...balances];
     let playSuccess = false;
 
-    // 1. Process Open Orders
     openOrders.forEach(order => {
       const baseSymbol = order.symbol.split('/')[0];
       const pairKey = `${baseSymbol}USDT`;
-      const currentPrice = currentPrices[pairKey];
+      const priceEntry = priceData[pairKey];
+      const currentPrice = typeof priceEntry === 'object' ? priceEntry.price : priceEntry;
       
       if (!currentPrice) {
         nextOpenOrders.push(order);
@@ -286,11 +285,11 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
       }
     });
 
-    // 2. Process Filled Orders for TP/SL Triggers
     filledOrders.forEach(order => {
       const baseSymbol = order.symbol.split('/')[0];
       const pairKey = `${baseSymbol}USDT`;
-      const currentPrice = currentPrices[pairKey];
+      const priceEntry = priceData[pairKey];
+      const currentPrice = typeof priceEntry === 'object' ? priceEntry.price : priceEntry;
       
       if (!currentPrice || (!order.tpPrice && !order.slPrice)) {
         nextFilledOrders.push(order);
@@ -300,7 +299,6 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
       let triggered = false;
       let triggerType: 'tp' | 'sl' | null = null;
 
-      // Logic for closing a position based on TP/SL
       if (order.side === 'buy') {
         if (order.tpPrice && currentPrice >= order.tpPrice) { triggered = true; triggerType = 'tp'; }
         else if (order.slPrice && currentPrice <= order.slPrice) { triggered = true; triggerType = 'sl'; }
@@ -320,13 +318,12 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
           type: triggerType === 'tp' ? 'success' : 'warning'
         });
 
-        // Execute closing trade (reverse of original)
         const quoteSymbol = order.symbol.split('/')[1];
         updatedBalances = updatedBalances.map(b => {
-          if (order.side === 'buy') { // Close buy position = Sell
+          if (order.side === 'buy') { 
             if (b.symbol === baseSymbol) return { ...b, balance: b.balance - order.amount, available: b.available - order.amount };
             if (b.symbol === quoteSymbol) return { ...b, balance: b.balance + (currentPrice * order.amount), available: b.available + (currentPrice * order.amount) };
-          } else { // Close sell position = Buy
+          } else { 
             if (b.symbol === quoteSymbol) return { ...b, balance: b.balance - (currentPrice * order.amount), available: b.available - (currentPrice * order.amount) };
             if (b.symbol === baseSymbol) return { ...b, balance: b.balance + order.amount, available: b.available + order.amount };
           }
@@ -354,10 +351,19 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
       tradeHistory: updatedHistory,
       balances: (balancesChanged ? updatedBalances : state.balances).map(asset => {
         const pair = `${asset.symbol}USDT`;
-        const newPrice = priceData[pair];
+        const entry = priceData[pair];
+        if (!entry) return asset;
+        
+        if (typeof entry === 'object') {
+          return {
+            ...asset,
+            price: entry.price,
+            change24h: entry.change24h
+          };
+        }
         return {
           ...asset,
-          price: newPrice || asset.price
+          price: entry
         };
       })
     }));
@@ -448,6 +454,7 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
         if (!baseAsset || baseAsset.available < orderData.amount) return false;
         
         set(s => ({
+          // Fix: Changing order.amount to orderData.amount to fix "Cannot find name 'order'" error.
           balances: s.balances.map(b => b.symbol === base ? { ...b, available: b.available - orderData.amount } : b)
         }));
       }

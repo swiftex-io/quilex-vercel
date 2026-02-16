@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { useExchangeStore } from '../store';
 
@@ -6,7 +7,7 @@ interface MarketsProps {
 }
 
 const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
-  const { balances, marketsActiveTab, setMarketsActiveTab } = useExchangeStore();
+  const { balances, marketsActiveTab, setMarketsActiveTab, favorites, toggleFavorite } = useExchangeStore();
   const [cryptoFilter, setCryptoFilter] = useState('All');
   
   const [currentPage, setCurrentPage] = useState(1);
@@ -19,7 +20,9 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
   const filteredAssets = useMemo(() => {
     let result = [...balances];
     
-    if (cryptoFilter === 'Meme') {
+    if (cryptoFilter === 'Favorites') {
+      result = result.filter(a => favorites.includes(a.symbol));
+    } else if (cryptoFilter === 'Meme') {
       result = result.filter(a => ['DOGE', 'SHIB', 'PEPE'].includes(a.symbol));
     } else if (cryptoFilter === 'AI') {
       result = result.filter(a => ['RNDR', 'NEAR', 'ICP'].includes(a.symbol));
@@ -32,7 +35,7 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
     }
     
     return result;
-  }, [balances, cryptoFilter]);
+  }, [balances, cryptoFilter, favorites]);
 
   const totalPages = Math.ceil(filteredAssets.length / itemsPerPage);
   const paginatedAssets = useMemo(() => {
@@ -168,8 +171,9 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
           <button 
             key={tab.label} 
             disabled={tab.soon}
+            onClick={() => tab.label === 'Favorites' ? setCryptoFilter('Favorites') : setCryptoFilter('All')}
             className={`text-sm font-medium transition-all pb-2 flex items-center gap-2 ${
-              tab.label === 'Crypto' ? 'text-white border-b-2 border-white' : 
+              cryptoFilter === tab.label || (tab.label === 'Crypto' && cryptoFilter !== 'Favorites') ? 'text-white border-b-2 border-white' : 
               tab.soon ? 'text-zinc-700 cursor-not-allowed opacity-60' : 'text-zinc-500 hover:text-white'
             }`}
           >
@@ -210,7 +214,14 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
               <tr key={asset.symbol} onClick={onTrade} className="hover:bg-zinc-900/30 transition-all group cursor-pointer">
                 <td className="px-8 py-5">
                   <div className="flex items-center gap-3 text-left">
-                    <button onClick={(e) => e.stopPropagation()} className="text-zinc-800 hover:text-amber-500 transition-colors"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg></button>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); toggleFavorite(asset.symbol); }} 
+                      className={`transition-colors ${favorites.includes(asset.symbol) ? 'text-[#F1F22D]' : 'text-zinc-800 hover:text-[#F1F22D]'}`}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"/>
+                      </svg>
+                    </button>
                     <img src={`https://assets.coincap.io/assets/icons/${asset.symbol.toLowerCase()}@2x.png`} className="w-8 h-8 rounded-full" alt="" />
                     <div className="flex flex-col">
                       <span className="text-sm font-normal text-white">{asset.symbol}</span>

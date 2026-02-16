@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Page, LayoutType, Notification } from './types';
 import Navbar from './components/Navbar';
@@ -107,18 +108,26 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const simulatePrices = () => {
-      const simulationMap: Record<string, number> = {};
+      const simulationMap: Record<string, { price: number; change24h: number }> = {};
       balancesRef.current.forEach(asset => {
         if (asset.symbol !== 'USDT') {
           const currentPrice = asset.price;
-          const change = 1 + (Math.random() - 0.5) * 0.0008;
-          simulationMap[`${asset.symbol}USDT`] = currentPrice * change;
+          const fluctuation = 1 + (Math.random() - 0.5) * 0.0008;
+          const newPrice = currentPrice * fluctuation;
+          
+          // Slightly simulate 24h change drift
+          const drift = (Math.random() - 0.5) * 0.05;
+          const newChange = asset.change24h + drift;
+          
+          simulationMap[`${asset.symbol}USDT`] = { 
+            price: newPrice, 
+            change24h: newChange 
+          };
         }
       });
-      updatePrices(simulationMap);
+      updatePrices(simulationMap as any);
     };
 
-    // Reduced price update frequency to 5 seconds to minimize lag during development
     const interval = setInterval(simulatePrices, 5000);
     return () => clearInterval(interval);
   }, [updatePrices]);
