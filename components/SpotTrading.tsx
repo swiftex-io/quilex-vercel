@@ -395,8 +395,8 @@ const SpotTrading: React.FC = () => {
             </span>
           </div>
 
-          {/* Additional Stats: 24h Low, High, Vol */}
-          <div className="hidden min-[1200px]:flex items-center gap-7 shrink-0">
+          {/* Additional Stats: 24h Low, High, Vol - Visibility updated to 960px */}
+          <div className="hidden min-[960px]:flex items-center gap-7 shrink-0">
             <div className="flex flex-col">
               <span className="text-[11px] text-zinc-600 font-bold uppercase tracking-tight mb-0.5">24h low</span>
               <span className="text-[12px] text-zinc-200 font-bold tabular-nums">{(livePrice * 0.95).toLocaleString(undefined, { maximumFractionDigits: 1 })}</span>
