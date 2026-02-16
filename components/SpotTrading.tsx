@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import OrderBook from './OrderBook';
 import TradeChart from './TradeChart';
 import { useExchangeStore } from '../store';
+import { Order } from '../types';
 
 const SpotTrading: React.FC = () => {
   const [orderType, setOrderType] = useState<'limit' | 'market' | 'tpsl'>('limit');
@@ -15,6 +16,7 @@ const SpotTrading: React.FC = () => {
   const [pairSearchQuery, setPairSearchQuery] = useState('');
   const [historyTab, setHistoryTab] = useState<'open' | 'history' | 'assets' | 'bots'>('open');
   const [openOrdersSubTab, setOpenOrdersSubTab] = useState<'limit_market' | 'tpsl'>('limit_market');
+  const [historySubTab, setHistorySubTab] = useState<'limit_market' | 'tpsl'>('limit_market');
   const [sidebarTab, setSidebarTab] = useState<'All' | 'Favorites' | 'Meme' | 'L1' | 'AI'>('All');
   
   // Assets Tab States
@@ -28,10 +30,13 @@ const SpotTrading: React.FC = () => {
   const [tpslExecutionType, setTpslExecutionType] = useState<'market' | 'limit'>('market');
   const [isTpslTypeDropdownOpen, setIsTpslTypeDropdownOpen] = useState(false);
   
+  // Modal State for Viewing TP/SL Details
+  const [viewingTPSLOrder, setViewingTPSLOrder] = useState<Order | null>(null);
+  
   const pairSelectorRef = useRef<HTMLDivElement>(null);
   const tpslTypeRef = useRef<HTMLDivElement>(null);
 
-  const { balances, placeOrder, tradeHistory, openOrders, cancelOrder, activePair, setActivePair, favorites, toggleFavorite, user, setDepositModalOpen } = useExchangeStore();
+  const { balances, placeOrder, tradeHistory, openOrders, filledOrders, cancelOrder, activePair, setActivePair, favorites, toggleFavorite, user, setDepositModalOpen } = useExchangeStore();
   
   const [activeBase, activeQuote] = activePair.split('/');
   
@@ -201,6 +206,13 @@ const SpotTrading: React.FC = () => {
     return openOrders.filter(o => o.symbol === activePair && o.type === 'tpsl');
   }, [openOrders, openOrdersSubTab, activePair]);
 
+  const filteredHistoryOrders = useMemo(() => {
+    if (historySubTab === 'limit_market') {
+      return filledOrders.filter(o => o.symbol === activePair && (o.type === 'limit' || o.type === 'market'));
+    }
+    return filledOrders.filter(o => o.symbol === activePair && (o.type === 'tpsl' || o.tpPrice || o.slPrice));
+  }, [filledOrders, historySubTab, activePair]);
+
   const StarIcon = ({ filled, className }: { filled: boolean, className?: string }) => (
     <svg 
       width="15" 
@@ -229,6 +241,56 @@ const SpotTrading: React.FC = () => {
       </div>
     </div>
   );
+
+  // TP/SL Details Modal Component
+  const TPSLModal = ({ order, onClose }: { order: Order; onClose: () => void }) => {
+    const symbol = order.symbol.split('/')[1] || 'USDT';
+    return (
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div className="bg-[#1a1c22] border border-zinc-800 rounded-xl w-full max-w-[440px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="flex items-center justify-between px-6 py-5 border-b border-zinc-800/50">
+            <h3 className="text-lg font-bold text-white tracking-tight uppercase">TP/SL</h3>
+            <button onClick={onClose} className="text-zinc-500 hover:text-white transition-colors">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+          
+          <div className="p-6 space-y-6">
+            <div className="space-y-4">
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-zinc-500 font-medium">TP trigger price</span>
+                <span className="text-white font-black">{order.tpPrice?.toLocaleString() || '--'}</span>
+              </div>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-zinc-500 font-medium">SL trigger price</span>
+                <span className="text-white font-black">{order.slPrice?.toLocaleString() || '--'}</span>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {order.tpPrice && (
+                <div className="bg-[#1e222a] p-4 rounded-xl text-[12px] leading-relaxed text-zinc-400">
+                  When the last price reaches <span className="text-white font-bold">{order.tpPrice} {symbol}</span>, take-profit will be filled at <span className="text-white font-bold">{order.tpPrice} {symbol}</span>, the estimated PNL amount is <span className="text-white font-bold">0 {symbol}</span>, and the PNL rate is <span className="text-white font-bold">0.00%</span>.
+                </div>
+              )}
+              {order.slPrice && (
+                <div className="bg-[#1e222a] p-4 rounded-xl text-[12px] leading-relaxed text-zinc-400">
+                  When the last price reaches <span className="text-white font-bold">{order.slPrice} {symbol}</span>, stop-loss will be filled at <span className="text-white font-bold">{order.slPrice} {symbol}</span>, the estimated PNL amount is <span className="text-white font-bold">0 {symbol}</span>, and the PNL rate is <span className="text-white font-bold">0.00%</span>.
+                </div>
+              )}
+            </div>
+
+            <button 
+              onClick={onClose}
+              className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-full text-sm uppercase tracking-tight shadow-xl transition-all active:scale-[0.98]"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="flex h-[calc(100vh-64px-32px)] bg-black overflow-hidden border-t border-zinc-900">
@@ -526,6 +588,65 @@ const SpotTrading: React.FC = () => {
                         {filteredOpenOrders.length === 0 && (
                           <tr>
                             <td colSpan={openOrdersSubTab === 'tpsl' ? 7 : 6} className="py-20 text-center text-zinc-600 uppercase font-black text-[10px] tracking-widest opacity-20">No active orders</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </>
+                )}
+              </div>
+            ) : historyTab === 'history' ? (
+              <div className="flex flex-col h-full animate-in fade-in duration-300">
+                {!user ? (
+                   <AuthCTA feature="order history" />
+                ) : (
+                  <>
+                    <div className="flex gap-1 p-2 border-b border-zinc-900/50 bg-zinc-950/20 shrink-0">
+                      <button onClick={() => setHistorySubTab('limit_market')} className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all ${historySubTab === 'limit_market' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-custom-400'}`}>Limit | Market</button>
+                      <button onClick={() => setHistorySubTab('tpsl')} className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all ${historySubTab === 'tpsl' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-400'}`}>TP/SL</button>
+                    </div>
+                    <table className="w-full text-[11px] text-left border-separate border-spacing-0">
+                      <thead className="sticky top-0 bg-zinc-950 text-zinc-500 font-normal border-b border-zinc-900 z-10">
+                        <tr>
+                          <th className="px-4 py-3 font-normal">Time</th>
+                          <th className="px-4 py-3 font-normal">Pair / Type</th>
+                          <th className="px-4 py-3 font-normal">Side</th>
+                          <th className="px-4 py-3 font-normal">Price</th>
+                          <th className="px-4 py-3 font-normal">Amount</th>
+                          <th className="px-4 py-3 font-normal">TP/SL</th>
+                          <th className="px-4 py-3 text-right font-normal pr-4">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredHistoryOrders.map((o) => (
+                          <tr key={o.id} className="border-b border-zinc-900/30 hover:bg-zinc-900/20 transition-all group">
+                            <td className="px-4 py-4 text-zinc-500 font-medium">{o.time}</td>
+                            <td className="px-4 py-4"><span className="font-bold text-white uppercase">{o.symbol}</span> <span className="text-[9px] text-zinc-600 uppercase ml-1">{o.type}</span></td>
+                            <td className={`px-4 py-4 font-bold ${o.side === 'buy' ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>{o.side.toUpperCase()}</td>
+                            <td className="px-4 py-4 tabular-nums text-zinc-200 font-bold">{o.price.toLocaleString()}</td>
+                            <td className="px-4 py-4 tabular-nums text-zinc-400 font-medium">{o.amount}</td>
+                            <td className="px-4 py-4">
+                              {(o.tpPrice || o.slPrice) ? (
+                                <button 
+                                  onClick={() => setViewingTPSLOrder(o)}
+                                  className="text-blue-400 hover:text-blue-300 font-black uppercase text-[10px] tracking-tight"
+                                >
+                                  View
+                                </button>
+                              ) : (
+                                <span className="text-zinc-700 font-black">--</span>
+                              )}
+                            </td>
+                            <td className="px-4 py-4 text-right pr-4">
+                               <span className={`text-[10px] font-black uppercase tracking-widest ${o.status === 'filled' ? 'text-[#00d18e]' : 'text-zinc-500'}`}>
+                                 {o.status}
+                               </span>
+                            </td>
+                          </tr>
+                        ))}
+                        {filteredHistoryOrders.length === 0 && (
+                          <tr>
+                            <td colSpan={7} className="py-20 text-center text-zinc-600 uppercase font-black text-[10px] tracking-widest opacity-20">No order records</td>
                           </tr>
                         )}
                       </tbody>
@@ -900,6 +1021,11 @@ const SpotTrading: React.FC = () => {
           </div>
         </div>
       </div>
+      
+      {/* Modal for viewing TP/SL Details */}
+      {viewingTPSLOrder && (
+        <TPSLModal order={viewingTPSLOrder} onClose={() => setViewingTPSLOrder(null)} />
+      )}
     </div>
   );
 };
