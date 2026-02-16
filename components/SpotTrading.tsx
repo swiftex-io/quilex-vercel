@@ -484,7 +484,7 @@ const SpotTrading: React.FC = () => {
 
                 <div className="grid grid-cols-12 px-5 py-2 text-[10px] font-bold text-zinc-500 uppercase tracking-widest border-b border-zinc-800/30">
                   <div className="col-span-8">Pair</div>
-                  <div className="col-span-4 text-right">Price</div>
+                  <div className="col-span-4 text-right Price">Price</div>
                 </div>
 
                 <div className="flex-1 overflow-y-auto custom-scrollbar bg-black/20">
@@ -758,32 +758,83 @@ const SpotTrading: React.FC = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredHistoryOrders.map((o) => (
-                          <tr key={o.id} className={`border-b border-zinc-900/30 hover:bg-zinc-900/20 transition-all group ${o.status === 'canceled' ? 'opacity-40 grayscale-[0.5]' : ''}`}>
-                            <td className="px-4 py-4 text-zinc-500 font-medium tabular-nums">{o.time}</td>
-                            <td className="px-4 py-4"><span className="font-bold text-white uppercase">{o.symbol}</span> <span className="text-[9px] text-zinc-600 uppercase ml-1">{o.type}</span></td>
-                            <td className={`px-4 py-4 font-bold ${o.side === 'buy' ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>{o.side.toUpperCase()}</td>
-                            <td className="px-4 py-4 tabular-nums text-zinc-200 font-bold">{o.price.toLocaleString()}</td>
-                            <td className="px-4 py-4 tabular-nums text-zinc-400 font-medium">{o.amount}</td>
-                            <td className="px-4 py-4">
-                              {o.type === 'tpsl' ? (
-                                <button 
-                                  onClick={() => setViewingTPSLOrder(o)}
-                                  className="text-blue-400 hover:text-blue-300 font-black uppercase text-[10px] tracking-tight"
-                                >
-                                  View
-                                </button>
-                              ) : (
-                                <span className="text-zinc-700 font-black">--</span>
-                              )}
-                            </td>
-                            <td className="px-4 py-4 text-right pr-4">
-                               <span className={`text-[10px] font-black uppercase tracking-widest ${o.status === 'filled' ? 'text-[#00d18e]' : o.status === 'canceled' ? 'text-zinc-500' : 'text-blue-400'}`}>
-                                 {o.status === 'open' ? 'Pending' : o.status}
-                               </span>
-                            </td>
-                          </tr>
-                        ))}
+                        {filteredHistoryOrders.map((o) => {
+                          const isPendingBracket = o.status === 'open' && o.type === 'tpsl' && o.tpPrice && o.slPrice;
+
+                          if (isPendingBracket && historySubTab === 'tpsl') {
+                             return (
+                               <React.Fragment key={o.id}>
+                                 <tr className="border-b border-zinc-900/10 hover:bg-zinc-900/20 transition-all">
+                                   <td rowSpan={2} className="px-4 py-4 text-zinc-500 font-medium tabular-nums border-r border-zinc-900/10">{o.time}</td>
+                                   <td rowSpan={2} className="px-4 py-4 border-r border-zinc-900/10">
+                                      <div className="flex flex-col">
+                                        <span className="font-bold text-white uppercase">{o.symbol}</span>
+                                        <span className="text-[9px] text-zinc-600 font-black uppercase">Bracket</span>
+                                      </div>
+                                   </td>
+                                   <td rowSpan={2} className={`px-4 py-4 font-black border-r border-zinc-900/10 ${o.side === 'buy' ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>
+                                     {o.side.toUpperCase()}
+                                   </td>
+                                   {/* Split Price/Amount for Pending Brackets */}
+                                   <td className="px-4 py-4 text-zinc-300 font-medium tabular-nums">
+                                     <div className="flex items-center gap-2">
+                                       <span className="w-1.5 h-1.5 rounded-full bg-[#00d18e]"></span>
+                                       TP: {o.tpPrice?.toLocaleString()}
+                                     </div>
+                                   </td>
+                                   <td className="px-4 py-4 text-zinc-400 font-medium tabular-nums">{o.amount}</td>
+                                   <td rowSpan={2} className="px-4 py-4 border-l border-r border-zinc-900/10 text-center">
+                                      <button 
+                                        onClick={() => setViewingTPSLOrder(o)}
+                                        className="text-blue-400 hover:text-blue-300 font-black uppercase text-[10px] tracking-tight"
+                                      >
+                                        View
+                                      </button>
+                                   </td>
+                                   <td rowSpan={2} className="px-4 py-4 text-right pr-4">
+                                      <span className="text-[10px] font-black uppercase tracking-widest text-blue-400 animate-pulse">Pending</span>
+                                   </td>
+                                 </tr>
+                                 <tr className="border-b border-zinc-900/30 hover:bg-zinc-900/20 transition-all">
+                                   <td className="px-4 py-4 text-zinc-300 font-medium tabular-nums">
+                                      <div className="flex items-center gap-2">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-[#ff4d4f]"></span>
+                                        SL: {o.slPrice?.toLocaleString()}
+                                      </div>
+                                   </td>
+                                   <td className="px-4 py-4 text-zinc-400 font-medium tabular-nums">{o.amount}</td>
+                                 </tr>
+                               </React.Fragment>
+                             );
+                          }
+
+                          return (
+                            <tr key={o.id} className={`border-b border-zinc-900/30 hover:bg-zinc-900/20 transition-all group ${o.status === 'canceled' ? 'opacity-40 grayscale-[0.5]' : ''}`}>
+                              <td className="px-4 py-4 text-zinc-500 font-medium tabular-nums">{o.time}</td>
+                              <td className="px-4 py-4"><span className="font-bold text-white uppercase">{o.symbol}</span> <span className="text-[9px] text-zinc-600 uppercase ml-1">{o.type}</span></td>
+                              <td className={`px-4 py-4 font-bold ${o.side === 'buy' ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>{o.side.toUpperCase()}</td>
+                              <td className="px-4 py-4 tabular-nums text-zinc-200 font-bold">{o.price.toLocaleString()}</td>
+                              <td className="px-4 py-4 tabular-nums text-zinc-400 font-medium">{o.amount}</td>
+                              <td className="px-4 py-4">
+                                {o.type === 'tpsl' || o.tpPrice || o.slPrice ? (
+                                  <button 
+                                    onClick={() => setViewingTPSLOrder(o)}
+                                    className="text-blue-400 hover:text-blue-300 font-black uppercase text-[10px] tracking-tight"
+                                  >
+                                    View
+                                  </button>
+                                ) : (
+                                  <span className="text-zinc-700 font-black">--</span>
+                                )}
+                              </td>
+                              <td className="px-4 py-4 text-right pr-4">
+                                 <span className={`text-[10px] font-black uppercase tracking-widest ${o.status === 'filled' ? 'text-[#00d18e]' : o.status === 'canceled' ? 'text-zinc-500' : 'text-blue-400'}`}>
+                                   {o.status === 'open' ? 'Pending' : o.status}
+                                 </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
                         {filteredHistoryOrders.length === 0 && (
                           <tr>
                             <td colSpan={7} className="py-20 text-center text-zinc-600 uppercase font-black text-[10px] tracking-widest opacity-20">No order records</td>
