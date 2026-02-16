@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useExchangeStore } from '../store';
 
@@ -162,6 +163,7 @@ const Assets: React.FC = () => {
               <tr>
                 <th className="px-8 py-4">Asset</th>
                 <th className="px-8 py-4">Total Balance</th>
+                <th className="px-8 py-4">Frozen</th>
                 <th className="px-8 py-4">Available</th>
                 <th className="px-8 py-4 text-right">Actions</th>
               </tr>
@@ -176,10 +178,19 @@ const Assets: React.FC = () => {
                       <div className="text-[10px] text-gray-500 font-medium">{asset.name}</div>
                     </div>
                   </td>
-                  <td className="px-8 py-5 font-mono text-xs">{asset.balance.toLocaleString()}</td>
-                  <td className="px-8 py-5 font-mono text-xs text-white">${(asset.balance * asset.price).toLocaleString()}</td>
+                  <td className="px-8 py-5">
+                    <div className="flex flex-col">
+                      <span className="font-mono text-xs text-white">{asset.balance.toLocaleString(undefined, { minimumFractionDigits: 4 })}</span>
+                      <span className="text-[10px] text-gray-500 font-medium mt-0.5">${(asset.balance * asset.price).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    </div>
+                  </td>
+                  <td className="px-8 py-5">
+                    <span className="font-mono text-xs text-zinc-500">{(asset.balance - asset.available).toLocaleString(undefined, { minimumFractionDigits: 4 })}</span>
+                  </td>
+                  <td className="px-8 py-5">
+                    <span className="font-mono text-xs text-white">{asset.available.toLocaleString(undefined, { minimumFractionDigits: 4 })}</span>
+                  </td>
                   <td className="px-8 py-5 text-right">
-                    {/* Synchronized Action Button: 13px, rounded-full */}
                     <button className="px-6 py-1.5 bg-white text-black text-[13px] font-bold rounded-full hover:bg-zinc-200 transition-all shadow-lg">Trade</button>
                   </td>
                 </tr>
