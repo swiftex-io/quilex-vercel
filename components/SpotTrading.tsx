@@ -46,11 +46,12 @@ const SpotTrading: React.FC = () => {
   const quoteBalance = quoteAsset?.available || 0;
   const baseBalance = baseAsset?.available || 0;
 
+  // INITIALIZE Price only when pair or mode changes, NOT every time livePrice ticks
   useEffect(() => {
     if (orderType === 'limit' || (orderType === 'tpsl' && tpslExecutionType === 'limit')) {
       setPriceInput(livePrice.toFixed(2));
     }
-  }, [activePair, orderType, tpslExecutionType, livePrice]);
+  }, [activePair, orderType, tpslExecutionType]); 
 
   useEffect(() => {
     setAmount('');
@@ -674,7 +675,35 @@ const SpotTrading: React.FC = () => {
             )}
 
             <div className="flex items-center border rounded-xl px-3 h-12 group transition-all relative bg-[#111] border-zinc-800 focus-within:border-zinc-400 min-w-0">
-              <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest min-[1500px]:min-w-[60px] min-w-[50px] shrink-0">Price</span>
+              {orderType === 'tpsl' ? (
+                /* DROPDOWN SELECTOR IN TP/SL MODE */
+                <div className="relative h-full flex items-center" ref={tpslTypeRef}>
+                  <div 
+                    onClick={() => setIsTpslTypeDropdownOpen(!isTpslTypeDropdownOpen)}
+                    className="flex items-center gap-1 cursor-pointer min-[1500px]:min-w-[70px] min-w-[60px] text-zinc-500 group-hover:text-zinc-300 transition-colors"
+                  >
+                    <span className="text-[10px] font-black uppercase tracking-widest">{tpslExecutionType}</span>
+                    <svg className={`w-3 h-3 transition-transform ${isTpslTypeDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="m6 9 6 6 6-6"/></svg>
+                  </div>
+                  
+                  {isTpslTypeDropdownOpen && (
+                    <div className="absolute top-full left-0 mt-2 bg-zinc-200 text-black rounded-lg shadow-2xl py-1 z-50 w-24 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                      {['market', 'limit'].map((type) => (
+                        <button 
+                          key={type}
+                          onClick={() => { setTpslExecutionType(type as any); setIsTpslTypeDropdownOpen(false); }}
+                          className={`w-full text-left px-3 py-1.5 text-[10px] font-black uppercase tracking-widest hover:bg-zinc-300 transition-colors ${tpslExecutionType === type ? 'bg-zinc-400/30' : ''}`}
+                        >
+                          {type}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest min-[1500px]:min-w-[60px] min-w-[50px] shrink-0">Price</span>
+              )}
+              
               <input 
                 type="text" 
                 value={(orderType === 'market' || (orderType === 'tpsl' && tpslExecutionType === 'market')) ? 'Market' : priceInput} 
@@ -697,23 +726,58 @@ const SpotTrading: React.FC = () => {
               <span className="text-[11px] font-bold text-zinc-600 shrink-0 uppercase truncate max-w-[40px]">{activeBase}</span>
             </div>
 
+            {/* RESTORED SLIDER UI */}
             <div className="px-1 py-1 relative group/slider">
               <div className="relative h-8 flex items-center">
+                {/* Track Background */}
                 <div className="absolute top-1/2 left-0 right-0 h-1.5 bg-zinc-800 -translate-y-1/2 rounded-full overflow-hidden">
+                   {/* Progress Fill */}
                    <div 
                     className={`h-full transition-all ${side === 'buy' ? 'bg-[#00d18e]' : 'bg-[#ff4d4f]'}`} 
                     style={{ width: `${percent}%` }}
                    />
                 </div>
+                
+                {/* Anchor Dots */}
+                <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 flex justify-between pointer-events-none px-0.5">
+                  {[0, 25, 50, 75, 100].map((dot) => (
+                    <div 
+                      key={dot} 
+                      className={`w-1.5 h-1.5 rounded-full border border-zinc-900 transition-colors ${percent >= dot ? 'bg-white' : 'bg-zinc-600'}`}
+                    />
+                  ))}
+                </div>
+
+                {/* Actual Input Range */}
                 <input 
                   type="range" min="0" max="100" step="1" value={percent}
                   onChange={(e) => handlePercentChange(parseInt(e.target.value))}
                   className="absolute inset-0 w-full h-full bg-transparent appearance-none cursor-pointer z-10 opacity-0"
                 />
-                <div className={`absolute top-1/2 w-4 h-4 rounded-full shadow-lg border-2 border-zinc-900 pointer-events-none -translate-x-1/2 -translate-y-1/2 transition-all bg-white`} style={{ left: `${percent}%` }} />
+
+                {/* Visual Thumb */}
+                <div 
+                  className={`absolute top-1/2 w-4 h-4 rounded-full shadow-lg border-2 border-zinc-900 pointer-events-none -translate-x-1/2 -translate-y-1/2 transition-all bg-white`} 
+                  style={{ left: `${percent}%` }}
+                />
               </div>
+              
+              {/* Percentage Labels */}
               <div className="flex justify-between text-[10px] font-bold text-zinc-500 px-0.5 uppercase tracking-tight -mt-1 select-none">
                 <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+              </div>
+
+              {/* RESTORED QUICK SELECT BUTTONS */}
+              <div className="grid grid-cols-4 gap-2 mt-4">
+                {[25, 50, 75, 100].map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => handlePercentChange(p)}
+                    className="bg-zinc-900/50 border border-white/5 hover:border-white/20 rounded-lg py-1.5 text-[11px] font-bold text-zinc-400 hover:text-white transition-all"
+                  >
+                    {p}%
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -728,51 +792,6 @@ const SpotTrading: React.FC = () => {
               />
               <span className="text-[11px] font-bold text-zinc-600 shrink-0 uppercase truncate max-w-[40px]">{activeQuote}</span>
             </div>
-
-            {/* Finalized TP/SL Section for Limit Orders */}
-            {orderType === 'limit' && (
-              <div className="space-y-3 pt-1">
-                <label className="flex items-center gap-2 cursor-pointer select-none w-fit">
-                  <div className={`w-4 h-4 rounded border transition-all flex items-center justify-center ${showTPSL ? 'bg-white border-white' : 'border-zinc-700 hover:border-zinc-500'}`}>
-                    <input 
-                      type="checkbox" 
-                      checked={showTPSL} 
-                      onChange={(e) => setShowTPSL(e.target.checked)}
-                      className="sr-only" 
-                    />
-                    {showTPSL && <svg className="w-3 h-3 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="m5 13 4 4L19 7"/></svg>}
-                  </div>
-                  <span className="text-[12px] font-bold text-zinc-400 hover:text-zinc-200 transition-colors uppercase tracking-tight">TP/SL</span>
-                </label>
-                
-                {showTPSL && (
-                  <div className="space-y-3 animate-in slide-in-from-top-2 duration-300">
-                    <div className="flex items-center border border-zinc-800 bg-[#111] rounded-xl px-3 h-12 focus-within:border-zinc-400 transition-all">
-                      <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest min-w-[60px] shrink-0">TP Price</span>
-                      <input 
-                        type="number" 
-                        value={tpInput} 
-                        onChange={(e) => setTpInput(e.target.value)} 
-                        placeholder="Take Profit" 
-                        className="flex-1 bg-transparent border-none outline-none text-right text-[13px] font-medium text-white placeholder:text-zinc-700 min-w-0" 
-                      />
-                      <span className="text-[10px] font-bold text-zinc-600 ml-2 uppercase shrink-0">{activeQuote}</span>
-                    </div>
-                    <div className="flex items-center border border-zinc-800 bg-[#111] rounded-xl px-3 h-12 focus-within:border-zinc-400 transition-all">
-                      <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest min-w-[60px] shrink-0">SL Price</span>
-                      <input 
-                        type="number" 
-                        value={slInput} 
-                        onChange={(e) => setSlInput(e.target.value)} 
-                        placeholder="Stop Loss" 
-                        className="flex-1 bg-transparent border-none outline-none text-right text-[13px] font-medium text-white placeholder:text-zinc-700 min-w-0" 
-                      />
-                      <span className="text-[10px] font-bold text-zinc-600 ml-2 uppercase shrink-0">{activeQuote}</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
 
             <div className="mt-6 pt-6 border-t border-zinc-900/50 bg-black shrink-0">
               {user ? (
@@ -793,11 +812,11 @@ const SpotTrading: React.FC = () => {
                 </>
               ) : (
                 <div className="space-y-3 pt-2">
-                  <button className="w-full py-4 apr-badge-glow text-white font-black rounded-full text-[13px] tracking-tight shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                  <button className="w-full py-4 apr-badge-glow text-white font-black rounded-full text-[13px] transition-all flex items-center justify-center gap-2">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 12V22H4V12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H16.5C18.433 7 20 5.433 20 3.5C20 1.567 18.433 0 16.5 0C14.567 0 12 2 12 7ZM12 7H7.5C5.567 7 4 5.433 4 3.5C4 1.567 5.567 0 7.5 0C9.433 0 12 2 12 7Z"/></svg>
                     Sign up to claim $10
                   </button>
-                  <button className="w-full py-4 bg-zinc-800 text-white font-black rounded-full text-[13px] tracking-tight hover:bg-zinc-700 transition-all shadow-lg">
+                  <button className="w-full py-4 bg-zinc-800 text-white font-black rounded-full text-[13px] transition-all hover:bg-zinc-700">
                     Log In
                   </button>
                 </div>
