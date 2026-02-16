@@ -84,7 +84,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
 
         <div className="text-center mb-10">
           <Logo className="h-10 mx-auto mb-6 text-white" />
-          <h2 className="text-3xl font-black mb-2 tracking-tighter">{isLogin ? 'Lintex Login' : 'Create Account'}</h2>
+          <h2 className="text-3xl font-black mb-2 tracking-tighter">{isLogin ? 'Lintex Log In' : 'Create Account'}</h2>
         </div>
 
         <form onSubmit={handleAuth} className="space-y-4">
@@ -146,17 +146,17 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full py-5 bg-white text-black font-black rounded-2xl text-lg hover:scale-[1.02] active:scale-95 transition-all shadow-xl disabled:opacity-50 mt-4 uppercase"
+            className="w-full py-5 bg-white text-black font-black rounded-2xl text-lg hover:scale-[1.02] active:scale-95 transition-all shadow-xl disabled:opacity-50 mt-4"
           >
-            {loading ? 'Working...' : (isLogin ? 'Sign In' : 'Sign Up')}
+            {loading ? 'Working...' : (isLogin ? 'Log In' : 'Sign Up')}
           </button>
         </form>
 
         <div className="mt-8 pt-8 border-t border-white/5 space-y-4">
-          <button onClick={() => setIsLogin(!isLogin)} className="text-[10px] font-black text-gray-500 hover:text-white transition-colors uppercase tracking-widest block w-full text-center">
-            {isLogin ? "Need an account? Sign Up" : "Already have an account? Sign In"}
+          <button onClick={() => setIsLogin(!isLogin)} className="text-[11px] font-bold text-gray-500 hover:text-white transition-colors tracking-tight block w-full text-center">
+            {isLogin ? "Need an account? Sign Up" : "Already have an account? Log In"}
           </button>
-          <button onClick={() => enterAsGuest().then(onClose)} className="w-full py-4 bg-zinc-800 text-gray-400 font-black rounded-2xl text-[10px] hover:bg-zinc-700 transition-all border border-white/5 uppercase tracking-widest">
+          <button onClick={() => enterAsGuest().then(onClose)} className="w-full py-4 bg-zinc-800 text-gray-400 font-bold rounded-2xl text-[11px] hover:bg-zinc-700 transition-all border border-white/5 tracking-tight">
             ⚡ Bypass to Guest Mode (Safe)
           </button>
         </div>

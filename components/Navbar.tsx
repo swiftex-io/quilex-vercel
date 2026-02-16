@@ -508,8 +508,8 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
               <button onClick={() => setShowAuth(true)} className="group px-6 py-2.5 bg-white text-black text-[12px] font-bold tracking-tight rounded-full hover:bg-gray-200 transition-all shadow-xl whitespace-nowrap shrink-0 overflow-hidden">
                 <span className="rolling-text-container">
                   <span className="rolling-text-inner">
-                    <span className="block">Sign in</span>
-                    <span className="block">Sign in</span>
+                    <span className="block">Log In</span>
+                    <span className="block">Log In</span>
                   </span>
                 </span>
               </button>

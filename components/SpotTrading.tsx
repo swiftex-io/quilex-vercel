@@ -218,8 +218,8 @@ const SpotTrading: React.FC = () => {
       </div>
       <h4 className="text-sm font-bold text-white mb-2 tracking-tight">Log in or sign up to view your {feature}</h4>
       <div className="flex gap-3 mt-4">
-        <button className="px-6 py-2 bg-white text-black font-black rounded-full text-[11px] uppercase transition-all hover:bg-zinc-200">Log In</button>
-        <button className="px-6 py-2 bg-zinc-800 text-white font-black rounded-full text-[11px] uppercase transition-all hover:bg-zinc-700">Sign Up</button>
+        <button className="px-6 py-2 bg-white text-black font-black rounded-full text-[11px] transition-all hover:bg-zinc-200">Log In</button>
+        <button className="px-6 py-2 bg-zinc-800 text-white font-black rounded-full text-[11px] transition-all hover:bg-zinc-700">Sign Up</button>
       </div>
     </div>
   );
@@ -793,11 +793,11 @@ const SpotTrading: React.FC = () => {
                 </>
               ) : (
                 <div className="space-y-3 pt-2">
-                  <button className="w-full py-4 apr-badge-glow text-white font-black rounded-full text-[13px] uppercase tracking-tight shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                  <button className="w-full py-4 apr-badge-glow text-white font-black rounded-full text-[13px] tracking-tight shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 12V22H4V12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H16.5C18.433 7 20 5.433 20 3.5C20 1.567 18.433 0 16.5 0C14.567 0 12 2 12 7ZM12 7H7.5C5.567 7 4 5.433 4 3.5C4 1.567 5.567 0 7.5 0C9.433 0 12 2 12 7Z"/></svg>
                     Sign up to claim $10
                   </button>
-                  <button className="w-full py-4 bg-zinc-900/80 text-white font-black rounded-full text-[13px] uppercase tracking-tight hover:bg-zinc-800 transition-all">
+                  <button className="w-full py-4 bg-zinc-800 text-white font-black rounded-full text-[13px] tracking-tight hover:bg-zinc-700 transition-all shadow-lg">
                     Log In
                   </button>
                 </div>
