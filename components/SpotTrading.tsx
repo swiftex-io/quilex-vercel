@@ -264,13 +264,26 @@ const SpotTrading: React.FC = () => {
 
   // TP/SL Details Modal Component
   const TPSLModal = ({ order, onClose }: { order: Order; onClose: () => void }) => {
+    const [isExiting, setIsExiting] = useState(false);
     const symbol = order.symbol.split('/')[1] || 'USDT';
+
+    const handleClose = () => {
+      setIsExiting(true);
+      setTimeout(onClose, 200); // Wait for animation
+    };
+
     return (
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-in fade-in duration-200">
-        <div className="bg-[#1a1c22] border border-zinc-800 rounded-xl w-full max-w-[440px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+      <div 
+        className={`fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm ${isExiting ? 'animate-overlay-out' : 'animate-overlay-in'}`}
+        onClick={handleClose}
+      >
+        <div 
+          className={`bg-[#1a1c22] border border-zinc-800 rounded-xl w-full max-w-[440px] shadow-2xl overflow-hidden ${isExiting ? 'animate-modal-out' : 'animate-modal-in'}`}
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="flex items-center justify-between px-6 py-5 border-b border-zinc-800/50">
             <h3 className="text-lg font-bold text-white tracking-tight uppercase">TP/SL</h3>
-            <button onClick={onClose} className="text-zinc-500 hover:text-white transition-colors">
+            <button onClick={handleClose} className="text-zinc-500 hover:text-white transition-colors">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
             </button>
           </div>
@@ -279,11 +292,11 @@ const SpotTrading: React.FC = () => {
             <div className="space-y-4">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-zinc-500 font-medium">TP trigger price</span>
-                <span className="text-white font-black">{order.tpPrice?.toLocaleString() || '--'}</span>
+                <span className="text-white font-black tabular-nums">{order.tpPrice?.toLocaleString() || '--'}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-zinc-500 font-medium">SL trigger price</span>
-                <span className="text-white font-black">{order.slPrice?.toLocaleString() || '--'}</span>
+                <span className="text-white font-black tabular-nums">{order.slPrice?.toLocaleString() || '--'}</span>
               </div>
             </div>
 
@@ -301,8 +314,8 @@ const SpotTrading: React.FC = () => {
             </div>
 
             <button 
-              onClick={onClose}
-              className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-full text-sm uppercase tracking-tight shadow-xl transition-all active:scale-[0.98]"
+              onClick={handleClose}
+              className="w-full py-3.5 bg-white hover:bg-zinc-200 text-black font-black rounded-full text-sm uppercase tracking-tight shadow-xl transition-all active:scale-[0.98]"
             >
               OK
             </button>
@@ -591,8 +604,8 @@ const SpotTrading: React.FC = () => {
                     <table className="w-full text-[11px] text-left border-separate border-spacing-0">
                       <thead className="sticky top-0 bg-zinc-950 text-zinc-500 font-normal border-b border-zinc-900 z-10">
                         <tr>
-                          <th className="px-4 py-2 font-normal">Pair / Type</th>
-                          <th className="px-4 py-2 font-normal">Side</th>
+                          <th className="px-4 py-2">Pair / Type</th>
+                          <th className="px-4 py-2">Side</th>
                           {openOrdersSubTab === 'tpsl' && <th className="px-4 py-2 font-normal">Trigger condition</th>}
                           <th className="px-4 py-2 font-normal">Price</th>
                           <th className="px-4 py-2 font-normal">Amount</th>
