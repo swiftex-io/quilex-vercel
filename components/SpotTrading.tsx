@@ -60,7 +60,7 @@ const SpotTrading: React.FC = () => {
     setTpInput('');
     setSlInput('');
     setTriggerPrice('');
-    if (orderType === 'tpsl') {
+    if (orderType !== 'limit') {
       setShowTPSL(false);
     }
   }, [side, orderType, activePair]);
@@ -136,8 +136,8 @@ const SpotTrading: React.FC = () => {
     const numAmount = parseFloat(amount);
     if (isNaN(numPrice) || numAmount <= 0) return;
 
-    const tpValue = showTPSL && tpInput ? parseFloat(tpInput) : undefined;
-    const slValue = (orderType === 'tpsl' && triggerPrice) ? parseFloat(triggerPrice) : (showTPSL && slInput ? parseFloat(slInput) : undefined);
+    const tpValue = (orderType === 'limit' && showTPSL && tpInput) ? parseFloat(tpInput) : undefined;
+    const slValue = (orderType === 'tpsl' && triggerPrice) ? parseFloat(triggerPrice) : (orderType === 'limit' && showTPSL && slInput ? parseFloat(slInput) : undefined);
 
     const success = await placeOrder({
       symbol: activePair,
@@ -488,7 +488,7 @@ const SpotTrading: React.FC = () => {
                 ) : (
                   <>
                     <div className="flex gap-1 p-2 border-b border-zinc-900/50 bg-zinc-950/20 shrink-0">
-                      <button onClick={() => setOpenOrdersSubTab('limit_market')} className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all ${openOrdersSubTab === 'limit_market' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-400'}`}>Limit | Market</button>
+                      <button onClick={() => setOpenOrdersSubTab('limit_market')} className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all ${openOrdersSubTab === 'limit_market' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-custom-400'}`}>Limit | Market</button>
                       <button onClick={() => setOpenOrdersSubTab('tpsl')} className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all ${openOrdersSubTab === 'tpsl' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-400'}`}>TP/SL</button>
                     </div>
                     <table className="w-full text-[11px] text-left border-separate border-spacing-0">
@@ -617,7 +617,7 @@ const SpotTrading: React.FC = () => {
                 ) : (
                   <div className="flex flex-col items-center justify-center py-20 text-zinc-600 text-center animate-in fade-in duration-300">
                     <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.5" className="mb-4 opacity-10">
-                      <path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/>
+                      <path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2M20 14h2" /><path d="M15 13v2M9 13v2"/>
                     </svg>
                     <span className="text-[11px] font-black tracking-widest uppercase mb-6 opacity-30">No active bots found</span>
                     <button className="px-8 py-2.5 bg-zinc-900 text-white font-black rounded-full text-[12px] uppercase hover:bg-zinc-800 transition-all border border-white/5">Create Trading Bot</button>
@@ -817,6 +817,52 @@ const SpotTrading: React.FC = () => {
               />
               <span className="text-[11px] font-bold text-zinc-600 shrink-0 uppercase truncate max-w-[40px]">{activeQuote}</span>
             </div>
+
+            {/* TP/SL Toggle Row (OKX Style) - ONLY in Limit Tab */}
+            {orderType === 'limit' && (
+              <div className="flex items-center gap-2 mt-2 px-1">
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <div className={`w-3.5 h-3.5 rounded border transition-all flex items-center justify-center ${showTPSL ? 'bg-white border-white' : 'border-zinc-700 group-hover:border-zinc-500'}`}>
+                    <input 
+                      type="checkbox" 
+                      className="hidden" 
+                      checked={showTPSL} 
+                      onChange={() => setShowTPSL(!showTPSL)} 
+                    />
+                    {showTPSL && <svg className="w-2.5 h-2.5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="m5 13 4 4L19 7"/></svg>}
+                  </div>
+                  <span className="text-[11px] font-bold text-zinc-500 group-hover:text-zinc-300 transition-colors uppercase tracking-tight">TP/SL</span>
+                </label>
+              </div>
+            )}
+
+            {/* Conditional TP/SL Inputs - ONLY in Limit Tab when enabled */}
+            {orderType === 'limit' && showTPSL && (
+              <div className="space-y-4 mt-2 animate-in fade-in slide-in-from-top-1 duration-200">
+                <div className="flex items-center border border-zinc-800 bg-[#111] rounded-xl px-3 h-12 focus-within:border-zinc-500 transition-all min-w-0">
+                  <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest min-[1500px]:min-w-[60px] min-w-[50px] shrink-0">TP</span>
+                  <input 
+                    type="number" 
+                    value={tpInput}
+                    onChange={(e) => setTpInput(e.target.value)}
+                    placeholder="Take profit price"
+                    className="flex-1 bg-transparent border-none outline-none text-right text-[14px] font-medium text-white pr-2 placeholder:text-zinc-700 min-w-0" 
+                  />
+                  <span className="text-[11px] font-bold text-zinc-600 shrink-0 uppercase truncate max-w-[40px]">{activeQuote}</span>
+                </div>
+                <div className="flex items-center border border-zinc-800 bg-[#111] rounded-xl px-3 h-12 focus-within:border-zinc-500 transition-all min-w-0">
+                  <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest min-[1500px]:min-w-[60px] min-w-[50px] shrink-0">SL</span>
+                  <input 
+                    type="number" 
+                    value={slInput}
+                    onChange={(e) => setSlInput(e.target.value)}
+                    placeholder="Stop loss price"
+                    className="flex-1 bg-transparent border-none outline-none text-right text-[14px] font-medium text-white pr-2 placeholder:text-zinc-700 min-w-0" 
+                  />
+                  <span className="text-[11px] font-bold text-zinc-600 shrink-0 uppercase truncate max-w-[40px]">{activeQuote}</span>
+                </div>
+              </div>
+            )}
 
             <div className="mt-6 pt-6 border-t border-zinc-900/50 bg-black shrink-0">
               {user ? (
