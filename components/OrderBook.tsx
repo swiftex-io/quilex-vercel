@@ -46,8 +46,8 @@ const OrderBook: React.FC<OrderBookProps> = ({ currentPrice = 65432.50 }) => {
   }, []);
 
   const visibleRows = useMemo(() => {
-    if (viewMode === 'mixed') return isLargeScreen ? 20 : 11;
-    return isLargeScreen ? 40 : 22;
+    if (viewMode === 'mixed') return isLargeScreen ? 20 : 10;
+    return isLargeScreen ? 40 : 20;
   }, [viewMode, isLargeScreen]);
 
   // Initialize data
