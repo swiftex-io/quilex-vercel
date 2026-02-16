@@ -556,6 +556,7 @@ const SpotTrading: React.FC = () => {
                         <th className="px-4 py-3 font-normal">
                           <span className="border-b border-dotted border-zinc-800 inline-flex items-center gap-1 cursor-help">Balance <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M7 11l5 5 5-5M7 13l5 5 5-5"/></svg></span>
                         </th>
+                        <th className="px-4 py-3 font-normal">Frozen</th>
                         <th className="px-4 py-3 font-normal">
                           <span className="border-b border-dotted border-zinc-800 inline-flex items-center gap-1 cursor-help">Cost price</span>
                         </th>
@@ -587,6 +588,9 @@ const SpotTrading: React.FC = () => {
                             </td>
                             <td className="px-4 py-4 tabular-nums text-zinc-400 font-medium">
                               {asset.balance.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 })}
+                            </td>
+                            <td className="px-4 py-4 tabular-nums text-zinc-500 font-medium">
+                              {(asset.balance - asset.available).toLocaleString(undefined, { minimumFractionDigits: 4 })}
                             </td>
                             <td className="px-4 py-4 tabular-nums text-zinc-500">
                               {mockCostPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}
