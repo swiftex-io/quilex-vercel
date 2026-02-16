@@ -41,7 +41,7 @@ const SpotTrading: React.FC = () => {
   const [activeBase, activeQuote] = activePair.split('/');
   
   const baseAsset = balances.find(b => b.symbol === activeBase);
-  const quoteAsset = balances.find(b => b.symbol === quoteAsset);
+  const quoteAsset = balances.find(b => b.symbol === activeQuote);
   
   const livePrice = baseAsset?.price || 0;
   const priceChange = baseAsset?.change24h || 0;
@@ -198,6 +198,26 @@ const SpotTrading: React.FC = () => {
     setActivePair(`${symbol}/USDT`);
     setIsPairSelectorOpen(false);
   };
+
+  // Subtab Counts for Open Orders
+  const openLimitMarketCount = useMemo(() => 
+    openOrders.filter(o => o.symbol === activePair && (o.type === 'limit' || o.type === 'market')).length,
+    [openOrders, activePair]
+  );
+  const openTPSLCount = useMemo(() => 
+    openOrders.filter(o => o.symbol === activePair && o.type === 'tpsl').length,
+    [openOrders, activePair]
+  );
+
+  // Subtab Counts for History
+  const historyLimitMarketCount = useMemo(() => 
+    filledOrders.filter(o => o.symbol === activePair && (o.type === 'limit' || o.type === 'market')).length,
+    [filledOrders, activePair]
+  );
+  const historyTPSLCount = useMemo(() => 
+    filledOrders.filter(o => o.symbol === activePair && (o.type === 'tpsl' || o.tpPrice || o.slPrice)).length,
+    [filledOrders, activePair]
+  );
 
   const filteredOpenOrders = useMemo(() => {
     if (openOrdersSubTab === 'limit_market') {
@@ -550,8 +570,14 @@ const SpotTrading: React.FC = () => {
                 ) : (
                   <>
                     <div className="flex gap-1 p-2 border-b border-zinc-900/50 bg-zinc-950/20 shrink-0">
-                      <button onClick={() => setOpenOrdersSubTab('limit_market')} className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all ${openOrdersSubTab === 'limit_market' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-custom-400'}`}>Limit | Market</button>
-                      <button onClick={() => setOpenOrdersSubTab('tpsl')} className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all ${openOrdersSubTab === 'tpsl' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-400'}`}>TP/SL</button>
+                      <button onClick={() => setOpenOrdersSubTab('limit_market')} className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all flex items-center gap-2 ${openOrdersSubTab === 'limit_market' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-custom-400'}`}>
+                        Limit | Market
+                        <span className="w-4 h-4 bg-white text-black rounded-full flex items-center justify-center text-[9px] font-black">{openLimitMarketCount}</span>
+                      </button>
+                      <button onClick={() => setOpenOrdersSubTab('tpsl')} className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all flex items-center gap-2 ${openOrdersSubTab === 'tpsl' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-400'}`}>
+                        TP/SL
+                        <span className="w-4 h-4 bg-white text-black rounded-full flex items-center justify-center text-[9px] font-black">{openTPSLCount}</span>
+                      </button>
                     </div>
                     <table className="w-full text-[11px] text-left border-separate border-spacing-0">
                       <thead className="sticky top-0 bg-zinc-950 text-zinc-500 font-normal border-b border-zinc-900 z-10">
@@ -615,8 +641,14 @@ const SpotTrading: React.FC = () => {
                 ) : (
                   <>
                     <div className="flex gap-1 p-2 border-b border-zinc-900/50 bg-zinc-950/20 shrink-0">
-                      <button onClick={() => setHistorySubTab('limit_market')} className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all ${historySubTab === 'limit_market' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-custom-400'}`}>Limit | Market</button>
-                      <button onClick={() => setHistorySubTab('tpsl')} className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all ${historySubTab === 'tpsl' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-400'}`}>TP/SL</button>
+                      <button onClick={() => setHistorySubTab('limit_market')} className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all flex items-center gap-2 ${historySubTab === 'limit_market' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-custom-400'}`}>
+                        Limit | Market
+                        <span className="w-4 h-4 bg-white text-black rounded-full flex items-center justify-center text-[9px] font-black">{historyLimitMarketCount}</span>
+                      </button>
+                      <button onClick={() => setHistorySubTab('tpsl')} className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all flex items-center gap-2 ${historySubTab === 'tpsl' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-400'}`}>
+                        TP/SL
+                        <span className="w-4 h-4 bg-white text-black rounded-full flex items-center justify-center text-[9px] font-black">{historyTPSLCount}</span>
+                      </button>
                     </div>
                     <table className="w-full text-[11px] text-left border-separate border-spacing-0">
                       <thead className="sticky top-0 bg-zinc-950 text-zinc-500 font-normal border-b border-zinc-900 z-10">
