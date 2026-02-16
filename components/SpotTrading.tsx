@@ -41,7 +41,7 @@ const SpotTrading: React.FC = () => {
   const [activeBase, activeQuote] = activePair.split('/');
   
   const baseAsset = balances.find(b => b.symbol === activeBase);
-  const quoteAsset = balances.find(b => b.symbol === activeQuote);
+  const quoteAsset = balances.find(b => b.symbol === quoteAsset);
   
   const livePrice = baseAsset?.price || 0;
   const priceChange = baseAsset?.change24h || 0;
@@ -562,6 +562,7 @@ const SpotTrading: React.FC = () => {
                           <th className="px-4 py-2">Price</th>
                           <th className="px-4 py-2">Amount</th>
                           <th className="px-4 py-2">Filled</th>
+                          <th className="px-4 py-3 font-normal">TP/SL</th>
                           <th className="px-4 py-2 text-right">Action</th>
                         </tr>
                       </thead>
@@ -582,12 +583,24 @@ const SpotTrading: React.FC = () => {
                                  <div className="h-full bg-[#00d18e]" style={{ width: `${(o.filled / o.amount) * 100}%` }}></div>
                                </div>
                             </td>
+                            <td className="px-4 py-3">
+                              {(o.tpPrice || o.slPrice) ? (
+                                <button 
+                                  onClick={() => setViewingTPSLOrder(o)}
+                                  className="text-blue-400 hover:text-blue-300 font-black uppercase text-[10px] tracking-tight"
+                                >
+                                  View
+                                </button>
+                              ) : (
+                                <span className="text-zinc-700 font-black">--</span>
+                              )}
+                            </td>
                             <td className="px-4 py-3 text-right"><button onClick={() => cancelOrder(o.id)} className="text-[10px] font-bold text-red-400 hover:text-red-300 uppercase">Cancel</button></td>
                           </tr>
                         ))}
                         {filteredOpenOrders.length === 0 && (
                           <tr>
-                            <td colSpan={openOrdersSubTab === 'tpsl' ? 7 : 6} className="py-20 text-center text-zinc-600 uppercase font-black text-[10px] tracking-widest opacity-20">No active orders</td>
+                            <td colSpan={openOrdersSubTab === 'tpsl' ? 8 : 7} className="py-20 text-center text-zinc-600 uppercase font-black text-[10px] tracking-widest opacity-20">No active orders</td>
                           </tr>
                         )}
                       </tbody>
