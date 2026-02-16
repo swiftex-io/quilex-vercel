@@ -312,6 +312,15 @@ const SpotTrading: React.FC = () => {
     );
   };
 
+  const SubTabCounter = ({ count }: { count: number }) => {
+    if (count <= 0) return null;
+    return (
+      <span className="w-4 h-4 bg-white text-black rounded-full flex items-center justify-center text-[9px] font-black leading-none pt-[0.5px]">
+        {count}
+      </span>
+    );
+  };
+
   return (
     <div className="flex h-[calc(100vh-64px-32px)] bg-black overflow-hidden border-t border-zinc-900">
       
@@ -572,38 +581,38 @@ const SpotTrading: React.FC = () => {
                     <div className="flex gap-1 p-2 border-b border-zinc-900/50 bg-zinc-950/20 shrink-0">
                       <button onClick={() => setOpenOrdersSubTab('limit_market')} className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all flex items-center gap-2 ${openOrdersSubTab === 'limit_market' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-custom-400'}`}>
                         Limit | Market
-                        <span className="w-4 h-4 bg-white text-black rounded-full flex items-center justify-center text-[9px] font-black">{openLimitMarketCount}</span>
+                        <SubTabCounter count={openLimitMarketCount} />
                       </button>
                       <button onClick={() => setOpenOrdersSubTab('tpsl')} className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all flex items-center gap-2 ${openOrdersSubTab === 'tpsl' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-400'}`}>
                         TP/SL
-                        <span className="w-4 h-4 bg-white text-black rounded-full flex items-center justify-center text-[9px] font-black">{openTPSLCount}</span>
+                        <SubTabCounter count={openTPSLCount} />
                       </button>
                     </div>
                     <table className="w-full text-[11px] text-left border-separate border-spacing-0">
                       <thead className="sticky top-0 bg-zinc-950 text-zinc-500 font-normal border-b border-zinc-900 z-10">
                         <tr>
-                          <th className="px-4 py-2">Pair / Type</th>
-                          <th className="px-4 py-2">Side</th>
-                          {openOrdersSubTab === 'tpsl' && <th className="px-4 py-2">Trigger condition</th>}
-                          <th className="px-4 py-2">Price</th>
-                          <th className="px-4 py-2">Amount</th>
-                          <th className="px-4 py-2">Filled</th>
+                          <th className="px-4 py-2 font-normal">Pair / Type</th>
+                          <th className="px-4 py-2 font-normal">Side</th>
+                          {openOrdersSubTab === 'tpsl' && <th className="px-4 py-2 font-normal">Trigger condition</th>}
+                          <th className="px-4 py-2 font-normal">Price</th>
+                          <th className="px-4 py-2 font-normal">Amount</th>
+                          <th className="px-4 py-2 font-normal">Filled</th>
                           <th className="px-4 py-3 font-normal">TP/SL</th>
-                          <th className="px-4 py-2 text-right">Action</th>
+                          <th className="px-4 py-2 text-right font-normal">Action</th>
                         </tr>
                       </thead>
                       <tbody>
                         {filteredOpenOrders.map((o) => (
                           <tr key={o.id} className="border-b border-zinc-900/30 hover:bg-zinc-900/20 transition-all">
-                            <td className="px-4 py-3"><span className="font-bold text-white">{o.symbol}</span> <span className="text-zinc-600 text-[9px] uppercase">{o.type}</span></td>
+                            <td className="px-4 py-3 font-medium"><span className="font-bold text-white">{o.symbol}</span> <span className="text-zinc-600 text-[9px] uppercase">{o.type}</span></td>
                             <td className={`px-4 py-3 font-bold ${o.side === 'buy' ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>{o.side.toUpperCase()}</td>
                             {openOrdersSubTab === 'tpsl' && (
                               <td className="px-4 py-3 text-zinc-400 font-medium whitespace-nowrap">
                                 Last price {o.side === 'buy' ? '>=' : '<='} {o.slPrice?.toLocaleString()}
                               </td>
                             )}
-                            <td className="px-4 py-3 text-zinc-300 font-medium">{o.price.toLocaleString()}</td>
-                            <td className="px-4 py-3 text-zinc-300 font-medium">{o.amount}</td>
+                            <td className="px-4 py-3 text-zinc-300 font-medium tabular-nums">{o.price.toLocaleString()}</td>
+                            <td className="px-4 py-3 text-zinc-300 font-medium tabular-nums">{o.amount}</td>
                             <td className="px-4 py-3">
                                <div className="w-16 h-1 bg-zinc-800 rounded-full overflow-hidden">
                                  <div className="h-full bg-[#00d18e]" style={{ width: `${(o.filled / o.amount) * 100}%` }}></div>
@@ -643,11 +652,11 @@ const SpotTrading: React.FC = () => {
                     <div className="flex gap-1 p-2 border-b border-zinc-900/50 bg-zinc-950/20 shrink-0">
                       <button onClick={() => setHistorySubTab('limit_market')} className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all flex items-center gap-2 ${historySubTab === 'limit_market' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-custom-400'}`}>
                         Limit | Market
-                        <span className="w-4 h-4 bg-white text-black rounded-full flex items-center justify-center text-[9px] font-black">{historyLimitMarketCount}</span>
+                        <SubTabCounter count={historyLimitMarketCount} />
                       </button>
                       <button onClick={() => setHistorySubTab('tpsl')} className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all flex items-center gap-2 ${historySubTab === 'tpsl' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-400'}`}>
                         TP/SL
-                        <span className="w-4 h-4 bg-white text-black rounded-full flex items-center justify-center text-[9px] font-black">{historyTPSLCount}</span>
+                        <SubTabCounter count={historyTPSLCount} />
                       </button>
                     </div>
                     <table className="w-full text-[11px] text-left border-separate border-spacing-0">
@@ -665,7 +674,7 @@ const SpotTrading: React.FC = () => {
                       <tbody>
                         {filteredHistoryOrders.map((o) => (
                           <tr key={o.id} className="border-b border-zinc-900/30 hover:bg-zinc-900/20 transition-all group">
-                            <td className="px-4 py-4 text-zinc-500 font-medium">{o.time}</td>
+                            <td className="px-4 py-4 text-zinc-500 font-medium tabular-nums">{o.time}</td>
                             <td className="px-4 py-4"><span className="font-bold text-white uppercase">{o.symbol}</span> <span className="text-[9px] text-zinc-600 uppercase ml-1">{o.type}</span></td>
                             <td className={`px-4 py-4 font-bold ${o.side === 'buy' ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>{o.side.toUpperCase()}</td>
                             <td className="px-4 py-4 tabular-nums text-zinc-200 font-bold">{o.price.toLocaleString()}</td>
@@ -811,10 +820,10 @@ const SpotTrading: React.FC = () => {
                     <tbody>
                       {tradeHistory.filter(t => t.pair === activePair).map((t) => (
                         <tr key={t.id} className="border-b border-zinc-900/30">
-                          <td className="px-4 py-1.5 text-zinc-500 font-medium">{t.time}</td>
+                          <td className="px-4 py-1.5 text-zinc-500 font-medium tabular-nums">{t.time}</td>
                           <td className={`px-4 py-1.5 font-normal ${t.type === 'buy' ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>{t.type === 'buy' ? 'Buy' : 'Sell'}</td>
-                          <td className="px-4 py-1.5 text-zinc-300 font-medium">{t.price.toLocaleString()}</td>
-                          <td className="px-4 py-1.5 text-right text-zinc-500 font-medium">{t.amount}</td>
+                          <td className="px-4 py-1.5 text-zinc-300 font-medium tabular-nums">{t.price.toLocaleString()}</td>
+                          <td className="px-4 py-1.5 text-right text-zinc-500 font-medium tabular-nums">{t.amount}</td>
                         </tr>
                       ))}
                       {tradeHistory.filter(t => t.pair === activePair).length === 0 && (
