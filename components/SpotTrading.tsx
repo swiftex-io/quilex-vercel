@@ -218,13 +218,13 @@ const SpotTrading: React.FC = () => {
     [openOrders, activePair]
   );
 
-  // Subtab Counts for History
+  // Subtab Counts for History (Refined to split by type)
   const historyLimitMarketCount = useMemo(() => 
     filledOrders.filter(o => o.symbol === activePair && (o.type === 'limit' || o.type === 'market')).length,
     [filledOrders, activePair]
   );
   const historyTPSLCount = useMemo(() => 
-    filledOrders.filter(o => o.symbol === activePair && (o.type === 'tpsl' || o.tpPrice || o.slPrice)).length,
+    filledOrders.filter(o => o.symbol === activePair && o.type === 'tpsl').length,
     [filledOrders, activePair]
   );
 
@@ -239,7 +239,8 @@ const SpotTrading: React.FC = () => {
     if (historySubTab === 'limit_market') {
       return filledOrders.filter(o => o.symbol === activePair && (o.type === 'limit' || o.type === 'market'));
     }
-    return filledOrders.filter(o => o.symbol === activePair && (o.type === 'tpsl' || o.tpPrice || o.slPrice));
+    // Only show real trigger orders (type 'tpsl') in the history subtab
+    return filledOrders.filter(o => o.symbol === activePair && o.type === 'tpsl');
   }, [filledOrders, historySubTab, activePair]);
 
   const StarIcon = ({ filled, className }: { filled: boolean, className?: string }) => (
@@ -757,7 +758,7 @@ const SpotTrading: React.FC = () => {
                             <td className="px-4 py-4 tabular-nums text-zinc-200 font-bold">{o.price.toLocaleString()}</td>
                             <td className="px-4 py-4 tabular-nums text-zinc-400 font-medium">{o.amount}</td>
                             <td className="px-4 py-4">
-                              {(o.tpPrice || o.slPrice) ? (
+                              {o.type === 'tpsl' ? (
                                 <button 
                                   onClick={() => setViewingTPSLOrder(o)}
                                   className="text-blue-400 hover:text-blue-300 font-black uppercase text-[10px] tracking-tight"
@@ -1032,7 +1033,7 @@ const SpotTrading: React.FC = () => {
                 {/* Actual Input Range */}
                 <input 
                   type="range" min="0" max="100" step="1" value={percent}
-                  onChange={(e) => handlePercentChange(parseInt(e.target.value))}
+                  onChange={(e) => setPercent(parseInt(e.target.value))}
                   className="absolute inset-0 w-full h-full bg-transparent appearance-none cursor-pointer z-10 opacity-0"
                 />
 
