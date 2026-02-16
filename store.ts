@@ -225,12 +225,11 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
     const { openOrders, balances, tradeHistory, addNotification } = get();
     const updatedHistory: Trade[] = [...tradeHistory];
     const nextOpenOrders: Order[] = [];
-    const nextFilledOrders: Order[] = [...get().filledOrders];
+    let updatedFilledOrders: Order[] = [...get().filledOrders];
     let balancesChanged = false;
     let updatedBalances = [...balances];
     let playSuccess = false;
 
-    // We use a manual loop to handle dynamic addition of TP/SL orders when a limit order is filled
     openOrders.forEach(order => {
       const baseSymbol = order.symbol.split('/')[0];
       const pairKey = `${baseSymbol}USDT`;
@@ -247,12 +246,10 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
         let triggered = false;
         let triggerType: 'tp' | 'sl' | null = null;
 
-        // If side is 'sell', it means it was an exit for a 'buy' entry
         if (order.side === 'sell') {
           if (order.tpPrice && currentPrice >= order.tpPrice) { triggered = true; triggerType = 'tp'; }
           else if (order.slPrice && currentPrice <= order.slPrice) { triggered = true; triggerType = 'sl'; }
         } else {
-          // Exit for 'sell' entry (order.side is 'buy')
           if (order.tpPrice && currentPrice <= order.tpPrice) { triggered = true; triggerType = 'tp'; }
           else if (order.slPrice && currentPrice >= order.slPrice) { triggered = true; triggerType = 'sl'; }
         }
@@ -271,11 +268,9 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
           const quoteSymbol = order.symbol.split('/')[1];
           updatedBalances = updatedBalances.map(b => {
             if (order.side === 'sell') { 
-              // Closing a BUY entry (Selling BTC for USDT)
               if (b.symbol === baseSymbol) return { ...b, balance: b.balance - order.amount, available: b.available - order.amount };
               if (b.symbol === quoteSymbol) return { ...b, balance: b.balance + (currentPrice * order.amount), available: b.available + (currentPrice * order.amount) };
             } else { 
-              // Closing a SELL entry (Buying BTC back with USDT)
               if (b.symbol === quoteSymbol) return { ...b, balance: b.balance - (currentPrice * order.amount), available: b.available - (currentPrice * order.amount) };
               if (b.symbol === baseSymbol) return { ...b, balance: b.balance + order.amount, available: b.available + order.amount };
             }
@@ -291,9 +286,9 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
             time: new Date().toLocaleTimeString([], { hour12: false })
           });
           
-          // Move to filled orders as history
-          nextFilledOrders.unshift({ ...order, status: 'filled', filled: order.amount, time: new Date().toLocaleTimeString([], { hour12: false }) });
-          return; // Don't add to nextOpenOrders
+          // Update status in history
+          updatedFilledOrders = updatedFilledOrders.map(o => o.id === order.id ? { ...o, status: 'filled', filled: order.amount } : o);
+          return; 
         } else {
           nextOpenOrders.push(order);
           return;
@@ -312,8 +307,8 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
         balancesChanged = true;
         playSuccess = true;
         
-        const filledOrder: Order = { ...order, status: 'filled', filled: order.amount };
-        nextFilledOrders.unshift(filledOrder);
+        // Update history entry status
+        updatedFilledOrders = updatedFilledOrders.map(o => o.id === order.id ? { ...o, status: 'filled', filled: order.amount } : o);
 
         updatedHistory.unshift({
           id: order.id,
@@ -342,14 +337,13 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
           return b;
         });
 
-        // SPECIAL LOGIC: If this order had TP/SL parameters, convert them to a new ACTIVE TP/SL order
         if (order.tpPrice || order.slPrice) {
           const tpslExitOrder: Order = {
             id: `tpsl-exit-${order.id}`,
             symbol: order.symbol,
-            side: order.side === 'buy' ? 'sell' : 'buy', // Exit side is opposite of entry
+            side: order.side === 'buy' ? 'sell' : 'buy',
             type: 'tpsl',
-            price: order.price, // Reference entry price
+            price: order.price,
             amount: order.amount,
             filled: 0,
             status: 'open',
@@ -358,6 +352,8 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
             slPrice: order.slPrice
           };
           nextOpenOrders.push(tpslExitOrder);
+          // Also add protective order to history as Pending
+          updatedFilledOrders.unshift(tpslExitOrder);
           
           addNotification({
             title: 'TP/SL Protection Active',
@@ -374,7 +370,7 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
 
     set((state) => ({
       openOrders: nextOpenOrders,
-      filledOrders: nextFilledOrders,
+      filledOrders: updatedFilledOrders,
       tradeHistory: updatedHistory,
       balances: (balancesChanged ? updatedBalances : state.balances).map(asset => {
         const pair = `${asset.symbol}USDT`;
@@ -400,6 +396,7 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
     const { balances, addNotification } = get();
     const base = orderData.symbol.split('/')[0];
     const quote = orderData.symbol.split('/')[1];
+    const orderId = Math.random().toString(36).substr(2, 9);
 
     if (orderData.type === 'market') {
       const bAsset = balances.find(b => b.symbol === base);
@@ -416,7 +413,7 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
             return b;
           }),
           tradeHistory: [{
-            id: Math.random().toString(36).substr(2, 9),
+            id: orderId,
             pair: orderData.symbol,
             type: 'buy',
             price: orderData.price,
@@ -425,7 +422,7 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
           }, ...s.tradeHistory],
           filledOrders: [{
             ...orderData,
-            id: Math.random().toString(36).substr(2, 9),
+            id: orderId,
             filled: orderData.amount,
             status: 'filled',
             time: new Date().toLocaleTimeString([], { hour12: false })
@@ -442,7 +439,7 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
             return b;
           }),
           tradeHistory: [{
-            id: Math.random().toString(36).substr(2, 9),
+            id: orderId,
             pair: orderData.symbol,
             type: 'sell',
             price: orderData.price,
@@ -451,7 +448,7 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
           }, ...s.tradeHistory],
           filledOrders: [{
             ...orderData,
-            id: Math.random().toString(36).substr(2, 9),
+            id: orderId,
             filled: orderData.amount,
             status: 'filled',
             time: new Date().toLocaleTimeString([], { hour12: false })
@@ -466,7 +463,6 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
         type: 'success'
       });
 
-      // Handle TP/SL for Market Orders
       if (orderData.tpPrice || orderData.slPrice) {
         const tpslExitOrder: Order = {
           id: `tpsl-exit-mkt-${Math.random().toString(36).substr(2, 9)}`,
@@ -481,7 +477,10 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
           tpPrice: orderData.tpPrice,
           slPrice: orderData.slPrice
         };
-        set(s => ({ openOrders: [...s.openOrders, tpslExitOrder] }));
+        set(s => ({ 
+          openOrders: [...s.openOrders, tpslExitOrder],
+          filledOrders: [tpslExitOrder, ...s.filledOrders]
+        }));
       }
 
       return true;
@@ -505,13 +504,16 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
 
       const newOrder: Order = {
         ...orderData,
-        id: Math.random().toString(36).substr(2, 9),
+        id: orderId,
         filled: 0,
         status: 'open',
         time: new Date().toLocaleTimeString([], { hour12: false })
       };
 
-      set(s => ({ openOrders: [...s.openOrders, newOrder] }));
+      set(s => ({ 
+        openOrders: [...s.openOrders, newOrder],
+        filledOrders: [newOrder, ...s.filledOrders]
+      }));
       playAudio(SOUNDS.PLACED);
       addNotification({
         title: 'Order Placed',
@@ -524,14 +526,13 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
   },
 
   cancelOrder: (id) => {
-    const { openOrders, balances, addNotification } = get();
+    const { openOrders, filledOrders, addNotification } = get();
     const order = openOrders.find(o => o.id === id);
     if (!order) return;
 
     const quote = order.symbol.split('/')[1];
     const base = order.symbol.split('/')[0];
 
-    // If it's a regular limit order, return reserved funds
     if (order.type === 'limit') {
       if (order.side === 'buy') {
         const cost = order.price * order.amount;
@@ -544,10 +545,12 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
         }));
       }
     }
-    // If it's a TP/SL order, it doesn't "reserve" additional funds in this prototype (it protects existing position),
-    // so we just remove it from the list.
 
-    set(s => ({ openOrders: s.openOrders.filter(o => o.id !== id) }));
+    set(s => ({ 
+      openOrders: s.openOrders.filter(o => o.id !== id),
+      filledOrders: s.filledOrders.map(o => o.id === id ? { ...o, status: 'canceled' } : o)
+    }));
+    
     addNotification({
       title: 'Order Canceled',
       message: `${order.type === 'tpsl' ? 'TP/SL Protection' : order.side.toUpperCase() + ' ' + order.amount + ' ' + base} canceled.`,

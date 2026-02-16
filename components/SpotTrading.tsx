@@ -741,7 +741,7 @@ const SpotTrading: React.FC = () => {
                       </thead>
                       <tbody>
                         {filteredHistoryOrders.map((o) => (
-                          <tr key={o.id} className="border-b border-zinc-900/30 hover:bg-zinc-900/20 transition-all group">
+                          <tr key={o.id} className={`border-b border-zinc-900/30 hover:bg-zinc-900/20 transition-all group ${o.status === 'canceled' ? 'opacity-40 grayscale-[0.5]' : ''}`}>
                             <td className="px-4 py-4 text-zinc-500 font-medium tabular-nums">{o.time}</td>
                             <td className="px-4 py-4"><span className="font-bold text-white uppercase">{o.symbol}</span> <span className="text-[9px] text-zinc-600 uppercase ml-1">{o.type}</span></td>
                             <td className={`px-4 py-4 font-bold ${o.side === 'buy' ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>{o.side.toUpperCase()}</td>
@@ -760,8 +760,8 @@ const SpotTrading: React.FC = () => {
                               )}
                             </td>
                             <td className="px-4 py-4 text-right pr-4">
-                               <span className={`text-[10px] font-black uppercase tracking-widest ${o.status === 'filled' ? 'text-[#00d18e]' : 'text-zinc-500'}`}>
-                                 {o.status}
+                               <span className={`text-[10px] font-black uppercase tracking-widest ${o.status === 'filled' ? 'text-[#00d18e]' : o.status === 'canceled' ? 'text-zinc-500' : 'text-blue-400'}`}>
+                                 {o.status === 'open' ? 'Pending' : o.status}
                                </span>
                             </td>
                           </tr>
