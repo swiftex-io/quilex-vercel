@@ -52,6 +52,12 @@ const SpotTrading: React.FC = () => {
   const quoteBalance = quoteAsset?.available || 0;
   const baseBalance = baseAsset?.available || 0;
 
+  // Validation: Amount must be provided and greater than 0
+  const isAmountValid = useMemo(() => {
+    const num = parseFloat(amount);
+    return !isNaN(num) && num > 0;
+  }, [amount]);
+
   useEffect(() => {
     if (orderType === 'limit' || (orderType === 'tpsl' && tpslExecutionType === 'limit')) {
       setPriceInput(livePrice.toFixed(2));
@@ -136,10 +142,13 @@ const SpotTrading: React.FC = () => {
   }, []);
 
   const handleTrade = async () => {
+    if (!isAmountValid) return; // Guard clause
+
     const isMarketExecution = orderType === 'market' || (orderType === 'tpsl' && tpslExecutionType === 'market');
     const numPrice = isMarketExecution ? livePrice : parseFloat(priceInput);
     const numAmount = parseFloat(amount);
-    if (isNaN(numPrice) || numAmount <= 0) return;
+    
+    if (isNaN(numPrice)) return;
 
     const tpValue = (orderType === 'limit' && showTPSL && tpInput) ? parseFloat(tpInput) : undefined;
     const slValue = (orderType === 'tpsl' && triggerPrice) ? parseFloat(triggerPrice) : (orderType === 'limit' && showTPSL && slInput ? parseFloat(slInput) : undefined);
@@ -1121,7 +1130,8 @@ const SpotTrading: React.FC = () => {
 
                   <button 
                     onClick={handleTrade}
-                    className={`w-full py-3.5 rounded-2xl font-black text-[14px] uppercase tracking-wider transition-all active:scale-[0.98] shadow-2xl ${
+                    disabled={!isAmountValid}
+                    className={`w-full py-3.5 rounded-2xl font-black text-[14px] uppercase tracking-wider transition-all active:scale-[0.98] shadow-2xl disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed ${
                       side === 'buy' ? 'bg-[#00d18e] hover:bg-[#00e099] text-black' : 'bg-[#ff4d4f] hover:bg-[#ff5c5e] text-white'
                     }`}
                   >
