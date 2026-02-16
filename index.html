@@ -66,7 +66,6 @@
 
         /* 
            PRECISE DROPDOWN ANIMATION
-           Base state: Hidden, slightly moved up.
         */
         .dropdown-container {
             position: absolute !important;
@@ -81,12 +80,30 @@
             will-change: transform, opacity;
         }
 
-        /* Visible state: At the destination. */
         .dropdown-container.is-visible {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
             pointer-events: auto;
+        }
+
+        /* Toast Animations */
+        @keyframes toast-in {
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes toast-out {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+
+        .animate-toast-in {
+            animation: toast-in 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        .animate-toast-out {
+            animation: toast-out 0.3s cubic-bezier(0.4, 0, 1, 1) forwards;
         }
 
         /* Synchronized "Empire" Gradient for Earn Badges */
@@ -109,13 +126,13 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Rolling Text Logic - Snappier & Stable */
+        /* Rolling Text Logic */
         .rolling-text-container {
             display: inline-block;
             position: relative;
             overflow: hidden;
-            height: 16px; /* Restored and adjusted for 12px font */
-            line-height: 16px; /* Restored and adjusted for 12px font */
+            height: 16px;
+            line-height: 16px;
             vertical-align: middle;
         }
 
@@ -128,12 +145,10 @@
             transform: translateY(-50%);
         }
 
-        /* Tabular numbers for all prices */
         .font-mono, [class*="price"], [class*="roi"] {
             font-variant-numeric: tabular-nums;
         }
 
-        /* Search Placeholder Fade In/Out Animation */
         .coin-placeholder-fade {
             animation: coin-placeholder-sequence 3s linear forwards;
         }
@@ -145,7 +160,6 @@
             100% { opacity: 0; transform: translateY(-3px); }
         }
 
-        /* Logo Symbol Animated Gradient Hover */
         .logo-symbol path {
             fill: #605cf4;
             transition: fill 0.3s ease;
@@ -155,7 +169,6 @@
             fill: url(#logo-symbol-gradient);
         }
 
-        /* Easter Egg: Logo Symbol Rotation */
         .logo-symbol-mark {
             transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
             transform-origin: center;

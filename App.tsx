@@ -14,44 +14,65 @@ import { useExchangeStore } from './store';
 
 const NotificationToast: React.FC<{ notification: Notification; onDismiss: (id: string) => void }> = ({ notification, onDismiss }) => {
   const [progress, setProgress] = useState(100);
+  const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
     const startTime = Date.now();
     const duration = 5000;
+    
+    // Timer for the progress bar
     const interval = setInterval(() => {
       const elapsed = Date.now() - startTime;
       const remaining = Math.max(0, 100 - (elapsed / duration) * 100);
       setProgress(remaining);
       if (remaining <= 0) clearInterval(interval);
     }, 10);
-    return () => clearInterval(interval);
+
+    // Auto-trigger exit animation shortly before removal
+    const exitTimer = setTimeout(() => {
+      setIsExiting(true);
+    }, 4700);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(exitTimer);
+    };
   }, []);
+
+  const handleManualDismiss = () => {
+    setIsExiting(true);
+    // Allow time for exit animation
+    setTimeout(() => onDismiss(notification.id), 300);
+  };
 
   const getIcon = () => {
     switch (notification.type) {
-      case 'success': return <div className="w-8 h-8 rounded-full bg-[#00d18e]/10 flex items-center justify-center text-[#00d18e]"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m20 6-11 11-5-5"/></svg></div>;
-      case 'info': return <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></div>;
-      case 'warning': return <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M12 8v4M12 16h.01M22 12A10 10 0 1 1 2 12a10 10 0 0 1 20 0z"/></svg></div>;
+      case 'success': return <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-[#00d18e] shadow-sm"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m20 6-11 11-5-5"/></svg></div>;
+      case 'info': return <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shadow-sm"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></div>;
+      case 'warning': return <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 shadow-sm"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M12 8v4M12 16h.01M22 12A10 10 0 1 1 2 12a10 10 0 0 1 20 0z"/></svg></div>;
       default: return null;
     }
   };
 
   return (
-    <div className="w-80 bg-[#0d0d0d] border border-zinc-800 rounded-xl shadow-[0_24px_48px_rgba(0,0,0,0.5)] overflow-hidden animate-in slide-in-from-right duration-300">
-      <div className="p-4 flex gap-4">
+    <div className={`w-85 bg-white border border-zinc-100 rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.15)] overflow-hidden transition-all ${isExiting ? 'animate-toast-out' : 'animate-toast-in'}`}>
+      <div className="p-5 flex gap-4 items-start">
         {getIcon()}
-        <div className="flex-1">
-          <div className="flex justify-between items-start">
-            <h4 className="text-[13px] font-bold text-white">{notification.title}</h4>
-            <button onClick={() => onDismiss(notification.id)} className="text-zinc-600 hover:text-white transition-colors">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        <div className="flex-1 min-w-0">
+          <div className="flex justify-between items-start mb-1">
+            <h4 className="text-[14px] font-black text-zinc-900 tracking-tight truncate pr-2">{notification.title}</h4>
+            <button onClick={handleManualDismiss} className="text-zinc-300 hover:text-zinc-600 transition-colors p-0.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
             </button>
           </div>
-          <p className="text-[11px] text-zinc-500 font-medium mt-1 leading-relaxed">{notification.message}</p>
+          <p className="text-[12px] text-zinc-500 font-medium leading-relaxed">{notification.message}</p>
         </div>
       </div>
-      <div className="h-0.5 bg-zinc-800 w-full relative">
-        <div className="h-full bg-zinc-500 transition-all ease-linear" style={{ width: `${progress}%` }}></div>
+      <div className="h-1 bg-zinc-50 w-full relative">
+        <div 
+          className="h-full bg-gradient-to-r from-blue-500 to-zinc-400 transition-all ease-linear" 
+          style={{ width: `${progress}%` }}
+        ></div>
       </div>
     </div>
   );
@@ -74,7 +95,6 @@ const App: React.FC = () => {
     balancesRef.current = balances;
   }, [balances]);
 
-  // Handle click outside for footer settings
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (footerSettingsRef.current && !footerSettingsRef.current.contains(event.target as Node)) {
@@ -109,7 +129,6 @@ const App: React.FC = () => {
 
   const layout = getLayoutType(currentPage);
   
-  // Get top 10 assets excluding USDT for the ticker
   const tickerAssets = balances.filter(b => b.symbol !== 'USDT').slice(0, 10);
 
   const renderContent = () => {
@@ -146,7 +165,6 @@ const App: React.FC = () => {
         </div>
         <div className="h-3 w-[1px] bg-zinc-800 shrink-0"></div>
         
-        {/* Top 10 Coins Ticker */}
         <div className="flex items-center gap-1 overflow-hidden select-none h-full">
            {tickerAssets.map((asset) => (
              <button 
@@ -166,7 +184,6 @@ const App: React.FC = () => {
         </div>
       </div>
       
-      {/* Configuration Right */}
       <div className="relative h-full flex items-center" ref={footerSettingsRef}>
         <button 
           onClick={() => setIsFooterSettingsOpen(!isFooterSettingsOpen)}
@@ -215,7 +232,7 @@ const App: React.FC = () => {
 
       {tickerPosition === 'bottom' && TickerStrip}
 
-      {/* Notifications Overlay */}
+      {/* Notifications Overlay - Changed to top center/right for better visibility with down motion */}
       <div className="fixed top-20 right-6 z-[1000] flex flex-col gap-4 pointer-events-none">
         {notifications.map((n) => (
           <div key={n.id} className="pointer-events-auto">
