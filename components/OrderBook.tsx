@@ -38,7 +38,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ currentPrice = 65432.50 }) => {
   // Dynamic visible rows based on view mode and screen size
   useEffect(() => {
     const handleResize = () => {
-      setIsLargeScreen(window.innerWidth >= 1441);
+      setIsLargeScreen(window.innerWidth >= 1500);
     };
     handleResize();
     window.addEventListener('resize', handleResize);
