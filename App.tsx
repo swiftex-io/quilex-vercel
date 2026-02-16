@@ -118,7 +118,8 @@ const App: React.FC = () => {
       updatePrices(simulationMap);
     };
 
-    const interval = setInterval(simulatePrices, 1000);
+    // Reduced price update frequency to 5 seconds to minimize lag during development
+    const interval = setInterval(simulatePrices, 5000);
     return () => clearInterval(interval);
   }, [updatePrices]);
 

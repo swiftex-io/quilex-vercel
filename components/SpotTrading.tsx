@@ -302,8 +302,8 @@ const SpotTrading: React.FC = () => {
       <div className="flex-1 flex flex-col min-0 h-full overflow-hidden border-r border-zinc-900">
         
         {/* Restored Detailed Ticker Header */}
-        <div className="h-[60px] border-b border-zinc-900 flex items-center px-4 gap-12 bg-black shrink-0 relative z-50">
-          <div className="flex items-center gap-4 shrink-0 relative" ref={pairSelectorRef}>
+        <div className="h-[60px] border-b border-zinc-900 flex items-center px-4 gap-7 bg-black shrink-0 relative z-50">
+          <div className="flex items-center gap-3 shrink-0 relative" ref={pairSelectorRef}>
             <div 
               className="flex items-center gap-2 cursor-pointer group select-none" 
               onClick={() => setIsPairSelectorOpen(!isPairSelectorOpen)}
@@ -387,16 +387,16 @@ const SpotTrading: React.FC = () => {
           </div>
 
           <div className="flex flex-col justify-center shrink-0">
-            <span className={`text-[20px] font-black tabular-nums leading-none ${priceChange >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>
+            <span className={`text-[16px] font-black tabular-nums leading-none ${priceChange >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>
               {livePrice.toLocaleString(undefined, { minimumFractionDigits: livePrice < 1 ? 4 : 2 })}
             </span>
-            <span className={`text-[12px] font-bold tabular-nums leading-none mt-1 ${priceChange >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>
+            <span className={`text-[10px] font-bold tabular-nums leading-none mt-1 ${priceChange >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>
               {priceChange >= 0 ? '+' : ''}{absChange.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 3 })} ({priceChange.toFixed(2)}%)
             </span>
           </div>
 
           {/* Additional Stats: 24h Low, High, Vol */}
-          <div className="hidden min-[1200px]:flex items-center gap-10 shrink-0">
+          <div className="hidden min-[1200px]:flex items-center gap-7 shrink-0">
             <div className="flex flex-col">
               <span className="text-[11px] text-zinc-600 font-bold uppercase tracking-tight mb-0.5">24h low</span>
               <span className="text-[12px] text-zinc-200 font-bold tabular-nums">{(livePrice * 0.95).toLocaleString(undefined, { maximumFractionDigits: 1 })}</span>
