@@ -470,7 +470,7 @@ const SpotTrading: React.FC = () => {
         </div>
 
         {/* Sub-Column 2: Order Entry Section */}
-        <div className="w-full min-[1440px]:w-1/2 flex flex-col h-fit min-[1440px]:h-full bg-black min-h-0">
+        <div className="w-full min-[1440px]:w-1/2 flex flex-col h-fit min-[1440px]:h-full bg-black min-w-0">
           {/* Static Header Part of Order Entry */}
           <div className="p-4 pb-0 shrink-0">
             <div className="flex gap-1 p-0.5 bg-zinc-900/50 rounded-lg mb-4">
@@ -485,30 +485,30 @@ const SpotTrading: React.FC = () => {
             </div>
           </div>
 
-          {/* Middle Part: Fields and Slider - Increased space-y-4 for breathing space */}
-          <div className="h-auto min-[1440px]:flex-1 min-[1440px]:overflow-y-auto custom-scrollbar px-4 space-y-4 pt-4 pb-16">
+          {/* Middle Part: Fields and Slider - Constrained horizontal labels for narrow screens */}
+          <div className="h-auto min-[1440px]:flex-1 min-[1440px]:overflow-y-auto custom-scrollbar px-4 space-y-4 pt-4 pb-4">
             {/* Conditional Trigger Price Field for TP/SL tab */}
             {orderType === 'tpsl' && (
-              <div className="flex items-center border border-zinc-800 bg-[#111] rounded-xl px-3 h-12 focus-within:border-zinc-500 transition-all">
-                <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest min-w-[60px] shrink-0">Trigger</span>
+              <div className="flex items-center border border-zinc-800 bg-[#111] rounded-xl px-3 h-12 focus-within:border-zinc-500 transition-all min-w-0">
+                <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest min-[1440px]:min-w-[60px] min-w-[50px] shrink-0">Trigger</span>
                 <input 
                   type="number" 
                   value={triggerPrice}
                   onChange={(e) => setTriggerPrice(e.target.value)}
                   placeholder="Price"
-                  className="flex-1 bg-transparent border-none outline-none text-right text-[14px] font-medium text-white pr-2 placeholder:text-zinc-700" 
+                  className="flex-1 bg-transparent border-none outline-none text-right text-[14px] font-medium text-white pr-2 placeholder:text-zinc-700 min-w-0" 
                 />
-                <span className="text-[11px] font-bold text-zinc-600 shrink-0 uppercase">{activeQuote}</span>
+                <span className="text-[11px] font-bold text-zinc-600 shrink-0 uppercase truncate max-w-[40px]">{activeQuote}</span>
               </div>
             )}
 
-            {/* Price/Order Field - Increased height to h-12 */}
-            <div className="flex items-center border rounded-xl px-3 h-12 group transition-all relative bg-[#111] border-zinc-800 focus-within:border-zinc-400">
+            {/* Price/Order Field */}
+            <div className="flex items-center border rounded-xl px-3 h-12 group transition-all relative bg-[#111] border-zinc-800 focus-within:border-zinc-400 min-w-0">
               {orderType === 'tpsl' ? (
                 <div className="relative shrink-0 flex items-center" ref={tpslTypeRef}>
                   <button 
                     onClick={() => setIsTpslTypeDropdownOpen(!isTpslTypeDropdownOpen)}
-                    className="text-[10px] font-black text-zinc-500 uppercase tracking-widest min-w-[60px] flex items-center gap-1.5 hover:text-zinc-300 transition-colors"
+                    className="text-[10px] font-black text-zinc-500 uppercase tracking-widest min-[1440px]:min-w-[60px] min-w-[50px] flex items-center gap-1.5 hover:text-zinc-300 transition-colors"
                   >
                     {tpslExecutionType} 
                     <svg className={`w-3 h-3 text-zinc-600 transition-transform ${isTpslTypeDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="m6 9 6 6 6-6"/></svg>
@@ -528,7 +528,7 @@ const SpotTrading: React.FC = () => {
                   )}
                 </div>
               ) : (
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest min-w-[60px] shrink-0">Price</span>
+                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest min-[1440px]:min-w-[60px] min-w-[50px] shrink-0">Price</span>
               )}
 
               <input 
@@ -536,27 +536,27 @@ const SpotTrading: React.FC = () => {
                 value={(orderType === 'market' || (orderType === 'tpsl' && tpslExecutionType === 'market')) ? 'Market' : priceInput} 
                 onChange={(e) => handlePriceChange(e.target.value)} 
                 disabled={orderType === 'market' || (orderType === 'tpsl' && tpslExecutionType === 'market')} 
-                className="flex-1 bg-transparent border-none outline-none text-right text-[14px] font-medium text-white pr-2 placeholder:text-zinc-700 disabled:text-zinc-500" 
+                className="flex-1 bg-transparent border-none outline-none text-right text-[14px] font-medium text-white pr-2 placeholder:text-zinc-700 disabled:text-zinc-500 min-w-0" 
               />
-              <span className="text-[11px] font-bold text-zinc-600 shrink-0 uppercase">{activeQuote}</span>
+              <span className="text-[11px] font-bold text-zinc-600 shrink-0 uppercase truncate max-w-[40px]">{activeQuote}</span>
             </div>
 
-            {/* Amount Field - Increased height to h-12 */}
+            {/* Amount Field */}
             {orderType !== 'market' && (
-              <div className="flex items-center border rounded-xl px-3 h-12 group transition-all bg-[#111] border-zinc-800 focus-within:border-zinc-400">
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest min-w-[60px] shrink-0">Amount</span>
+              <div className="flex items-center border rounded-xl px-3 h-12 group transition-all bg-[#111] border-zinc-800 focus-within:border-zinc-400 min-w-0">
+                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest min-[1440px]:min-w-[60px] min-w-[50px] shrink-0">Amount</span>
                 <input 
                   type="number" 
                   value={amount} 
                   placeholder="0.00"
                   onChange={(e) => handleAmountChange(e.target.value)} 
-                  className="flex-1 bg-transparent border-none outline-none text-right text-[14px] font-medium text-white pr-2 placeholder:text-zinc-700" 
+                  className="flex-1 bg-transparent border-none outline-none text-right text-[14px] font-medium text-white pr-2 placeholder:text-zinc-700 min-w-0" 
                 />
-                <span className="text-[11px] font-bold text-zinc-600 shrink-0 uppercase">{activeBase}</span>
+                <span className="text-[11px] font-bold text-zinc-600 shrink-0 uppercase truncate max-w-[40px]">{activeBase}</span>
               </div>
             )}
 
-            {/* Investment Slider - Increased label font sizes */}
+            {/* Investment Slider */}
             <div 
               className="px-1 py-1 relative group/slider"
               onMouseEnter={() => setIsSliderHovered(true)}
@@ -618,20 +618,20 @@ const SpotTrading: React.FC = () => {
                ))}
             </div>
 
-            {/* Total Field - Increased height to h-12 */}
-            <div className={`flex items-center border rounded-xl px-3 h-12 group transition-all bg-[#111] border-zinc-800 focus-within:border-zinc-400`}>
-              <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest min-w-[60px] shrink-0">Total</span>
+            {/* Total Field */}
+            <div className={`flex items-center border rounded-xl px-3 h-12 group transition-all bg-[#111] border-zinc-800 focus-within:border-zinc-400 min-w-0`}>
+              <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest min-[1440px]:min-w-[60px] min-w-[50px] shrink-0">Total</span>
               <input 
                 type="number" 
                 value={total} 
                 placeholder="0.00"
                 onChange={(e) => handleTotalChange(e.target.value)} 
-                className="flex-1 bg-transparent border-none outline-none text-right text-[14px] font-medium text-white pr-2 placeholder:text-zinc-700" 
+                className="flex-1 bg-transparent border-none outline-none text-right text-[14px] font-medium text-white pr-2 placeholder:text-zinc-700 min-w-0" 
               />
-              <span className="text-[11px] font-bold text-zinc-600 shrink-0 uppercase">{activeQuote}</span>
+              <span className="text-[11px] font-bold text-zinc-600 shrink-0 uppercase truncate max-w-[40px]">{activeQuote}</span>
             </div>
 
-            {/* TP/SL Inner Toggle Section - Increased height for sub-inputs to h-11 */}
+            {/* TP/SL Inner Toggle Section */}
             {orderType !== 'tpsl' && (
               <div className="pt-2">
                 <label className="flex items-center gap-3 cursor-pointer group w-fit select-none">
@@ -644,49 +644,49 @@ const SpotTrading: React.FC = () => {
 
                 <div className={`overflow-hidden transition-all duration-300 ease-in-out ${showTPSL ? 'max-h-40 opacity-100 mt-4 space-y-3' : 'max-h-0 opacity-0'}`}>
                   {/* Take Profit Input */}
-                  <div className="flex items-center border border-zinc-800 bg-[#111] rounded-xl px-3 h-11 focus-within:border-zinc-500 transition-all">
-                    <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest min-w-[60px] shrink-0">TP Price</span>
+                  <div className="flex items-center border border-zinc-800 bg-[#111] rounded-xl px-3 h-11 focus-within:border-zinc-500 transition-all min-w-0">
+                    <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest min-[1440px]:min-w-[60px] min-w-[50px] shrink-0">TP Price</span>
                     <input 
                       type="number" 
                       value={tpInput}
                       onChange={(e) => setTpInput(e.target.value)}
                       placeholder="Take Profit"
-                      className="flex-1 bg-transparent border-none outline-none text-right text-[13px] font-medium text-white pr-2 placeholder:text-zinc-700" 
+                      className="flex-1 bg-transparent border-none outline-none text-right text-[13px] font-medium text-white pr-2 placeholder:text-zinc-700 min-w-0" 
                     />
-                    <span className="text-[10px] font-bold text-zinc-600 shrink-0 uppercase">{activeQuote}</span>
+                    <span className="text-[10px] font-bold text-zinc-600 shrink-0 uppercase truncate max-w-[40px]">{activeQuote}</span>
                   </div>
                   {/* Stop Loss Input */}
-                  <div className="flex items-center border border-zinc-800 bg-[#111] rounded-xl px-3 h-11 focus-within:border-zinc-500 transition-all">
-                    <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest min-w-[60px] shrink-0">SL Price</span>
+                  <div className="flex items-center border border-zinc-800 bg-[#111] rounded-xl px-3 h-11 focus-within:border-zinc-500 transition-all min-w-0">
+                    <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest min-[1440px]:min-w-[60px] min-w-[50px] shrink-0">SL Price</span>
                     <input 
                       type="number" 
                       value={slInput}
                       onChange={(e) => setSlInput(e.target.value)}
                       placeholder="Stop Loss"
-                      className="flex-1 bg-transparent border-none outline-none text-right text-[13px] font-medium text-white pr-2 placeholder:text-zinc-700" 
+                      className="flex-1 bg-transparent border-none outline-none text-right text-[10px] font-medium text-white pr-2 placeholder:text-zinc-700 min-w-0" 
                     />
-                    <span className="text-[10px] font-bold text-zinc-600 shrink-0 uppercase">{activeQuote}</span>
+                    <span className="text-[10px] font-bold text-zinc-600 shrink-0 uppercase truncate max-w-[40px]">{activeQuote}</span>
                   </div>
                 </div>
               </div>
             )}
-          </div>
 
-          {/* Fixed Footer Actions Area */}
-          <div className="mt-auto pt-6 p-4 border-t border-zinc-900/50 bg-black shrink-0">
-            <div className="flex justify-between items-center text-[12px] font-normal text-zinc-500 px-1 mb-3">
-              <span>Available</span>
-              <span className="text-zinc-300 font-bold tabular-nums tracking-tight">{side === 'buy' ? `${quoteBalance.toLocaleString()} ${activeQuote}` : `${baseBalance.toFixed(4)} ${activeBase}`}</span>
+            {/* Static Actions Area (follows flow in compact mode, bottom of column in fullscreen) */}
+            <div className="min-[1440px]:mt-auto pt-6 border-t border-zinc-900/50 bg-black shrink-0">
+              <div className="flex justify-between items-center text-[12px] font-normal text-zinc-500 px-1 mb-3">
+                <span>Available</span>
+                <span className="text-zinc-300 font-bold tabular-nums tracking-tight">{side === 'buy' ? `${quoteBalance.toLocaleString()} ${activeQuote}` : `${baseBalance.toFixed(4)} ${activeBase}`}</span>
+              </div>
+
+              <button 
+                onClick={handleTrade}
+                className={`w-full py-3.5 rounded-2xl font-black text-[14px] uppercase tracking-wider transition-all active:scale-[0.98] shadow-2xl ${
+                  side === 'buy' ? 'bg-[#00d18e] hover:bg-[#00e099] text-black' : 'bg-[#ff4d4f] hover:bg-[#ff5c5e] text-white'
+                }`}
+              >
+                {side === 'buy' ? 'Buy' : 'Sell'} {activeBase}
+              </button>
             </div>
-
-            <button 
-              onClick={handleTrade}
-              className={`w-full py-3.5 rounded-2xl font-black text-[14px] uppercase tracking-wider transition-all active:scale-[0.98] shadow-2xl ${
-                side === 'buy' ? 'bg-[#00d18e] hover:bg-[#00e099] text-black' : 'bg-[#ff4d4f] hover:bg-[#ff5c5e] text-white'
-              }`}
-            >
-              {side === 'buy' ? 'Buy' : 'Sell'} {activeBase}
-            </button>
           </div>
         </div>
       </div>
