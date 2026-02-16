@@ -92,7 +92,11 @@ const SpotTrading: React.FC = () => {
     if (!isNaN(effectivePrice) && !isNaN(a)) {
       setTotal((effectivePrice * a).toFixed(2));
       const max = side === 'buy' ? (effectivePrice > 0 ? quoteBalance / effectivePrice : 0) : baseBalance;
-      setPercent(max > 0 ? Math.min(100, Math.round((a / max) * 100)) : 0);
+      if (max > 0) {
+        setPercent(Math.min(100, (a / max) * 100));
+      } else {
+        setPercent(0);
+      }
     } else if (val === '') {
       setTotal('');
       setPercent(0);
@@ -107,7 +111,11 @@ const SpotTrading: React.FC = () => {
       const calculatedAmount = (t / effectivePrice).toFixed(6);
       setAmount(calculatedAmount);
       const maxTotal = side === 'buy' ? quoteBalance : (baseBalance * effectivePrice);
-      setPercent(maxTotal > 0 ? Math.min(100, Math.round((t / maxTotal) * 100)) : 0);
+      if (maxTotal > 0) {
+        setPercent(Math.min(100, (t / maxTotal) * 100));
+      } else {
+        setPercent(0);
+      }
     } else if (val === '') {
       setAmount('');
       setPercent(0);
@@ -1013,9 +1021,9 @@ const SpotTrading: React.FC = () => {
               <div className="relative h-8 flex items-center">
                 {/* Track Background */}
                 <div className="absolute top-1/2 left-0 right-0 h-1.5 bg-zinc-800 -translate-y-1/2 rounded-full overflow-hidden">
-                   {/* Progress Fill */}
+                   {/* Progress Fill - Transitions removed for instantaneous cursor tracking */}
                    <div 
-                    className={`h-full transition-all ${side === 'buy' ? 'bg-[#00d18e]' : 'bg-[#ff4d4f]'}`} 
+                    className={`h-full ${side === 'buy' ? 'bg-[#00d18e]' : 'bg-[#ff4d4f]'}`} 
                     style={{ width: `${percent}%` }}
                    />
                 </div>
@@ -1032,14 +1040,14 @@ const SpotTrading: React.FC = () => {
 
                 {/* Actual Input Range */}
                 <input 
-                  type="range" min="0" max="100" step="1" value={percent}
-                  onChange={(e) => setPercent(parseInt(e.target.value))}
+                  type="range" min="0" max="100" step="any" value={percent}
+                  onChange={(e) => handlePercentChange(parseFloat(e.target.value))}
                   className="absolute inset-0 w-full h-full bg-transparent appearance-none cursor-pointer z-10 opacity-0"
                 />
 
-                {/* Visual Thumb */}
+                {/* Visual Thumb - Transitions removed for instantaneous cursor tracking */}
                 <div 
-                  className={`absolute top-1/2 w-4 h-4 rounded-full shadow-lg border-2 border-zinc-900 pointer-events-none -translate-x-1/2 -translate-y-1/2 transition-all bg-white`} 
+                  className={`absolute top-1/2 w-4 h-4 rounded-full shadow-lg border-2 border-zinc-900 pointer-events-none -translate-x-1/2 -translate-y-1/2 bg-white`} 
                   style={{ left: `${percent}%` }}
                 />
               </div>
