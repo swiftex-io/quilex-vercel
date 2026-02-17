@@ -8,6 +8,9 @@ interface MarketsProps {
 
 const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
   const { balances, marketsActiveTab, setMarketsActiveTab, favorites, toggleFavorite } = useExchangeStore();
+  
+  // Separate main navigation from sub-filters
+  const [mainTab, setMainTab] = useState<'Favorites' | 'Crypto' | 'Spot' | 'Futures'>('Crypto');
   const [cryptoFilter, setCryptoFilter] = useState('All');
   
   const [currentPage, setCurrentPage] = useState(1);
@@ -15,14 +18,18 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [cryptoFilter]);
+  }, [cryptoFilter, mainTab]);
 
   const filteredAssets = useMemo(() => {
     let result = [...balances];
     
-    if (cryptoFilter === 'Favorites') {
+    // 1. Apply Main Tab Filtering
+    if (mainTab === 'Favorites') {
       result = result.filter(a => favorites.includes(a.symbol));
-    } else if (cryptoFilter === 'Meme') {
+    }
+    
+    // 2. Apply Sub-Category Filtering
+    if (cryptoFilter === 'Meme') {
       result = result.filter(a => ['DOGE', 'SHIB', 'PEPE'].includes(a.symbol));
     } else if (cryptoFilter === 'AI') {
       result = result.filter(a => ['RNDR', 'NEAR', 'ICP'].includes(a.symbol));
@@ -35,7 +42,7 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
     }
     
     return result;
-  }, [balances, cryptoFilter, favorites]);
+  }, [balances, cryptoFilter, mainTab, favorites]);
 
   const totalPages = Math.ceil(filteredAssets.length / itemsPerPage);
   const paginatedAssets = useMemo(() => {
@@ -59,6 +66,7 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
 
   const renderMarketsTab = () => (
     <div className="animate-in fade-in duration-500">
+      {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
         <div className="bg-[#111111] p-6 rounded-2xl group transition-all shadow-xl text-left border border-white/5">
           <div className="flex justify-between items-center mb-6">
@@ -80,7 +88,7 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
                   <span className="text-sm font-bold text-white">{asset.symbol}<span className="text-zinc-600">/USDT</span></span>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm font-mono font-bold tracking-tight text-zinc-200">{asset.price.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</div>
+                  <div className="text-sm font-bold tracking-tight text-zinc-200 tabular-nums">{asset.price.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</div>
                   <div className={`text-[11px] font-bold ${asset.change24h >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>{asset.change24h >= 0 ? '+' : ''}{asset.change24h.toFixed(2)}%</div>
                 </div>
               </div>
@@ -104,7 +112,7 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
                   <span className="text-sm font-bold text-white">{item.s}<span className="text-zinc-600">/USDT</span></span>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm font-mono font-bold tracking-tight text-zinc-200">{item.p.toFixed(item.p < 1 ? 5 : 2)}</div>
+                  <div className="text-sm font-bold tracking-tight text-zinc-200 tabular-nums">{item.p.toFixed(item.p < 1 ? 5 : 2)}</div>
                   <div className={`text-[11px] font-bold ${item.c >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>{item.c >= 0 ? '+' : ''}{item.c.toFixed(2)}%</div>
                 </div>
               </div>
@@ -161,30 +169,33 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
         </div>
       </div>
 
-      <div className="flex items-center gap-6 mb-8 overflow-x-auto no-scrollbar border-b border-zinc-900 py-2">
-        {[
-          { label: 'Favorites', soon: false },
-          { label: 'Crypto', soon: false },
-          { label: 'Spot', soon: false },
-          { label: 'Futures', soon: true }
-        ].map(tab => (
-          <button 
-            key={tab.label} 
-            disabled={tab.soon}
-            onClick={() => tab.label === 'Favorites' ? setCryptoFilter('Favorites') : setCryptoFilter('All')}
-            className={`text-sm font-medium transition-all pb-2 flex items-center gap-2 ${
-              cryptoFilter === tab.label || (tab.label === 'Crypto' && cryptoFilter !== 'Favorites') ? 'text-white border-b-2 border-white' : 
-              tab.soon ? 'text-zinc-700 cursor-not-allowed opacity-60' : 'text-zinc-500 hover:text-white'
-            }`}
-          >
-            {tab.label}
-            {tab.soon && (
-              <span className="bg-blue-500/10 text-blue-500 text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Soon</span>
-            )}
-          </button>
-        ))}
+      {/* Main Tabs Section - Fixed Border and Alignment */}
+      <div className="flex items-center gap-8 mb-8 overflow-x-auto no-scrollbar border-b border-zinc-900 pt-2">
+        {(['Favorites', 'Crypto', 'Spot', 'Futures'] as const).map(label => {
+          const isSoon = label === 'Futures';
+          const isActive = mainTab === label;
+          return (
+            <button 
+              key={label} 
+              disabled={isSoon}
+              onClick={() => setMainTab(label)}
+              className={`text-sm font-bold transition-all pb-3 relative flex items-center gap-2 -mb-[1px] ${
+                isActive ? 'text-white' : 
+                isSoon ? 'text-zinc-700 cursor-not-allowed opacity-60' : 'text-zinc-500 hover:text-white'
+              }`}
+            >
+              {label}
+              {isSoon && (
+                <span className="bg-blue-500/10 text-blue-500 text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Soon</span>
+              )}
+              {/* Active Underline connected to border */}
+              {isActive && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white z-10"></div>}
+            </button>
+          );
+        })}
       </div>
 
+      {/* Sub Category Filters */}
       <div className="flex items-center gap-4 mb-6 overflow-x-auto no-scrollbar">
         {['All', 'Top', 'New', 'AI', 'Solana', 'RWA', 'Meme', 'Payment', 'DeFi', 'Layer 1'].map(filter => (
           <button key={filter} onClick={() => setCryptoFilter(filter)} className={`text-[13px] font-medium px-3 py-1.5 rounded-lg transition-all whitespace-nowrap ${cryptoFilter === filter ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>
@@ -196,6 +207,7 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
         </button>
       </div>
 
+      {/* List Table */}
       <div className="bg-zinc-950 border border-white/5 rounded-2xl shadow-2xl overflow-hidden">
         <table className="w-full text-left">
           <thead>
@@ -224,12 +236,14 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
                     </button>
                     <img src={`https://assets.coincap.io/assets/icons/${asset.symbol.toLowerCase()}@2x.png`} className="w-8 h-8 rounded-full" alt="" />
                     <div className="flex flex-col">
-                      <span className="text-sm font-normal text-white">{asset.symbol}</span>
+                      <span className="text-sm font-normal text-white">
+                        {asset.symbol}{mainTab === 'Spot' && <span className="text-zinc-500 font-medium ml-0.5">/USDT</span>}
+                      </span>
                       <span className="text-[10px] text-zinc-600 font-normal uppercase">{asset.name}</span>
                     </div>
                   </div>
                 </td>
-                <td className="px-8 py-5 font-mono text-sm">${asset.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                <td className="px-8 py-5 text-sm tabular-nums font-bold">${asset.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                 <td className={`px-8 py-5 font-normal text-sm ${asset.change24h >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>
                   {asset.change24h >= 0 ? '+' : ''}{asset.change24h.toFixed(2)}%
                 </td>
@@ -249,7 +263,7 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
                     </div>
                   </div>
                 </td>
-                <td className="px-8 py-5 text-sm text-zinc-400 font-normal">${(Math.random() * 500).toFixed(2)}B</td>
+                <td className="px-8 py-5 text-sm text-zinc-400 font-normal tabular-nums">${(Math.random() * 500).toFixed(2)}B</td>
                 <td className="px-8 py-5 text-right">
                   <div className="flex items-center justify-end gap-3">
                     <button onClick={(e) => { e.stopPropagation(); }} className="text-[13px] font-bold text-zinc-500 hover:text-white transition-colors">Details</button>
@@ -347,8 +361,8 @@ const Markets: React.FC<MarketsProps> = ({ onTrade }) => {
                     </div>
                   </div>
                   <div className="col-span-2 text-right">
-                    <div className="text-[12px] font-mono font-bold text-zinc-200">{asset.price > 1000 ? asset.price.toLocaleString(undefined, { maximumFractionDigits: 1 }) : asset.price.toFixed(asset.price < 0.1 ? 4 : 2)}</div>
-                    <div className="text-[9px] text-zinc-700 font-bold">${asset.price.toLocaleString(undefined, { maximumFractionDigits: 2 })}</div>
+                    <div className="text-[12px] font-bold text-zinc-200 tabular-nums">{asset.price > 1000 ? asset.price.toLocaleString(undefined, { maximumFractionDigits: 1 }) : asset.price.toFixed(asset.price < 0.1 ? 4 : 2)}</div>
+                    <div className="text-[9px] text-zinc-700 font-bold tabular-nums">${asset.price.toLocaleString(undefined, { maximumFractionDigits: 2 })}</div>
                   </div>
                   <div className={`col-span-2 text-right text-[12px] font-bold ${asset.change24h >= 0 ? 'text-[#00d18e]' : 'text-[#ff4d4f]'}`}>
                     {asset.change24h >= 0 ? '+' : ''}{asset.change24h.toFixed(2)}%
